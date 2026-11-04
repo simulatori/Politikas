@@ -1,0 +1,1052 @@
+{
+  "schemaVersion": 1,
+  "vintage": "2026-10-24",
+  "sources": {
+    "ask-hicp-2024": {
+      "publisher": "Agjencia e Statistikave të Kosovës",
+      "title": "IHÇK, Dhjetor 2024, tabela 1 dhe 2",
+      "url": "https://askapi.rks-gov.net/Custom/972b64b8-75b2-4816-af65-340940a5ea88.pdf",
+      "accessedOn": "2026-10-24",
+      "frequency": "M; annual means; annual basket",
+      "unit": "2015=100; percent; permille",
+      "methodology": "Official HICP with Lowe-type aggregation and expenditure weights; use the fixed 2024 publication, not conflicting current API base notes.",
+      "status": "historical",
+      "revisions": "Snapshot is a pinned vintage; later releases may revise it. API updated fields are not treated as publication dates.",
+      "proposedUse": "Offline comparison only",
+      "limitations": "Two production sectors do not map to twelve COICOP expenditure divisions. Weights vary by year; do not recreate an official chain index by averaging fixed-base levels.",
+      "license": "ASK PxWeb pages state Copyright: No; retain attribution and snapshot provenance.",
+      "snapshotFile": "hicp-dec2024.pdf",
+      "snapshotSha256": "0dcdb8171f4737fe7650223171aa769ed6d56fd1f6cea2e08549ee4c11d34bd5",
+      "publicationDate": "2025-01-10"
+    },
+    "ask-wages": {
+      "publisher": "Agjencia e Statistikave të Kosovës",
+      "title": "Average Salary in Kosovo (Gross/Net), PxWeb tab01",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Niveli%20i%20Pagave/tab01.px",
+      "accessedOn": "2026-10-24",
+      "frequency": "A",
+      "unit": "EUR/month",
+      "methodology": "Annual average monthly employee salary. Public payroll administrative source; 2024 private/POE data from tax administration, previous years from business register (table notes).",
+      "status": "historical",
+      "revisions": "Snapshot is a pinned vintage; later releases may revise it. API updated fields are not treated as publication dates.",
+      "proposedUse": "Offline comparison only",
+      "limitations": "2024 source break; employees only, not disposable household income. Gross and net must remain separate.",
+      "license": "ASK PxWeb pages state Copyright: No; retain attribution and snapshot provenance.",
+      "snapshotFile": "wages-response.json",
+      "snapshotSha256": "7769b889f06b9b2732ba1f432c6384a4c336e1c41bfdd5534bfc78759ed6a16b",
+      "tableUrl": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Labour%20market__Niveli%20i%20Pagave/tab01.px/"
+    },
+    "ask-labour": {
+      "publisher": "Agjencia e Statistikave të Kosovës",
+      "title": "Main labor market indicators (%), PxWeb tab1b",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Anketa%20e%20Fuqis%C3%AB%20Pun%C3%ABtore/Annual%20labour%20market/tab1b.px",
+      "accessedOn": "2026-10-24",
+      "frequency": "A",
+      "unit": "percent",
+      "methodology": "Labour Force Survey, total sex, ages 15-64. Unemployment is a share of labour force; employment rate and participation use working-age population.",
+      "status": "historical",
+      "revisions": "Snapshot is a pinned vintage; later releases may revise it. API updated fields are not treated as publication dates.",
+      "proposedUse": "Offline comparison only",
+      "limitations": "Survey/revision and demographic denominator changes must be reviewed; employment rate is not 100 minus unemployment.",
+      "license": "ASK PxWeb pages state Copyright: No; retain attribution and snapshot provenance.",
+      "snapshotFile": "labour-response.json",
+      "snapshotSha256": "21676be9b4f28432652b22d7ccda4a60d26bc043dec25cbcb17d6c7ffe3d5351"
+    }
+  },
+  "series": [
+    {
+      "id": "hicp-index",
+      "sourceId": "ask-hicp-2024",
+      "title": "HICP all items",
+      "frequency": "M",
+      "unit": "index",
+      "definition": "hicp-all-items",
+      "scope": "Kosovo, household monetary consumption",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "base": "2015=100",
+      "observations": [
+        {
+          "period": "2022-01",
+          "value": 114.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 1, column 1"
+        },
+        {
+          "period": "2022-02",
+          "value": 115.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 2, column 1"
+        },
+        {
+          "period": "2022-03",
+          "value": 118.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 3, column 1"
+        },
+        {
+          "period": "2022-04",
+          "value": 120.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 4, column 1"
+        },
+        {
+          "period": "2022-05",
+          "value": 121.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 5, column 1"
+        },
+        {
+          "period": "2022-06",
+          "value": 123.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 6, column 1"
+        },
+        {
+          "period": "2022-07",
+          "value": 124.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 7, column 1"
+        },
+        {
+          "period": "2022-08",
+          "value": 124.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 8, column 1"
+        },
+        {
+          "period": "2022-09",
+          "value": 124.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 9, column 1"
+        },
+        {
+          "period": "2022-10",
+          "value": 125.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 10, column 1"
+        },
+        {
+          "period": "2022-11",
+          "value": 125.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 11, column 1"
+        },
+        {
+          "period": "2022-12",
+          "value": 126.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 12, column 1"
+        },
+        {
+          "period": "2023-01",
+          "value": 127.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 1, column 1"
+        },
+        {
+          "period": "2023-02",
+          "value": 127.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 2, column 1"
+        },
+        {
+          "period": "2023-03",
+          "value": 127,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 3, column 1"
+        },
+        {
+          "period": "2023-04",
+          "value": 127,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 4, column 1"
+        },
+        {
+          "period": "2023-05",
+          "value": 126.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 5, column 1"
+        },
+        {
+          "period": "2023-06",
+          "value": 126.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 6, column 1"
+        },
+        {
+          "period": "2023-07",
+          "value": 127.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 7, column 1"
+        },
+        {
+          "period": "2023-08",
+          "value": 128.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 8, column 1"
+        },
+        {
+          "period": "2023-09",
+          "value": 129.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 9, column 1"
+        },
+        {
+          "period": "2023-10",
+          "value": 129.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 10, column 1"
+        },
+        {
+          "period": "2023-11",
+          "value": 129.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 11, column 1"
+        },
+        {
+          "period": "2023-12",
+          "value": 129.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 12, column 1"
+        },
+        {
+          "period": "2024-01",
+          "value": 130.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 1, column 1"
+        },
+        {
+          "period": "2024-02",
+          "value": 130.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 2, column 1"
+        },
+        {
+          "period": "2024-03",
+          "value": 130,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 3, column 1"
+        },
+        {
+          "period": "2024-04",
+          "value": 130.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 4, column 1"
+        },
+        {
+          "period": "2024-05",
+          "value": 129.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 5, column 1"
+        },
+        {
+          "period": "2024-06",
+          "value": 129.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 6, column 1"
+        },
+        {
+          "period": "2024-07",
+          "value": 129.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 7, column 1"
+        },
+        {
+          "period": "2024-08",
+          "value": 130.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 8, column 1"
+        },
+        {
+          "period": "2024-09",
+          "value": 129.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 9, column 1"
+        },
+        {
+          "period": "2024-10",
+          "value": 130,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 10, column 1"
+        },
+        {
+          "period": "2024-11",
+          "value": 130.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 11, column 1"
+        },
+        {
+          "period": "2024-12",
+          "value": 131.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 12, column 1"
+        }
+      ]
+    },
+    {
+      "id": "hicp-monthly",
+      "sourceId": "ask-hicp-2024",
+      "title": "Published HICP month-on-month change",
+      "frequency": "M",
+      "unit": "percent",
+      "definition": "hicp-all-items; change lag 1",
+      "scope": "Kosovo, household monetary consumption",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "observations": [
+        {
+          "period": "2022-01",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 1, column 2"
+        },
+        {
+          "period": "2022-02",
+          "value": 1.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 2, column 2"
+        },
+        {
+          "period": "2022-03",
+          "value": 2.7,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 3, column 2"
+        },
+        {
+          "period": "2022-04",
+          "value": 1.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 4, column 2"
+        },
+        {
+          "period": "2022-05",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 5, column 2"
+        },
+        {
+          "period": "2022-06",
+          "value": 1.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 6, column 2"
+        },
+        {
+          "period": "2022-07",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 7, column 2"
+        },
+        {
+          "period": "2022-08",
+          "value": 0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 8, column 2"
+        },
+        {
+          "period": "2022-09",
+          "value": -0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 9, column 2"
+        },
+        {
+          "period": "2022-10",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 10, column 2"
+        },
+        {
+          "period": "2022-11",
+          "value": 0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 11, column 2"
+        },
+        {
+          "period": "2022-12",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 12, column 2"
+        },
+        {
+          "period": "2023-01",
+          "value": 0.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 1, column 2"
+        },
+        {
+          "period": "2023-02",
+          "value": -0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 2, column 2"
+        },
+        {
+          "period": "2023-03",
+          "value": -0.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 3, column 2"
+        },
+        {
+          "period": "2023-04",
+          "value": 0,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 4, column 2"
+        },
+        {
+          "period": "2023-05",
+          "value": -0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 5, column 2"
+        },
+        {
+          "period": "2023-06",
+          "value": 0,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 6, column 2"
+        },
+        {
+          "period": "2023-07",
+          "value": 0.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 7, column 2"
+        },
+        {
+          "period": "2023-08",
+          "value": 1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 8, column 2"
+        },
+        {
+          "period": "2023-09",
+          "value": 0.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 9, column 2"
+        },
+        {
+          "period": "2023-10",
+          "value": 0,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 10, column 2"
+        },
+        {
+          "period": "2023-11",
+          "value": -0.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 11, column 2"
+        },
+        {
+          "period": "2023-12",
+          "value": 0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 12, column 2"
+        },
+        {
+          "period": "2024-01",
+          "value": 0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 1, column 2"
+        },
+        {
+          "period": "2024-02",
+          "value": 0.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 2, column 2"
+        },
+        {
+          "period": "2024-03",
+          "value": -0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 3, column 2"
+        },
+        {
+          "period": "2024-04",
+          "value": 0.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 4, column 2"
+        },
+        {
+          "period": "2024-05",
+          "value": -0.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 5, column 2"
+        },
+        {
+          "period": "2024-06",
+          "value": 0,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 6, column 2"
+        },
+        {
+          "period": "2024-07",
+          "value": 0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 7, column 2"
+        },
+        {
+          "period": "2024-08",
+          "value": 0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 8, column 2"
+        },
+        {
+          "period": "2024-09",
+          "value": -0.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 9, column 2"
+        },
+        {
+          "period": "2024-10",
+          "value": 0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 10, column 2"
+        },
+        {
+          "period": "2024-11",
+          "value": 0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 11, column 2"
+        },
+        {
+          "period": "2024-12",
+          "value": 0.7,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 12, column 2"
+        }
+      ]
+    },
+    {
+      "id": "hicp-yearly",
+      "sourceId": "ask-hicp-2024",
+      "title": "Published HICP year-on-year change",
+      "frequency": "M",
+      "unit": "percent",
+      "definition": "hicp-all-items; change lag 12",
+      "scope": "Kosovo, household monetary consumption",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "observations": [
+        {
+          "period": "2022-01",
+          "value": 7.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 1, column 3"
+        },
+        {
+          "period": "2022-02",
+          "value": 7.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 2, column 3"
+        },
+        {
+          "period": "2022-03",
+          "value": 10,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 3, column 3"
+        },
+        {
+          "period": "2022-04",
+          "value": 11.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 4, column 3"
+        },
+        {
+          "period": "2022-05",
+          "value": 12.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 5, column 3"
+        },
+        {
+          "period": "2022-06",
+          "value": 14.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 6, column 3"
+        },
+        {
+          "period": "2022-07",
+          "value": 14.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 7, column 3"
+        },
+        {
+          "period": "2022-08",
+          "value": 13,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 8, column 3"
+        },
+        {
+          "period": "2022-09",
+          "value": 12.7,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 9, column 3"
+        },
+        {
+          "period": "2022-10",
+          "value": 12.7,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 10, column 3"
+        },
+        {
+          "period": "2022-11",
+          "value": 11.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 11, column 3"
+        },
+        {
+          "period": "2022-12",
+          "value": 12.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2022, month 12, column 3"
+        },
+        {
+          "period": "2023-01",
+          "value": 12,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 1, column 3"
+        },
+        {
+          "period": "2023-02",
+          "value": 10.5,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 2, column 3"
+        },
+        {
+          "period": "2023-03",
+          "value": 7.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 3, column 3"
+        },
+        {
+          "period": "2023-04",
+          "value": 5.6,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 4, column 3"
+        },
+        {
+          "period": "2023-05",
+          "value": 4.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 5, column 3"
+        },
+        {
+          "period": "2023-06",
+          "value": 2.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 6, column 3"
+        },
+        {
+          "period": "2023-07",
+          "value": 2.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 7, column 3"
+        },
+        {
+          "period": "2023-08",
+          "value": 3.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 8, column 3"
+        },
+        {
+          "period": "2023-09",
+          "value": 4.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 9, column 3"
+        },
+        {
+          "period": "2023-10",
+          "value": 3.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 10, column 3"
+        },
+        {
+          "period": "2023-11",
+          "value": 2.9,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 11, column 3"
+        },
+        {
+          "period": "2023-12",
+          "value": 2.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2023, month 12, column 3"
+        },
+        {
+          "period": "2024-01",
+          "value": 1.8,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 1, column 3"
+        },
+        {
+          "period": "2024-02",
+          "value": 2.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 2, column 3"
+        },
+        {
+          "period": "2024-03",
+          "value": 2.3,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 3, column 3"
+        },
+        {
+          "period": "2024-04",
+          "value": 2.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 4, column 3"
+        },
+        {
+          "period": "2024-05",
+          "value": 2.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 5, column 3"
+        },
+        {
+          "period": "2024-06",
+          "value": 2.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 6, column 3"
+        },
+        {
+          "period": "2024-07",
+          "value": 2.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 7, column 3"
+        },
+        {
+          "period": "2024-08",
+          "value": 1.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 8, column 3"
+        },
+        {
+          "period": "2024-09",
+          "value": 0.2,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 9, column 3"
+        },
+        {
+          "period": "2024-10",
+          "value": 0.4,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 10, column 3"
+        },
+        {
+          "period": "2024-11",
+          "value": 0.7,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 11, column 3"
+        },
+        {
+          "period": "2024-12",
+          "value": 1.1,
+          "status": "historical",
+          "locator": "PDF printed page 7, table 1; year 2024, month 12, column 3"
+        }
+      ]
+    },
+    {
+      "id": "wage-gross",
+      "sourceId": "ask-wages",
+      "title": "Average gross monthly salary",
+      "frequency": "A",
+      "unit": "EUR/month",
+      "definition": "gross-employee-wage",
+      "scope": "Kosovo, covered employees",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Administrative/business-register source change in 2024; no household disposable-income identity.",
+      "observations": [
+        {
+          "period": "2020",
+          "value": 466,
+          "status": "historical",
+          "locator": "PxWeb key [\"5\",\"0\",\"0\"]"
+        },
+        {
+          "period": "2021",
+          "value": 484,
+          "status": "historical",
+          "locator": "PxWeb key [\"4\",\"0\",\"0\"]"
+        },
+        {
+          "period": "2022",
+          "value": 521,
+          "status": "historical",
+          "locator": "PxWeb key [\"3\",\"0\",\"0\"]"
+        },
+        {
+          "period": "2023",
+          "value": 570,
+          "status": "historical",
+          "locator": "PxWeb key [\"2\",\"0\",\"0\"]"
+        },
+        {
+          "period": "2024",
+          "value": 639,
+          "status": "historical",
+          "locator": "PxWeb key [\"1\",\"0\",\"0\"]"
+        }
+      ]
+    },
+    {
+      "id": "wage-net",
+      "sourceId": "ask-wages",
+      "title": "Average net monthly salary",
+      "frequency": "A",
+      "unit": "EUR/month",
+      "definition": "net-employee-wage",
+      "scope": "Kosovo, covered employees",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Administrative/business-register source change in 2024; no household disposable-income identity.",
+      "observations": [
+        {
+          "period": "2020",
+          "value": 416,
+          "status": "historical",
+          "locator": "PxWeb key [\"5\",\"0\",\"1\"]"
+        },
+        {
+          "period": "2021",
+          "value": 432,
+          "status": "historical",
+          "locator": "PxWeb key [\"4\",\"0\",\"1\"]"
+        },
+        {
+          "period": "2022",
+          "value": 446,
+          "status": "historical",
+          "locator": "PxWeb key [\"3\",\"0\",\"1\"]"
+        },
+        {
+          "period": "2023",
+          "value": 506,
+          "status": "historical",
+          "locator": "PxWeb key [\"2\",\"0\",\"1\"]"
+        },
+        {
+          "period": "2024",
+          "value": 552,
+          "status": "historical",
+          "locator": "PxWeb key [\"1\",\"0\",\"1\"]"
+        }
+      ]
+    },
+    {
+      "id": "participation",
+      "sourceId": "ask-labour",
+      "title": "participation rate, total, 15-64",
+      "frequency": "A",
+      "unit": "percent",
+      "definition": "lf-participation-working-age",
+      "scope": "Kosovo, total sex, age 15-64",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "range": [
+        0,
+        100
+      ],
+      "observations": [
+        {
+          "period": "2023",
+          "value": 40.7,
+          "status": "historical",
+          "locator": "PxWeb key [\"0\",\"2023\",\"2\"]"
+        },
+        {
+          "period": "2024",
+          "value": 43.2,
+          "status": "historical",
+          "locator": "PxWeb key [\"0\",\"2024\",\"2\"]"
+        }
+      ]
+    },
+    {
+      "id": "inactivity",
+      "sourceId": "ask-labour",
+      "title": "inactivity rate, total, 15-64",
+      "frequency": "A",
+      "unit": "percent",
+      "definition": "inactive-working-age",
+      "scope": "Kosovo, total sex, age 15-64",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "range": [
+        0,
+        100
+      ],
+      "observations": [
+        {
+          "period": "2023",
+          "value": 59.3,
+          "status": "historical",
+          "locator": "PxWeb key [\"1\",\"2023\",\"2\"]"
+        },
+        {
+          "period": "2024",
+          "value": 56.8,
+          "status": "historical",
+          "locator": "PxWeb key [\"1\",\"2024\",\"2\"]"
+        }
+      ]
+    },
+    {
+      "id": "employment",
+      "sourceId": "ask-labour",
+      "title": "employment rate, total, 15-64",
+      "frequency": "A",
+      "unit": "percent",
+      "definition": "employment-working-age",
+      "scope": "Kosovo, total sex, age 15-64",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "range": [
+        0,
+        100
+      ],
+      "observations": [
+        {
+          "period": "2023",
+          "value": 36.3,
+          "status": "historical",
+          "locator": "PxWeb key [\"2\",\"2023\",\"2\"]"
+        },
+        {
+          "period": "2024",
+          "value": 38.6,
+          "status": "historical",
+          "locator": "PxWeb key [\"2\",\"2024\",\"2\"]"
+        }
+      ]
+    },
+    {
+      "id": "unemployment",
+      "sourceId": "ask-labour",
+      "title": "unemployment rate, total, 15-64",
+      "frequency": "A",
+      "unit": "percent",
+      "definition": "unemployment-labour-force",
+      "scope": "Kosovo, total sex, age 15-64",
+      "revisions": "Pinned source vintage; do not overwrite with later revisions.",
+      "use": "Offline benchmark; no automatic parameter changes",
+      "limitations": "Interpret using the source definition and common period.",
+      "range": [
+        0,
+        100
+      ],
+      "observations": [
+        {
+          "period": "2023",
+          "value": 10.9,
+          "status": "historical",
+          "locator": "PxWeb key [\"3\",\"2023\",\"2\"]"
+        },
+        {
+          "period": "2024",
+          "value": 10.8,
+          "status": "historical",
+          "locator": "PxWeb key [\"3\",\"2024\",\"2\"]"
+        }
+      ]
+    }
+  ],
+  "basket": {
+    "sourceId": "ask-hicp-2024",
+    "period": "2024",
+    "unit": "permille",
+    "classification": "COICOP divisions 01-12, 2024 publication",
+    "categories": [
+      {
+        "code": "01",
+        "label": "Ushqime dhe pije joalkoolike",
+        "weightPermille": 351.1,
+        "dec2024Index": 148.2
+      },
+      {
+        "code": "02",
+        "label": "Pije alkoolike dhe duhan",
+        "weightPermille": 67.6,
+        "dec2024Index": 141.7
+      },
+      {
+        "code": "03",
+        "label": "Veshje dhe këpucë",
+        "weightPermille": 40.6,
+        "dec2024Index": 109.8
+      },
+      {
+        "code": "04",
+        "label": "Banim, ujë, energji dhe lëndë djegëse",
+        "weightPermille": 89.8,
+        "dec2024Index": 125.1
+      },
+      {
+        "code": "05",
+        "label": "Mobilje, pajisje dhe mirëmbajtje shtëpie",
+        "weightPermille": 63,
+        "dec2024Index": 124
+      },
+      {
+        "code": "06",
+        "label": "Shëndetësi",
+        "weightPermille": 22.8,
+        "dec2024Index": 117.1
+      },
+      {
+        "code": "07",
+        "label": "Transport",
+        "weightPermille": 176.7,
+        "dec2024Index": 118.6
+      },
+      {
+        "code": "08",
+        "label": "Komunikim",
+        "weightPermille": 23.7,
+        "dec2024Index": 112.3
+      },
+      {
+        "code": "09",
+        "label": "Rekreacion dhe kulturë",
+        "weightPermille": 44.5,
+        "dec2024Index": 107.6
+      },
+      {
+        "code": "10",
+        "label": "Arsim",
+        "weightPermille": 6.9,
+        "dec2024Index": 104.2
+      },
+      {
+        "code": "11",
+        "label": "Restorante dhe hotele",
+        "weightPermille": 40.8,
+        "dec2024Index": 131.6
+      },
+      {
+        "code": "12",
+        "label": "Mallra dhe shërbime të tjera",
+        "weightPermille": 72.2,
+        "dec2024Index": 121.4
+      }
+    ],
+    "limitations": "Published rounded main-group weights sum to 999.7, not exactly 1000; normalize by the observed sum only for offline demonstrations. No parent/child double counting or mapping to agriculture/industry."
+  },
+  "excluded": [
+    {
+      "id": "worldbank-gdp-cpi",
+      "reason": "Metadata consulted; numeric API requests returned HTTP 502. No invented or substituted series."
+    },
+    {
+      "id": "imf-2026",
+      "reason": "Country page projections (GDP 3.3%, consumer prices 5.9%) are not observations and not fitting data."
+    },
+    {
+      "id": "current-hicp-base",
+      "reason": "Current API/page base claims conflict. Archived solely as a diagnostic; fixed PDF vintage anchors selected series."
+    }
+  ]
+}

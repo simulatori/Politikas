@@ -1,0 +1,49 @@
+{
+  "inputs": [
+    {
+      "file": "manifest.json",
+      "sha256": "1a4f9c103e7fa4df51ed7e713934b3dead92a64de80ff2462debd8fb017078c0"
+    },
+    {
+      "file": "cpi08-metadata.json",
+      "sha256": "7adc26375a7696c2b3e4e0bc954ba9791c3a37f86c5256dc958d4f7f5313a127"
+    },
+    {
+      "file": "cpi08-response.json",
+      "sha256": "dee3a011c286f0773fe292e7422d30d3277b9a5887aa67b08f872e74465f3c50"
+    },
+    {
+      "file": "cpi08-page.html",
+      "sha256": "92048e98486b842b2b6aedeeed28a7dd6f682a24d484d5eb25b861ce3c845a50"
+    },
+    {
+      "file": "cpi05-metadata.json",
+      "sha256": "dc4e87e57ec9100b4d99b7b9c703893bee87b76f2a01e918f61159f7db6bf564"
+    },
+    {
+      "file": "cpi05-response.json",
+      "sha256": "2d3870393e59162f11e5f234aaeb0b60e06dc78aff9e06e4cdcb6897304769ea"
+    },
+    {
+      "file": "cpi05-page.html",
+      "sha256": "6e9bb1da91e44207ca48816151d0dbd5d02541608c1c717a710c7c4f9082f7e7"
+    },
+    {
+      "file": "cpi04-metadata.json",
+      "sha256": "1ab9139b052f88acd4db56990e22a7bd03b9bdddb3104193adc824df07af9b06"
+    },
+    {
+      "file": "cpi04-response.json",
+      "sha256": "e415beeaafa7bd8fe2fe575b6e4238a73db2204cbec7ccfa4ac79f4d6ca96055"
+    },
+    {
+      "file": "cpi04-page.html",
+      "sha256": "af37f0991516f94bdfe076832b249604dae45e8c12ea6d2fd1b03745cd18df25"
+    },
+    {
+      "file": "series.json",
+      "sha256": "1c6d8f9f01c977d26a2ea48b8a3e541a4262d4d3f16a745dc53e049ac6a3efc9"
+    }
+  ],
+  "builderSha256": "c4e6e40b9ffd576dfaab9e2bd7f49aa1d2cdf792e9541283e08e730e77b4896d"
+}

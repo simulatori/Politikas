@@ -1,0 +1,18 @@
+{
+  "method": "Pinned local PxWeb keys plus reviewed PDF transcription; raw and normalized observations kept separate.",
+  "files": [
+    {
+      "file": "manifest.json",
+      "sha256": "c0339ffb29f14e8bdeb788ac731b6d9e9eb7308b88bf2334ba82bb3e23f62d4f"
+    },
+    {
+      "file": "hicp-reference-extract.json",
+      "sha256": "82a511e8aff1945a6ab678ae7a6baf43861f4bac5a51c099dcfa0db61142b49d"
+    },
+    {
+      "file": "series.json",
+      "sha256": "0f106e2d9e9af31500a303617bb0596fc834e604b4f7f170af5ae61fcf2cf9d3"
+    }
+  ],
+  "builderSha256": "bf32d9ca767c465768e8b756699542be7d11e64809a0ab965467f6bd8c127a8e"
+}

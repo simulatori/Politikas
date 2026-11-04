@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "republika-coicop-2024-research-map-v1",
+  "dataKind": "methodological-map-not-statistical-observations",
+  "dataset": "data/empirical/phase11/2026-10-24/series.json",
+  "classification": {
+    "id": "ASK-COICOP-as-published-December-2024",
+    "editionNote": "Twelve divisions as published in the pinned 2024 document; not automatically COICOP 2018 and not a production classification.",
+    "sourceId": "ask-hicp-2024",
+    "url": "https://askapi.rks-gov.net/Custom/972b64b8-75b2-4816-af65-340940a5ea88.pdf",
+    "table": "2",
+    "level": "division",
+    "frequency": "M",
+    "unit": "index",
+    "base": "2015=100",
+    "firstPeriod": "2024-12",
+    "lastPeriod": "2024-12",
+    "availability": "single-period-category-indices-and-annual-index-weights",
+    "seriesId": null,
+    "nameTranscription": "Source names with line breaks joined; spelling retained. Phase 11 category labels are shorter display paraphrases."
+  },
+  "catalog": [
+    {"code":"01","name":"Ushqimi dhe pijet joalkoolike","printedPage":9,"unmappedReason":null},
+    {"code":"02","name":"Pijet alkoolike, duhani","printedPage":9,"unmappedReason":"Agricultural inputs, processing and excise/retail components cannot be separated with current model data."},
+    {"code":"03","name":"Veshje dhe këpucë","printedPage":9,"unmappedReason":null},
+    {"code":"04","name":"Strehimi , uji, energji elektrike, gazi dhe lëndë djegëse të tjera","printedPage":9,"unmappedReason":"Housing services and household fuels are not an industry basket; production energy is already an input, not household energy consumption."},
+    {"code":"05","name":"Mobilje, pajisje shtëpie dhe mirëmbajtje e shtëpisë","printedPage":9,"unmappedReason":null},
+    {"code":"06","name":"Shëndetësia","printedPage":10,"unmappedReason":"Medicines/equipment and health services are mixed; government health budgets are not household consumption."},
+    {"code":"07","name":"Transporti","printedPage":10,"unmappedReason":"Vehicles, fuel and passenger services are mixed; trade shippingPct is not household transport expenditure."},
+    {"code":"08","name":"Mjetet e komunikimit","printedPage":10,"unmappedReason":"Equipment and telecom services have no separate household demand in the model."},
+    {"code":"09","name":"Rekracioni dhe kultura","printedPage":10,"unmappedReason":"Mixed consumer goods and services lack a product-to-purpose bridge."},
+    {"code":"10","name":"Arsimi","printedPage":10,"unmappedReason":"Household education services are not state education spending or an industry goods quantity."},
+    {"code":"11","name":"Restorantet dhe hotelet","printedPage":10,"unmappedReason":"Prepared meals and accommodation services cannot be assigned to agricultural output."},
+    {"code":"12","name":"Mallrat dhe shërbimet e ndryshme","printedPage":10,"unmappedReason":"Personal goods, insurance, finance and other services have no measured split between the two model categories."}
+  ],
+  "modelCategories": [
+    {"id":"agriculture","name":"Mallra bujqësore","description":"Aggregate agricultural output and goods balance; not a food expenditure classification.","statePath":"state.economicPilot.productive.trade.agriculture","reportPath":"state.economicPilot.history[0].productive.households","unit":"model-unit","priceUnit":"ratio-to-activation-reference","excludedCodes":["02","03","04","05","06","07","08","09","10","11","12"],"missingData":"Product-level consumption quantities, processing/import margins and product-to-COICOP correspondence."},
+    {"id":"industry","name":"Mallra industriale","description":"Aggregate industrial output and goods balance; contains no defined household product composition.","statePath":"state.economicPilot.productive.trade.industry","reportPath":"state.economicPilot.history[0].productive.households","unit":"model-unit","priceUnit":"ratio-to-activation-reference","excludedCodes":["02","04","06","07","08","09","10","11","12"],"missingData":"Consumer-product composition, services split, household expenditure shares and product-to-purpose correspondence."}
+  ],
+  "links": [
+    {"modelId":"agriculture","code":"01","relation":"partial","verification":"unresolved","quantitative":false,"allocationWeight":null,"rationale":"Food can contain agricultural products, but processed foods, beverages, imported content and trade margins are not identified. The full division cannot be equated to agricultural production.","overlapRisk":"Code 01 also has a possible industrial processing component; no weight is allocated to either category.","needs":"A product/processing/retail bridge and historical category series beyond the one snapshot."},
+    {"modelId":"industry","code":"01","relation":"partial","verification":"unresolved","quantitative":false,"allocationWeight":null,"rationale":"Food processing may be industrial; the model does not identify its share. This is an alternative partial link, not an allocation in addition to agriculture.","overlapRisk":"Shared candidate code 01; adding both would double count unmeasured processing and primary output.","needs":"Measured separation of primary output, processing and final-consumption value."},
+    {"modelId":"industry","code":"03","relation":"partial","verification":"unresolved","quantitative":false,"allocationWeight":null,"rationale":"Clothing and footwear include manufactured consumer goods, but there is no evidence of their share in the aggregate industrial index or of imported/retail value.","overlapRisk":"A consumer-purpose index is not an industrial-output price; do not use the entire division as the industrial category.","needs":"Product composition and a consistent time series with prices at the relevant valuation basis."},
+    {"modelId":"industry","code":"05","relation":"partial","verification":"unresolved","quantitative":false,"allocationWeight":null,"rationale":"Furniture and household equipment may be manufactured goods; maintenance and other services are mixed and not separated.","overlapRisk":"Goods, installation/maintenance services and margins cannot be assigned one-for-one to production.","needs":"Goods/services decomposition and measured final-consumption shares."}
+  ],
+  "aggregation": {
+    "enabled": false,
+    "weights": null,
+    "reason": "No defensible quantitative bridge from expenditure purposes to the two production/goods aggregates. Published HICP index weights are not automatically household spending shares at the model activation date.",
+    "exclusionMeaning": "Excluded codes are not included in proposed candidate links, not a claim that those goods or services are absent from the economy. All quantitative empirical aggregation remains blocked, including candidate codes."
+  }
+}

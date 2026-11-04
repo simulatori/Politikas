@@ -1,0 +1,28 @@
+{
+  "sourceFile": "hicp-dec2024.pdf",
+  "method": "Manual transcription of table 1, printed page 7, and table 2, printed pages 9-10; checked against the independently captured PxWeb response for all 108 monthly cells. No OCR inference or missing-value substitution.",
+  "publicationDate": "2025-01-10",
+  "base": "2015=100",
+  "columns": ["index", "monthOnMonthPercent", "yearOnYearPercent"],
+  "years": {
+    "2022": [[114.2,0.9,7.1],[115.5,1.1,7.5],[118.6,2.7,10.0],[120.3,1.5,11.2],[121.4,0.9,12.5],[123.1,1.4,14.1],[124.2,0.9,14.2],[124.5,0.2,13.0],[124.2,-0.2,12.7],[125.4,0.9,12.7],[125.8,0.3,11.6],[126.9,0.9,12.1]],
+    "2023": [[127.9,0.8,12.0],[127.6,-0.3,10.5],[127.0,-0.4,7.1],[127.0,0.0,5.6],[126.6,-0.3,4.3],[126.6,0.0,2.8],[127.1,0.4,2.3],[128.4,1.0,3.2],[129.5,0.9,4.2],[129.5,0.0,3.3],[129.4,-0.1,2.9],[129.8,0.3,2.3]],
+    "2024": [[130.2,0.3,1.8],[130.4,0.1,2.2],[130.0,-0.3,2.3],[130.1,0.1,2.4],[129.6,-0.4,2.4],[129.6,0.0,2.4],[129.9,0.3,2.2],[130.2,0.2,1.4],[129.8,-0.3,0.2],[130.0,0.2,0.4],[130.3,0.2,0.7],[131.2,0.7,1.1]]
+  },
+  "publishedAnnualMeans": {"2022":122.0,"2023":128.0,"2024":130.1},
+  "publishedAnnualMeanChanges": {"2023":4.9,"2024":1.6},
+  "categories": [
+    {"code":"01","label":"Ushqime dhe pije joalkoolike","weightPermille":351.1,"dec2024Index":148.2},
+    {"code":"02","label":"Pije alkoolike dhe duhan","weightPermille":67.6,"dec2024Index":141.7},
+    {"code":"03","label":"Veshje dhe këpucë","weightPermille":40.6,"dec2024Index":109.8},
+    {"code":"04","label":"Banim, ujë, energji dhe lëndë djegëse","weightPermille":89.8,"dec2024Index":125.1},
+    {"code":"05","label":"Mobilje, pajisje dhe mirëmbajtje shtëpie","weightPermille":63.0,"dec2024Index":124.0},
+    {"code":"06","label":"Shëndetësi","weightPermille":22.8,"dec2024Index":117.1},
+    {"code":"07","label":"Transport","weightPermille":176.7,"dec2024Index":118.6},
+    {"code":"08","label":"Komunikim","weightPermille":23.7,"dec2024Index":112.3},
+    {"code":"09","label":"Rekreacion dhe kulturë","weightPermille":44.5,"dec2024Index":107.6},
+    {"code":"10","label":"Arsim","weightPermille":6.9,"dec2024Index":104.2},
+    {"code":"11","label":"Restorante dhe hotele","weightPermille":40.8,"dec2024Index":131.6},
+    {"code":"12","label":"Mallra dhe shërbime të tjera","weightPermille":72.2,"dec2024Index":121.4}
+  ]
+}

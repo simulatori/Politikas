@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "industry-coicop03-feasibility-v1",
+  "selectedLink": {"modelId":"industry","code":"03"},
+  "question": "Can the model's aggregate industrial consumer-price ratio be interpreted as the historical ASK COICOP 03 clothing-and-footwear price index over 2022-2024 without an invented product composition or re-dating the simulation?",
+  "questionType": "conceptual-and-measurement-feasibility-not-parameter-fit",
+  "scope": "Only industry/03 is investigated. The other three candidates are screened for selection only.",
+  "selection": [
+    {"modelId":"industry","code":"03","selected":true,"reason":"Narrower named consumer-goods division than the mixed food/processing alternatives or furnishing/maintenance division. A pinned December 2024 observation exists and official monthly category tables are available for a source-side reproducibility check. This does not establish an industrial product composition."},
+    {"modelId":"agriculture","code":"01","selected":false,"reason":"Primary agricultural output cannot isolate processed foods, beverages, imports and retail margins; shares overlap with industry and are not measured."},
+    {"modelId":"industry","code":"01","selected":false,"reason":"Industrial food processing is not separately identified; the same division is also an agricultural candidate. No measured separation is available."},
+    {"modelId":"industry","code":"05","selected":false,"reason":"Household equipment and furnishing are combined with maintenance services; the model has no goods/services decomposition. Category 03 offers a narrower first feasibility question."}
+  ],
+  "model": {
+    "variable": "state.economicPilot.history[0].productive.households.prices.industry",
+    "measure": "Scenario unit-value ratio, production-cost pass-through and VAT relative to player activation; an aggregate with no clothing/footwear composition.",
+    "unit": "ratio-to-activation-reference",
+    "frequency": "game-tick; 4 ticks per game month, 48 per year",
+    "historicalRunAvailable": false,
+    "productCompositionAvailable": false,
+    "householdConsumptionQuantitiesFor03Available": false
+  },
+  "historical": {
+    "coicopName": "Veshje dhe këpucë",
+    "englishLabelPrefix": "03. Clothing and footwear",
+    "scope": "Consumer-purpose price index, not industrial output or quantity consumed",
+    "period": ["2022-01","2024-12"],
+    "frequency": "M",
+    "indexTable": "cpi08",
+    "monthlyChangeTable": "cpi05",
+    "annualChangeTable": "cpi04",
+    "baseToVerify": "2015=100",
+    "anchor": "Phase 11 pinned December 2024 publication, table 2, printed page 9, division 03"
+  },
+  "method": {
+    "freezeNote": "Scope and period fixed after metadata and three spot observations were inspected, before full-series analysis. No fitted model or unseen-holdout claim.",
+    "sourceChecks": ["Hash all new responses and metadata; preserve original copies","Resolve category codes from the saved labels, never assume API value numbers","Verify 36 monthly cells per selected table without filling gaps","Reproduce December 2024 source anchors","Check changes using exact month/year lags and source rounding intervals"],
+    "transformations": ["Historical-only rebase 100*I_t/I_2022-01","Historical-only monthly and annual ratios with lags 1 and 12","Published one-decimal observations imply interval bounds of +/-0.05, not an economic acceptance threshold"],
+    "stopRules": ["No model-vs-history errors or directional agreement score if product definitions are not equivalent","No time alignment by relabelling the actual game dates","No consumption inference from price indices","No weights, model changes or automatic status promotion in the phase 12 map"],
+    "economicErrorThreshold": null
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "accessedOn": "2026-10-24",
+  "entries": [
+    {
+      "file": "hicp-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi01.px",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:09.683Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "9d66160999e1169357669ad4532d2f7efd065e00143214a00eaa49ddbcd380e0"
+    },
+    {
+      "file": "hicp-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi01.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Viti/muaji",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2024M12",
+                "2024M11",
+                "2024M10",
+                "2024M09",
+                "2024M08",
+                "2024M07",
+                "2024M06",
+                "2024M05",
+                "2024M04",
+                "2024M03",
+                "2024M02",
+                "2024M01",
+                "2023M12",
+                "2023M11",
+                "2023M10",
+                "2023M09",
+                "2023M08",
+                "2023M07",
+                "2023M06",
+                "2023M05",
+                "2023M04",
+                "2023M03",
+                "2023M02",
+                "2023M01",
+                "2022M12",
+                "2022M11",
+                "2022M10",
+                "2022M09",
+                "2022M08",
+                "2022M07",
+                "2022M06",
+                "2022M05",
+                "2022M04",
+                "2022M03",
+                "2022M02",
+                "2022M01"
+              ]
+            }
+          },
+          {
+            "code": "variabla",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "0",
+                "1",
+                "2"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "retrievedAt": "2026-10-24T06:30:09.747Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "37c06c32372883a79dce6ac0924e5434439546107c3e8a79d43cfd60e531bbbf"
+    },
+    {
+      "file": "wages-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Niveli%20i%20Pagave/tab01.px",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:09.803Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "03a72727cacf0d468cecf1e3cb16a324dc34c16003194e1826f40e64350c150d"
+    },
+    {
+      "file": "wages-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Niveli%20i%20Pagave/tab01.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Viti",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+              ]
+            }
+          },
+          {
+            "code": "Variabla",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "0"
+              ]
+            }
+          },
+          {
+            "code": "Bruto/neto",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "0",
+                "1"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "retrievedAt": "2026-10-24T06:30:09.831Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "7769b889f06b9b2732ba1f432c6384a4c336e1c41bfdd5534bfc78759ed6a16b"
+    },
+    {
+      "file": "labour-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Anketa%20e%20Fuqis%C3%AB%20Pun%C3%ABtore/Annual%20labour%20market/tab1b.px",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:09.862Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "6dc5b2180b7d6fa93b81071b465e7cdf95010a329ce29dfdebd23fc8f24c564b"
+    },
+    {
+      "file": "labour-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Labour%20market/Anketa%20e%20Fuqis%C3%AB%20Pun%C3%ABtore/Annual%20labour%20market/tab1b.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Variabla",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "0",
+                "1",
+                "2",
+                "3"
+              ]
+            }
+          },
+          {
+            "code": "Viti",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2023",
+                "2024"
+              ]
+            }
+          },
+          {
+            "code": "Gjinia",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "retrievedAt": "2026-10-24T06:30:09.894Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "21676be9b4f28432652b22d7ccda4a60d26bc043dec25cbcb17d6c7ffe3d5351"
+    },
+    {
+      "file": "hicp-dec2024.pdf",
+      "url": "https://askapi.rks-gov.net/Custom/972b64b8-75b2-4816-af65-340940a5ea88.pdf",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:10.150Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "0dcdb8171f4737fe7650223171aa769ed6d56fd1f6cea2e08549ee4c11d34bd5"
+    },
+    {
+      "file": "hicp-table-page.html",
+      "url": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Prices__Consumer%20Price%20Index__Monthly%20indicators/cpi01.px/",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:10.236Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "63e40188ba7d5340d1f94b30bed0fa71b1bcd1e7fa49d297aea7f1ae4880d1d0"
+    },
+    {
+      "file": "wages-table-page.html",
+      "url": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Labour%20market__Niveli%20i%20Pagave/tab01.px/",
+      "method": "GET",
+      "request": null,
+      "retrievedAt": "2026-10-24T06:30:10.311Z",
+      "accessedOn": "2026-10-24",
+      "sha256": "0308970fd1981e66934bc2ee3f01ad97eb93d2546b2a9884c5be9d05d59a56b6"
+    }
+  ]
+}

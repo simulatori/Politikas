@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "accessedOn": "2026-10-24",
+  "selectedLink": {
+    "modelId": "industry",
+    "code": "03"
+  },
+  "entries": [
+    {
+      "file": "cpi08-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi08.px",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:27.511Z",
+      "sha256": "7adc26375a7696c2b3e4e0bc954ba9791c3a37f86c5256dc958d4f7f5313a127"
+    },
+    {
+      "file": "cpi08-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi08.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Viti/muaji",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2024M12",
+                "2024M11",
+                "2024M10",
+                "2024M09",
+                "2024M08",
+                "2024M07",
+                "2024M06",
+                "2024M05",
+                "2024M04",
+                "2024M03",
+                "2024M02",
+                "2024M01",
+                "2023M12",
+                "2023M11",
+                "2023M10",
+                "2023M09",
+                "2023M08",
+                "2023M07",
+                "2023M06",
+                "2023M05",
+                "2023M04",
+                "2023M03",
+                "2023M02",
+                "2023M01",
+                "2022M12",
+                "2022M11",
+                "2022M10",
+                "2022M09",
+                "2022M08",
+                "2022M07",
+                "2022M06",
+                "2022M05",
+                "2022M04",
+                "2022M03",
+                "2022M02",
+                "2022M01"
+              ]
+            }
+          },
+          {
+            "code": "Grupet kryesore",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "3"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "selection": {
+        "coicop": "03",
+        "label": "03. Clothing and footwear",
+        "code": "3"
+      },
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:27.572Z",
+      "sha256": "dee3a011c286f0773fe292e7422d30d3277b9a5887aa67b08f872e74465f3c50"
+    },
+    {
+      "file": "cpi08-page.html",
+      "url": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Prices__Consumer%20Price%20Index__Monthly%20indicators/cpi08.px/",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:27.705Z",
+      "sha256": "92048e98486b842b2b6aedeeed28a7dd6f682a24d484d5eb25b861ce3c845a50"
+    },
+    {
+      "file": "cpi05-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi05.px",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:27.753Z",
+      "sha256": "dc4e87e57ec9100b4d99b7b9c703893bee87b76f2a01e918f61159f7db6bf564"
+    },
+    {
+      "file": "cpi05-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi05.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Viti/muaji",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2024M12",
+                "2024M11",
+                "2024M10",
+                "2024M09",
+                "2024M08",
+                "2024M07",
+                "2024M06",
+                "2024M05",
+                "2024M04",
+                "2024M03",
+                "2024M02",
+                "2024M01",
+                "2023M12",
+                "2023M11",
+                "2023M10",
+                "2023M09",
+                "2023M08",
+                "2023M07",
+                "2023M06",
+                "2023M05",
+                "2023M04",
+                "2023M03",
+                "2023M02",
+                "2023M01",
+                "2022M12",
+                "2022M11",
+                "2022M10",
+                "2022M09",
+                "2022M08",
+                "2022M07",
+                "2022M06",
+                "2022M05",
+                "2022M04",
+                "2022M03",
+                "2022M02",
+                "2022M01"
+              ]
+            }
+          },
+          {
+            "code": "Grupet dhe nëngrupet",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "18"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "selection": {
+        "coicop": "03",
+        "label": "03. Clothing and footwear",
+        "code": "18"
+      },
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:27.788Z",
+      "sha256": "2d3870393e59162f11e5f234aaeb0b60e06dc78aff9e06e4cdcb6897304769ea"
+    },
+    {
+      "file": "cpi05-page.html",
+      "url": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Prices__Consumer%20Price%20Index__Monthly%20indicators/cpi05.px/",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:30.243Z",
+      "sha256": "6e9bb1da91e44207ca48816151d0dbd5d02541608c1c717a710c7c4f9082f7e7"
+    },
+    {
+      "file": "cpi04-metadata.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi04.px",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:30.279Z",
+      "sha256": "1ab9139b052f88acd4db56990e22a7bd03b9bdddb3104193adc824df07af9b06"
+    },
+    {
+      "file": "cpi04-response.json",
+      "url": "https://askdata.rks-gov.net/api/v1/en/ASKdata/Prices/Consumer%20Price%20Index/Monthly%20indicators/cpi04.px",
+      "method": "POST",
+      "request": {
+        "query": [
+          {
+            "code": "Viti/muaji",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "2024M12",
+                "2024M11",
+                "2024M10",
+                "2024M09",
+                "2024M08",
+                "2024M07",
+                "2024M06",
+                "2024M05",
+                "2024M04",
+                "2024M03",
+                "2024M02",
+                "2024M01",
+                "2023M12",
+                "2023M11",
+                "2023M10",
+                "2023M09",
+                "2023M08",
+                "2023M07",
+                "2023M06",
+                "2023M05",
+                "2023M04",
+                "2023M03",
+                "2023M02",
+                "2023M01",
+                "2022M12",
+                "2022M11",
+                "2022M10",
+                "2022M09",
+                "2022M08",
+                "2022M07",
+                "2022M06",
+                "2022M05",
+                "2022M04",
+                "2022M03",
+                "2022M02",
+                "2022M01"
+              ]
+            }
+          },
+          {
+            "code": "Grupet dhe nëngrupet",
+            "selection": {
+              "filter": "item",
+              "values": [
+                "18"
+              ]
+            }
+          }
+        ],
+        "response": {
+          "format": "json"
+        }
+      },
+      "selection": {
+        "coicop": "03",
+        "label": "03. Clothing and footwear",
+        "code": "18"
+      },
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:30.310Z",
+      "sha256": "e415beeaafa7bd8fe2fe575b6e4238a73db2204cbec7ccfa4ac79f4d6ca96055"
+    },
+    {
+      "file": "cpi04-page.html",
+      "url": "https://askdata.rks-gov.net/pxweb/en/ASKdata/ASKdata__Prices__Consumer%20Price%20Index__Monthly%20indicators/cpi04.px/",
+      "method": "GET",
+      "request": null,
+      "selection": null,
+      "accessedOn": "2026-10-24",
+      "retrievedAt": "2026-10-24T08:30:30.537Z",
+      "sha256": "af37f0991516f94bdfe076832b249604dae45e8c12ea6d2fd1b03745cd18df25"
+    }
+  ],
+  "anchor": {
+    "url": "https://askapi.rks-gov.net/Custom/972b64b8-75b2-4816-af65-340940a5ea88.pdf",
+    "checkedAt": "2026-10-24T08:30:30.840Z",
+    "sourceCopy": "data/empirical/phase11/2026-10-24/hicp-dec2024.pdf",
+    "originalSha256": "0dcdb8171f4737fe7650223171aa769ed6d56fd1f6cea2e08549ee4c11d34bd5",
+    "remoteSha256": "0dcdb8171f4737fe7650223171aa769ed6d56fd1f6cea2e08549ee4c11d34bd5",
+    "identical": true
+  }
+}
