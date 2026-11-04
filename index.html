@@ -24,7 +24,7 @@
          Pas ndryshimit të logos/kodit, rrit CACHE_VERSION te service-worker.js.
          manifest.json është JSON: komentet/instruksionet mbahen këtu, jo brenda tij.
          Instalimi kërkon HTTPS në publikim; localhost punon për testim. -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=51">
 </head>
 <body>
 
@@ -226,7 +226,7 @@
         </button>
         <button class="nav-item" onclick="switchMainTab('tab-elections', this)">
             <span class="nav-icon">📍</span>
-            <span>38 Komunat</span>
+            <span class="nav-label-wide">38 Komunat</span><span class="nav-label-compact">Komunat</span>
         </button>
         <button class="nav-item" onclick="switchMainTab('tab-diplomacy', this)">
             <span class="nav-icon">🌍</span>
@@ -264,18 +264,22 @@
                 </div>
                 <div class="header-controls">
                     <div class="badge-info" id="dateDisplay">Tetor 2026 • Java 1</div>
+                    <div class="header-action-grid" role="group" aria-label="Veprimet e shpejta">
                     <button class="btn-top" onclick="switchMainTab('tab-dashboard'); switchSubTab('dash', 'inbox', document.querySelectorAll('#tab-dashboard .sub-pill')[1])" id="inboxTopBtn" style="border-color:var(--accent-gold);">📥 Kërkesat</button>
                     <button class="btn-top" onclick="switchMainTab('tab-dashboard'); switchSubTab('dash', 'calendar', document.querySelectorAll('#tab-dashboard .sub-pill')[2])" id="calendarTopBtn">📅 Kalendari</button>
                     <button class="btn-top" id="uxNotificationsButton" onclick="openUXNotifications()">Njoftimet</button>
                     <button class="btn-top" onclick="toggleModal('saveModal', true)">💾 Ruajtjet</button>
-                    <div class="cloud-save-controls" role="group" aria-label="Llogaria dhe ruajtjet në Cloud">
-                        <span id="cloudAccountName">Mysafir</span>
+                    </div>
+                    <details class="profile-menu">
+                        <summary aria-label="Hap llogarinë dhe ruajtjet në Cloud"><span aria-hidden="true">👤</span> <span id="cloudAccountName">Mysafir</span><span class="profile-chevron" aria-hidden="true">⌄</span></summary>
+                        <div class="cloud-save-controls" role="group" aria-label="Llogaria dhe ruajtjet në Cloud">
                         <button type="button" class="btn-top" id="googleLoginBtn" disabled>Hyr me Google</button>
-                        <button type="button" class="btn-top" id="cloudSaveBtn" hidden>Ruaj në Cloud</button>
-                        <button type="button" class="btn-top" id="cloudLoadBtn" hidden>Ngarko nga Cloud</button>
-                        <button type="button" class="btn-top" id="googleLogoutBtn" hidden>Çkyçu</button>
+                        <button type="button" class="btn-top cloud-icon-action" id="cloudSaveBtn" title="Ruaj në Cloud" aria-label="Ruaj në Cloud" hidden><span aria-hidden="true" class="cloud-action-icon">☁↑</span><span class="cloud-action-label">Ruaj në Cloud</span></button>
+                        <button type="button" class="btn-top cloud-icon-action" id="cloudLoadBtn" title="Ngarko nga Cloud" aria-label="Ngarko nga Cloud" hidden><span aria-hidden="true" class="cloud-action-icon">☁↓</span><span class="cloud-action-label">Ngarko nga Cloud</span></button>
+                        <button type="button" class="btn-top cloud-icon-action" id="googleLogoutBtn" title="Çkyçu" aria-label="Çkyçu" hidden><span aria-hidden="true" class="cloud-action-icon">⇥</span><span class="cloud-action-label">Çkyçu</span></button>
                         <span id="cloudSaveStatus" role="status" aria-live="polite">Ruajtja automatike është vetëm lokale.</span>
                     </div>
+                    </details>
                     <button class="next-turn-btn" onclick="promptAdvanceTime(1)">Java Tjetër ▶</button>
                 </div>
             </div>
@@ -327,10 +331,13 @@
                 </div>
             </div>
         <!-- MEDIA TICKER -->
-        <div class="media-ticker">
+        <details class="media-ticker">
+          <summary title="Hap ose mbyll lajmin e plotë">
             <span class="ticker-badge">LAJMI I FUNDIT</span>
-            <div class="ticker-text" id="mediaTickerText">Sistemet gati për simulim politik. Përgatituni për vendime sfiduese.</div>
-        </div>
+            <span class="ticker-text" id="mediaTickerText">Sistemet gati për simulim politik. Përgatituni për vendime sfiduese.</span>
+            <span class="ticker-toggle" aria-hidden="true">⌄</span>
+          </summary>
+        </details>
 
         <main>
             <!-- TAB 1: DASHBOARD -->

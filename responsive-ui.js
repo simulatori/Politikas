@@ -10,6 +10,17 @@
     const mobile = window.matchMedia('(max-width: 767px)');
     const home = document.createComment('Dashboard tools return here on tablet/desktop');
     panel.before(home);
+    const dock = document.querySelector('.bottom-nav');
+    const urgent = document.getElementById('urgentSituationLauncher');
+    const profile = document.querySelector('.profile-menu');
+    const mobileBrand = document.querySelector('.sidebar-logo.mobile-only');
+    const profileHome = document.createComment('Profile returns to desktop controls');
+    if (profile) profile.before(profileHome);
+    const dockHomes = [launcher, urgent].filter(Boolean).map(function (button) {
+        const marker = document.createComment('Mobile dock action returns here');
+        button.before(marker);
+        return { button, marker };
+    });
     let scrollY = 0;
     let toastHome = null;
 
@@ -19,11 +30,24 @@
     function syncLayout() {
         if (mobile.matches) {
             if (panel.parentNode !== content) content.appendChild(panel);
+            if (dock) dockHomes.forEach(function (item) { dock.appendChild(item.button); });
+            if (profile && mobileBrand) mobileBrand.appendChild(profile);
         } else {
             closeSheet();
             home.after(panel);
+            dockHomes.forEach(function (item) { item.marker.after(item.button); });
+            if (profile) { profile.open = false; profileHome.after(profile); }
         }
     }
+    document.addEventListener('click', function (event) {
+        if (profile && !profile.contains(event.target)) profile.open = false;
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && profile && profile.open) {
+            profile.open = false;
+            profile.querySelector('summary').focus();
+        }
+    });
     launcher.addEventListener('click', function () {
         if (!mobile.matches || sheet.open) return;
         scrollY = window.scrollY;

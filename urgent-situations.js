@@ -44,7 +44,9 @@ function urgentSituationQueue(){
 function urgentInterfaceBusy(){return !state || weeklyProcessing || weeklyVisualBusy || state.weekCalendar?.transition || state.pendingVote;}
 function renderUrgentSituations(){
     var launcher=document.getElementById('urgentSituationLauncher');if(!launcher)return;
-    var rows=urgentSituationQueue();launcher.hidden=!rows.length;launcher.textContent='⚠ Situata urgjente ('+rows.length+')';
+    var rows=urgentSituationQueue();launcher.hidden=!rows.length;
+    launcher.setAttribute('aria-label','Situata urgjente ('+rows.length+')');
+    launcher.innerHTML='<span class="urgent-dock-icon" aria-hidden="true">⚠</span><span class="urgent-wide-label">Situata urgjente ('+rows.length+')</span><span class="urgent-dock-label">Urgjente ('+rows.length+')</span>';
     var modal=document.getElementById('urgentSituationModal');if(modal?.classList.contains('show')){
         if(!rows.length)closeUrgentSituations();else renderUrgentSituationPanel();
     }
