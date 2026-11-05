@@ -75,7 +75,7 @@ function canonicalCandidateRecord(st,record,partyId) {
 }
 function candidateDisplayName(record,partyId,st) {
     st=st || state;var canonical=canonicalCandidateRecord(st,record,partyId);
-    return String(canonical?.name || record.name || 'Emër i pakonfirmuar').replace(/\s*\(i\s+pa\s*konfirmuar në broshurë\)/gi,'').trim();
+    return String(canonical?.name || record.name || 'Emër i pakonfirmuar').replace(/\s*\([^)]*\)/g,'').replace(/[()]/g,'').trim();
 }
 function candidateGenderLabel(metadata,id,value) {
     var g=metadata?.genders?.[id];

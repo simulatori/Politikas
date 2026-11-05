@@ -103,7 +103,8 @@ export function initAuthCloudSave(sdk, game, root = document) {
             let json;
             try { json = game.exportJSON(); }
             catch (error) { message(error.message); return; }
-            if (new TextEncoder().encode(json).byteLength > MAX_BYTES) {
+            const payload = game.encodeJSON ? game.encodeJSON(json) : json;
+            if (new TextEncoder().encode(payload).byteLength > MAX_BYTES) {
                 message('Loja tejkalon madhësinë e lejuar për Cloud. Përdorni ruajtjet lokale.');
                 return;
             }
@@ -115,7 +116,7 @@ export function initAuthCloudSave(sdk, game, root = document) {
             if (cloudJSON && !window.confirm('Ruajtja ekzistuese në Cloud do të zëvendësohet. Vazhdo?')) return;
             message('Duke ruajtur në Cloud…');
             // Exactly one fixed-document write. Never call from saveGameAuto().
-            await sdk.setDoc(ref(uid), { schemaVersion: 1, gameJSON: json, updatedAt: sdk.serverTimestamp() });
+            await sdk.setDoc(ref(uid), { schemaVersion: 1, gameJSON: payload, updatedAt: sdk.serverTimestamp() });
             if (version !== generation) return;
             lastJSON = cloudJSON = json;
             lastWrite = Date.now();
@@ -160,7 +161,8 @@ export function initAuthCloudSave(sdk, game, root = document) {
                 if (data.schemaVersion !== 1 || typeof data.gameJSON !== 'string' || new TextEncoder().encode(data.gameJSON).byteLength > MAX_BYTES) {
                     throw new Error('Invalid cloud save');
                 }
-                cloudJSON = lastJSON = data.gameJSON;
+                cloudJSON = lastJSON = game.decodeJSON ? game.decodeJSON(data.gameJSON) : data.gameJSON;
+                JSON.parse(cloudJSON); // Reject corrupt payloads before offering Load.
                 lastWrite = data.updatedAt?.toMillis?.() || 0;
                 message('U gjet një lojë në Cloud. Zgjidhni “Ngarko nga Cloud” ose vazhdoni lokalisht.');
             } else message('Nuk ka ruajtje në Cloud. Loja vazhdon lokalisht.');

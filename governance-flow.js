@@ -8,7 +8,7 @@ function renderVisibleWorkspace(){
         'tab-dashboard':{base:'renderDashboard','dash-calendar':'renderStateCalendar','dash-inbox':'renderWeeklyAgenda','dash-promises':'renderMandateExperience'},
         'tab-party':{base:'renderPartySection','party-list':'renderElectoralList','party-coalition':'renderCoalitionNegotiations','party-structure':'renderMediaWarfare'},
         'tab-assembly':{base:'renderAssemblySection','ass-constituent':'renderConstituentSession','ass-composition':'renderAssemblyComposition','ass-laws':'renderAssemblySection'},
-        'tab-government':{base:'renderGovernmentSection','gov-sectors':'renderStateSectorsGrid','gov-macro':'renderGovernmentSection','gov-fiscal':'renderFiscalPanel','gov-trade':'renderBilateralTrade','gov-war':'renderSecurityOps','gov-intelligence':'renderIntelligenceAgency','gov-investments':'renderForeignInvestments','gov-enterprises':'renderStateEnterprises','gov-implementation':'renderLawImplementation','gov-unions':'renderUnions','gov-justice':'renderJusticeReform','gov-survival':'renderSurvivalCrises','gov-highway':'renderHighwayProject','gov-rtk':'renderRTK','gov-energyinquiry':'renderEnergyInquiry','gov-sovereign':'renderSovereignFund','gov-personnel':'renderPersonnelRegistry','gov-securitycrises':'renderSecurityCrises'},
+        'tab-government':{base:'renderGovernmentSection','gov-production':'renderProductionResources','gov-fields':'renderGovernmentFields','gov-sectors':'renderStateSectorsGrid','gov-macro':'renderGovernmentSection','gov-fiscal':'renderFiscalPanel','gov-trade':'renderBilateralTrade','gov-war':'renderSecurityOps','gov-intelligence':'renderIntelligenceAgency','gov-investments':'renderForeignInvestments','gov-enterprises':'renderStateEnterprises','gov-implementation':'renderLawImplementation','gov-unions':'renderUnions','gov-justice':'renderJusticeReform','gov-survival':'renderSurvivalCrises','gov-highway':'renderHighwayProject','gov-rtk':'renderRTK','gov-energyinquiry':'renderEnergyInquiry','gov-sovereign':'renderSovereignFund','gov-personnel':'renderPersonnelRegistry','gov-securitycrises':'renderSecurityCrises'},
         'tab-elections':{base:'renderElectionsSection','elec-locals':'renderLocalElections','elec-brochure':'renderBrochurePanel','elec-campaignplay':'renderCampaignPanel','elec-voting':'renderElectionDayPanel'},
         'tab-diplomacy':{base:'renderDiplomacySection','dip-institutions':'renderInternationalDiplomacy','dip-documents':'renderAgreementArchive','dip-report':'renderDiplomaticReport'},
         'tab-development':{base:'renderDevelopmentPanel'},'tab-catalog':{base:'renderGovernmentCatalog'}
@@ -36,6 +36,7 @@ function renderVisibleWorkspace(){
     for(const name of supplements[key||view.id]||[])callGameRenderer(name);
     if(key==='ass-laws'||key==='gov-macro')renderStrategicEconomy();
     if(key==='elec-campaignplay'||key==='dash-promises')renderSpecialPledges();
+    if(view.id==='tab-development'||key==='gov-highway')renderHighwayRoutes();if(view.id==='tab-development'){renderLivingState();renderGovernanceFields();}renderLivingIndicators();
     applyPoliticalActionGuards(view);renderExecutiveAccess();
 }
 function renderPendingGovernmentDialogs(){

@@ -1,6 +1,6 @@
 ﻿# Republika — paketa për GitHub
 
-Përditësuar më **4 nëntor 2026**, cache PWA **v48**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
+Përditësuar më **5 nëntor 2026**, cache PWA **v55**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
 
 Ngarko **përmbajtjen e folderit publikim** në rrënjën e repository-t. index.html duhet të jetë direkt aty, bashkë me JavaScript, CSS, manifestin, service worker-in, ikonat dhe folderin data. Mbaje .nojekyll. Nuk kërkohet build ose instalim paketash. Për GitHub Pages, zgjidh branch-in dhe folderin ku i vendos këta skedarë.
 
@@ -32,3 +32,23 @@ Versioni v47: tri nisma te Makroekonomia dhe Agjenda e Kuvendit — Obligacionet
 
 
 Paketa v48: menaxhim i mediave, konferenca me dropdown, takime tematike dhe premtime me detyrime pas formimit të qeverisë. Përfshi skedarin e ri political-engagement.js dhe service-worker.js (cache v48).
+
+
+v49: header mobile me grid 2x2, profil kompakt me ikona Cloud, hapesire per Javen Tjeter dhe etiketa te plota ne navigimin e poshtem.
+
+
+v50: profil me menu, panel mobile kompakt dhe navigim 5x2 me te gjitha skedat, Mjetet dhe Urgjencat. Asnje buton urgjence mbi permbajtje ne mobile. Mbyll dritaret e vjetra te lojes per aktivizimin e cache v50.
+
+
+v51: profil prane logos me menu qe mbyllet jashte/Escape, header me pak lartesi, navigim 100px dhe lajm qe zgjerohet me prekje. Verifikuar ne 332x645, 320px, 400px dhe 767px.
+
+
+v52 (2026-11-05): Cloud me RKS-LZW1:U16, raporte sekrete me delegim klikimesh, efekt afatgjate i arsimit te financuar, autostrada mes komunave me tri tendera/riparime, takime politike me tri faza dhe efekte ne vota/buxhet/raporte. Perfshi executive-strategy.js dhe te gjitha integrimet e kesaj pakete. Rregullat Firestore mbeten te njejta.
+
+
+v53: AAK me Ardian Gjinin; Ramush Haradinaj kandidat presidencial i vecante; emra pa shenime ne kllapa; demografi/familje me financim real; prodhim vendor dhe bilanc tregtar; Pasurite Kombetare me fabrike 20-javore dhe dilemen qymyr/gjelber. Perfshi modulin e ri living-state.js dhe te gjitha integrimet.
+
+
+v54: Qeveria -> Fushat e Qeverisjes. Banesa sociale/urbanizim, arsim teknik dhe mjekesor, paga me slider, prioritete rrugore/hekurudhore, miks energjetik, krim/patrullime/dosje AKI dhe ndarje Komando/Pajisje e FSK-se. Perfshi governance-fields.js dhe te gjitha integrimet e kesaj pakete.
+
+Prodhimi dhe Resurset (v55): pese sektore fizike me nivele 1-5, ndertime me afat, paga, greve, punesim, importe dhe eksporte javore. Yjet ekzistues te sherbimeve ruhen. Ruajtjet e vjetra kane aktivizim te shprehur ne panel.
