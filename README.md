@@ -1,6 +1,6 @@
 ﻿# Republika — paketa për GitHub
 
-Përditësuar më **5 nëntor 2026**, cache PWA **v56**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
+Përditësuar më **5 nëntor 2026**, cache PWA **v57**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
 
 Ngarko **përmbajtjen e folderit publikim** në rrënjën e repository-t. index.html duhet të jetë direkt aty, bashkë me JavaScript, CSS, manifestin, service worker-in, ikonat dhe folderin data. Mbaje .nojekyll. Nuk kërkohet build ose instalim paketash. Për GitHub Pages, zgjidh branch-in dhe folderin ku i vendos këta skedarë.
 
@@ -52,3 +52,5 @@ v53: AAK me Ardian Gjinin; Ramush Haradinaj kandidat presidencial i vecante; emr
 v54: Qeveria -> Fushat e Qeverisjes. Banesa sociale/urbanizim, arsim teknik dhe mjekesor, paga me slider, prioritete rrugore/hekurudhore, miks energjetik, krim/patrullime/dosje AKI dhe ndarje Komando/Pajisje e FSK-se. Perfshi governance-fields.js dhe te gjitha integrimet e kesaj pakete.
 
 Prodhimi dhe Resurset (v55): pese sektore fizike me nivele 1-5, ndertime me afat, paga, greve, punesim, importe dhe eksporte javore. Yjet ekzistues te sherbimeve ruhen. Ruajtjet e vjetra kane aktivizim te shprehur ne panel.
+
+V57: tete sektore fizike, centrale sipas teknologjise dhe miks KEK i lidhur me ndertimet e perfunduara; zinxhir Miniera-Industri, kosto jetese, subvencione, automatizim dhe bashkefinancim BE. Aktivizimi eshte automatik edhe per ruajtjet e vjetra.

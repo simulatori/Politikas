@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-05",
-  "cacheVersion": "v56",
+  "cacheVersion": "v57",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -324,8 +324,8 @@
     },
     {
       "file": "executive-strategy.js",
-      "bytes": 28054,
-      "sha256": "4af279dbdd177df3e2117d55f2bc0d3988e8c73100607163950cac857143b4ea"
+      "bytes": 28235,
+      "sha256": "184ec1fefd9a2040bafaded76edda8067ce08fb21a2574d7167cb8034eeeaf37"
     },
     {
       "file": "finance-extension.js",
@@ -354,8 +354,8 @@
     },
     {
       "file": "governance-fields.js",
-      "bytes": 17484,
-      "sha256": "7a31d4aecc2046469ecb4ab8b352f503d9f5cd8c9e212756c97d9389062493b8"
+      "bytes": 17560,
+      "sha256": "87f8404690d50d7ac0b540ca57843a0e6b82bd4198e3b3e1f62bda04a04cfa68"
     },
     {
       "file": "governance-flow.js",
@@ -394,8 +394,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 90319,
-      "sha256": "e8dc88e6d125eeb2ee71c675fe7e0c417564ae5337586c28e729abfe26f4995f"
+      "bytes": 90372,
+      "sha256": "6846919740b91003088e692dac4641f00c808d047cdaaf2c33fba57c5b6a5c88"
     },
     {
       "file": "informal-economy.js",
@@ -434,8 +434,8 @@
     },
     {
       "file": "justice-reform.js",
-      "bytes": 9001,
-      "sha256": "dc05bd2248c60215ecafdebfa274ea43433e53a3ddd9d21021955c31f5c98cf7"
+      "bytes": 9581,
+      "sha256": "3d1306634de887738ca7ea033c971355010693fa8d4223519ffc1778732d7d79"
     },
     {
       "file": "labor-exodus.js",
@@ -593,6 +593,11 @@
       "sha256": "51f130c3c9cf50fa91d7953852fe9a00e08bb059071e6b2ca780ca7aee869be6"
     },
     {
+      "file": "production-economy.js",
+      "bytes": 33069,
+      "sha256": "6a3c1d3a9e6bcdd92125e7eb808fa7b6d6a275099243efbe8e51e2cd5d8d126e"
+    },
+    {
       "file": "production-resources.js",
       "bytes": 22948,
       "sha256": "d632561357ce20ad715030eea79ee5c2621dd45d896e7b603db281d450b1d9e3"
@@ -634,8 +639,8 @@
     },
     {
       "file": "script.js",
-      "bytes": 561311,
-      "sha256": "768f92f777e5138341608388182415c957345b927095f453f0e4686e2f3b6d86"
+      "bytes": 561407,
+      "sha256": "026fff556655d641451c7c57ee0b01cc00a586169557e009c0b2f49480624e60"
     },
     {
       "file": "sector-expansion-data.js",
@@ -654,8 +659,8 @@
     },
     {
       "file": "sector-management.js",
-      "bytes": 35805,
-      "sha256": "0cb94b0105ffb04ecd60a8c5a81a3ce2d59017b3b9049b4f300f01c4db6f0701"
+      "bytes": 35789,
+      "sha256": "3f71f80071332fb1d1c5addadc0449022e09876329512e92c81bb888d971f598"
     },
     {
       "file": "security-crises.js",
@@ -669,8 +674,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 5690,
-      "sha256": "e271168bd93e08e2ddd35a71c1fbacbc69cccc4ea750777a2284a364e0aad0e3"
+      "bytes": 5721,
+      "sha256": "8d4c2d638399f711cc7db1d03c2fa14de1c43828337184b0cb43630baacaec9e"
     },
     {
       "file": "sovereign-fund.js",
@@ -704,8 +709,8 @@
     },
     {
       "file": "style.css",
-      "bytes": 144713,
-      "sha256": "2c78dac83523a1659ee720f52869f26252a8f6989ed8994aa83a6bd906a1d2c2"
+      "bytes": 145376,
+      "sha256": "ecb08cf648f5784125ae76bbea8372d78aa751f1d3fc2e9fe84d4906b866b056"
     },
     {
       "file": "survival-crises-ui.js",
@@ -754,8 +759,8 @@
     },
     {
       "file": "winter-energy.js",
-      "bytes": 11104,
-      "sha256": "710ad970a13c49b729e07eda829eff3621e0c8dee1edf5380b78810c8e851679"
+      "bytes": 11184,
+      "sha256": "915b7c97633c11f751cfaed5373c593529d924683c8e87078f357058b8fff8ad"
     }
   ]
 }

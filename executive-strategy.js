@@ -108,7 +108,7 @@ function validateExecutiveStrategy(st){
     function bad(){throw Error('Regjistri i strategjisë ekzekutive është i pavlefshëm.');}
     const ids=new Set(),links=new Set();for(const r of routeRows(st)){
         if(!r||ids.has(r.id)||r.id!=='route:'+ids.size||!st.parties?.[r.owner]||!ROUTE_BIDS[r.bid]||!['BUILDING','COMPLETED','REPAIR'].includes(r.status))bad();ids.add(r.id);
-        const q=routeQuote(st,r.from,r.to,r.bid),link=[r.from,r.to].sort().join('|');if(links.has(link))bad();links.add(link);
+        const base=routeQuoteV55(st,r.from,r.to,r.bid),factor=r.constructionFactor??1;if(!Number.isFinite(factor)||factor<1||factor>2)bad();const q={...base,costB:fiscalRound(base.costB*factor),weeks:Math.ceil(base.weeks*factor)},link=[r.from,r.to].sort().join('|');if(links.has(link))bad();links.add(link);
         for(const k of ['km','baseB','costB','weeks'])if(q[k]!==r[k])bad();
         const receipt=st.publicFinance?.ledger.find(p=>p.id===r.paymentId);if(!receipt||receipt.type!=='CAPITAL_PAYMENT'||receipt.amountB!==-r.costB||receipt.turn!==r.startTurn||receipt.source!=='Autostradë: '+r.from+' / '+r.to)bad();
         if(!Number.isInteger(r.startTurn)||r.startTurn>st.turnCount||!Number.isInteger(r.lastTurn)||r.lastTurn<r.startTurn||r.lastTurn>st.turnCount||!Number.isInteger(r.elapsed)||r.elapsed<0||r.elapsed>r.weeks||r.progress!==Math.round(r.elapsed/r.weeks*100)||!Number.isFinite(r.qualityRoll)||r.qualityRoll<0||r.qualityRoll>=1)bad();
