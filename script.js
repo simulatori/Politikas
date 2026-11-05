@@ -1933,8 +1933,8 @@ function prepareLoadedState(rawState) {
     // Extend old sector snapshots before validating their now-expanded key set.
     if(loaded?.sectorManagement&&loaded.sectorManagement.expansion===undefined)migrateSectorExpansion(loaded);
     if(loaded?.parties?.AAK)loaded.parties.AAK.leader='Ardian Gjini';
-    repairPostElectionPublication(loaded);validateLoadedState(loaded);
-    runAllMigrations(loaded);repairPostElectionPublication(loaded);reconcileAssociationUltimatum(loaded);
+    if(loaded.productionResources)migrateProductionEconomy(loaded);repairPostElectionPublication(loaded);validateLoadedState(loaded);
+    runAllMigrations(loaded);migrateProductionEconomy(loaded);repairPostElectionPublication(loaded);reconcileAssociationUltimatum(loaded);
     validateLoadedState(loaded);
     return loaded;
 }

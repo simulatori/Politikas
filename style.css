@@ -2238,3 +2238,8 @@ details.media-ticker { display: block; padding: 0; }
 #productionResourcesPanel progress{height:12px;accent-color:#f4b51c}
 #productionResourcesPanel button{min-height:44px;white-space:normal}
 #productionResourcesPanel .card{min-width:0;overflow-wrap:anywhere}
+.production-eu{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;margin:4px 0;border:1px solid #3b82f6;border-radius:8px;background:#153a6b;color:#dbeafe;font-size:12px}
+.production-eu.is-frozen{filter:grayscale(1);background:#202938;border-color:#475569;color:#a3aab8}
+#productionResourcesPanel .production-subsidy{display:flex;align-items:center;gap:10px;min-height:44px;line-height:1.4}
+#productionResourcesPanel .production-subsidy input{width:20px;height:20px;flex:0 0 20px;accent-color:#f4b51c}
+.production-chain,#productionPlantPreview{padding:12px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(96,165,250,.22)}
