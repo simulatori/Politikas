@@ -187,7 +187,7 @@ function processFiscalWeek(turn){
         if(d.inflationDelta)state.inflation=fiscalRound(clamp(state.inflation+d.inflationDelta/d.weeks,0,20));
         if(d.elapsed===d.weeks){d.status='COMPLETED';d.completedTurn=turn;if(d.savingB)f.auditSavings[state.year]=(f.auditSavings[state.year]||0)+d.savingB;state.historyLog.unshift(state.year+' [Financat]: Përfundoi '+d.title+'.');}
     });
-    processEconomicPilotWeek(turn);
+    processEconomicPilotWeek(turn);var living=processLivingStateFiscal(turn),production=processProductionFiscal(turn);
     captureFinancePrices(state);
     var taxFactor=typeof fiscalCollectionFactor==='function'?fiscalCollectionFactor(state):populationFactor(state);
     var revenue=fiscalRound(taxCollectableAnnual(state.taxRevenueB,state)/FISCAL_WEEKS),withheld=fiscalRound(Math.min(fiscalOperatingPlan()/FISCAL_WEEKS,generalStrikeWithheldWeekly(state))),operating=fiscalRound(fiscalOperatingPlan()/FISCAL_WEEKS-withheld),interest=fiscalRound(fiscalAnnualInterestB(state)/FISCAL_WEEKS);
@@ -206,16 +206,16 @@ function processFiscalWeek(turn){
     if(typeof recordUnionOperatingFunding==='function')recordUnionOperatingFunding(turn,operating,paidOperating);
     var sectorQuality=typeof processSectorQualityFunding==='function'?processSectorQualityFunding(turn):{paidB:0,unpaidB:0};
     var enterprises=typeof processStateEnterprisesFiscal==='function'?processStateEnterprisesFiscal(turn):{paidB:0,revenueB:0};
-    revenue=fiscalRound(revenue+enterprises.revenueB);
+    revenue=fiscalRound(revenue+enterprises.revenueB+production.revenueB);
     var veterans=typeof processVeteransFiscal==='function'?processVeteransFiscal(turn):{paidB:0,unpaidB:0};
     var north=processNorthFiscal(turn);
     var generalPay=processGeneralStrikeFiscal(turn,withheld);
     var expansionPay=sectorExpansionFiscal(turn);revenue=fiscalRound(revenue+expansionPay.revenueB);
     var laborPay=processLaborSubsidyFiscal(turn),highwayPay=processHighwayFiscal(turn),sovereignPay=processSovereignFiscal(turn);revenue=fiscalRound(revenue+sovereignPay.revenueB);
-    var unpaid=fiscalRound(expansionPay.unpaidB+sovereignPay.unpaidB+highwayPay.unpaidB+laborPay.unpaidB+interest-paidInterest+operating-paidOperating+sectorQuality.unpaidB+veterans.unpaidB+north.unpaidB+generalPay.unpaidB);f.arrearsB=fiscalRound(f.arrearsB+unpaid);
+    var unpaid=fiscalRound(production.unpaidB+living.unpaidB+expansionPay.unpaidB+sovereignPay.unpaidB+highwayPay.unpaidB+laborPay.unpaidB+interest-paidInterest+operating-paidOperating+sectorQuality.unpaidB+veterans.unpaidB+north.unpaidB+generalPay.unpaidB);f.arrearsB=fiscalRound(f.arrearsB+unpaid);
     processFiscalDebtContracts(state,interest,paidInterest);
     processPrivateFinanceWeek(state);
-    state.lastWeekRevenues=revenue;state.lastWeekExpenses=fiscalRound(expansionPay.paidB+paidInterest+paidOperating+sectorQuality.paidB+enterprises.paidB+veterans.paidB+north.paidB+generalPay.paidB+laborPay.paidB+highwayPay.paidB+sovereignPay.paidB);state.plannedRevenues=fiscalRound(sectorExpansionWeeklyRevenue(state)*FISCAL_WEEKS+taxCollectableAnnual(state.taxRevenueB+(typeof foreignInvestmentAnnualTax==='function'?foreignInvestmentAnnualTax(state):0)+(typeof regionalCustomsAnnual==='function'?regionalCustomsAnnual(state,state.turnCount+1):0),state)+(typeof stateEnterpriseAnnualDividends==='function'?stateEnterpriseAnnualDividends(state):0)+(councilMember(state)&&!sectorExpansionCoal(state)&&!internationalIsolation(state)&&!associationTotalSanctions(state)?.003*FISCAL_WEEKS:0));
+    state.lastWeekRevenues=revenue;state.lastWeekExpenses=fiscalRound(production.paidB+living.paidB+expansionPay.paidB+paidInterest+paidOperating+sectorQuality.paidB+enterprises.paidB+veterans.paidB+north.paidB+generalPay.paidB+laborPay.paidB+highwayPay.paidB+sovereignPay.paidB);state.plannedRevenues=fiscalRound(sectorExpansionWeeklyRevenue(state)*FISCAL_WEEKS+taxCollectableAnnual(state.taxRevenueB+(typeof foreignInvestmentAnnualTax==='function'?foreignInvestmentAnnualTax(state):0)+(typeof regionalCustomsAnnual==='function'?regionalCustomsAnnual(state,state.turnCount+1):0),state)+(typeof stateEnterpriseAnnualDividends==='function'?stateEnterpriseAnnualDividends(state):0)+(councilMember(state)&&!sectorExpansionCoal(state)&&!internationalIsolation(state)&&!associationTotalSanctions(state)?.003*FISCAL_WEEKS:0));
     var entry={week:turn,year:state.year,month:MONTHS_SQ[state.monthIndex],revenues:revenue,expenses:state.lastWeekExpenses,balance:fiscalRound(revenue-state.lastWeekExpenses),interest:paidInterest,debtPct:state.publicDebtPct,reserve:state.fiscalReserve,gdpGrowth:state.gdpGrowth,inflation:state.inflation,events:unpaid>0?['Pagesa të papërmbushura për mungesë mjetesh.']:[]};
     state.fiscalHistory.unshift(entry);state.weeklyReports.unshift(Object.assign({},entry));return true;
 }
@@ -274,13 +274,13 @@ function confirmFiscalDecision(id){
         f.decisions.push(d);f.pending=null;state.historyLog.unshift(state.year+' [Financat]: '+p.title+' — '+(p.weeks?'zbatim në '+p.weeks+' javë.':'urdhri u krye.'));
     });if(ok){toggleModal('interactiveActionModal',false);showToast('Vendimi u regjistrua. Ecuria dhe pagesat shfaqen në panelin financiar.');}return ok;
 }
-function fiscalAdjustMinistry(idx,value){
+function fiscalAdjustMinistry(idx,value,afterChange){
     if(!assertGovernmentAuthority('Planifikimi i ministrisë'))return false;var m=state.ministries[idx],n=Number(value);
     if(!m || !Number.isFinite(n) || n<0 || n>1200 || n===m.budget)return false;
     var imf=typeof activeIMFPackage==='function'?activeIMFPackage(state):null;if(imf&&imf.ceilings[m.id]!==undefined&&n>m.budget){showToast('FMN ndalon rritjen e kesaj ndarjeje gjate austeritetit.');return false;}
     var b=fiscalBudgetForYear(state.year),total=calculatePlannedMinistriesBudget()+(n-m.budget)/1000+(typeof sectorManagementAnnualPublicCost==='function'?sectorManagementAnnualPublicCost(state):0);
     if(b?.status==='APPROVED' && total>b.plannedB-b.capitalB-(b.interestB||0)-(b.veteransB||0)-(b.northB||0)-(b.generalStrikeB||0)-(b.laborB||0)-(b.highwayB||0)-(b.akpB||0)-(b.expansionB||0)+(b.expansionSavingsB||0)+(b.rtkSavingsB||0)+.000001){showToast('Ndarja kalon planin e votuar. Përgatitni rishikim buxhetor për Kuvendin.');return false;}
-    return fiscalCommit(function(){m.budget=n;state.plannedExpenses=fiscalRound(total+(b?.capitalB||0)+(b?.interestB||0)+veteransAnnualCost(state)+northAnnualCost(state)+generalStrikeAnnualCost(state)+laborSubsidyWeekly(state)*FISCAL_WEEKS+highwayWeeklyCost(state)*FISCAL_WEEKS+sovereignWeeklyCost(state)*FISCAL_WEEKS-rtkAnnualSavings(state)+sectorExpansionAnnualNet(state));state.historyLog.unshift(state.year+' [Financat]: Plani i '+m.name+' u ndryshua në €'+n+'M. Pagesat kryhen gjatë javëve; ndryshimi i planit nuk krijon para.');});
+    return fiscalCommit(function(){m.budget=n;if(typeof afterChange==='function')afterChange();state.plannedExpenses=fiscalRound(total+(b?.capitalB||0)+(b?.interestB||0)+veteransAnnualCost(state)+northAnnualCost(state)+generalStrikeAnnualCost(state)+laborSubsidyWeekly(state)*FISCAL_WEEKS+highwayWeeklyCost(state)*FISCAL_WEEKS+sovereignWeeklyCost(state)*FISCAL_WEEKS-rtkAnnualSavings(state)+sectorExpansionAnnualNet(state));state.historyLog.unshift(state.year+' [Financat]: Plani i '+m.name+' u ndryshua në €'+n+'M. Pagesat kryhen gjatë javëve; ndryshimi i planit nuk krijon para.');});
 }
 function fiscalAllocationForm(){
     if(!assertGovernmentAuthority('Plani i ministrive'))return false;var e=catalogEscape;

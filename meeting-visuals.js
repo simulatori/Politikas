@@ -68,10 +68,12 @@ function openScheduledVisualMeeting(index){
     var m=state.scheduledMeetings[index];if(!m)return false;if(state.pendingVote){showToast('Përfundoni votimin përpara takimit.');return false;}if(m.status==='SCHEDULED' && m.dueTurn>state.turnCount){showToast('Takimi është planifikuar për '+diplomaticDate(m.dueTurn)+'.');return false;}
     var before=JSON.stringify(state),c=scheduledVisualContext(m),key='visual:scheduled:'+m.id;
     if(!state.meetingScenes[key])politicalSceneJournal('scheduled:'+m.id,c.kind,'U hap takimi për '+m.topic+'. Nuk është arritur marrëveshje.','OPEN');
+    if(strategyMeetingSupported(m))strategyFlow(m);
     if(!saveGameAuto()){state=JSON.parse(before);return false;}
     politicalSceneReturnFocus=document.activeElement;renderScheduledVisualMeeting(index);toggleModal('interactiveActionModal',false);toggleModal('meetingSceneModal',true);return true;
 }
 function renderScheduledVisualMeeting(index){
+    if(strategyMeetingSupported(state.scheduledMeetings[index]))return renderStrategyMeeting(index);
     var m=state.scheduledMeetings[index];if(!m)return;var c=scheduledVisualContext(m),scene=state.meetingScenes['visual:scheduled:'+m.id],esc=electoralEscape,box=document.getElementById('meetingSceneModalContent');
     var html='<div class="scene-toolbar"><strong>Takim '+(m.political9?'politik i partisë':'institucional')+' · Ora '+esc(m.hour || 'Nuk ka të dhëna')+'</strong><button class="btn-top" id="sceneClose" onclick="closePoliticalMeeting()" aria-label="Mbyll takimin">Mbyll ×</button></div>'+politicalSceneMarkup(c.kind,c)+'<div class="scene-dialogue" aria-live="polite">'+scene.lines.map(function(l){return '<p><strong>'+esc(l.who)+':</strong> '+esc(l.text)+'</p>';}).join('')+'</div>';
     if(m.status==='COMPLETED')html+='<div class="scene-result"><h3>Takimi përfundoi</h3><p>'+esc(m.outcome || 'Shih procesverbalin e regjistruar.')+'</p></div>';
@@ -89,6 +91,7 @@ function renderScheduledVisualMeeting(index){
 }
 function closePoliticalMeeting(){toggleModal('meetingSceneModal',false);if(politicalSceneReturnFocus && politicalSceneReturnFocus.isConnected && politicalSceneReturnFocus.focus)politicalSceneReturnFocus.focus();politicalSceneReturnFocus=null;}
 function decideScheduledVisualMeeting(index,code){
+    if(strategyMeetingSupported(state.scheduledMeetings[index]))return false;
     if(!assertPoliticalMeeting(state.scheduledMeetings[index]))return false;
     if(code==='NEGOTIATE' && !assertGovernmentAuthority('Marrëveshjet shtetërore'))return false;
     if(state.scheduledMeetings[index]?.requiresExecutive && !agendaExecutive())return false;

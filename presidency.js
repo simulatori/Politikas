@@ -72,6 +72,7 @@ function presidentialCandidates(){
     var seen=new Set();return Object.values(getAllPresCandidates()).filter(function(c){var key=presidentialIdentity(c.name);if(seen.has(key))return false;seen.add(key);return true;});
 }
 function presidentialProfileParty(c){
+    if(c.independent)return 'I pavarur';
     if(c.partyId)return c.partyId;
     var mp=state.mps.find(function(m){return presidentialIdentity(m.name)===presidentialIdentity(c.name);});
     if(mp)return mp.party;

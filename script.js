@@ -195,7 +195,7 @@ const INITIAL_POLITICAL_DB = {
             id: "AAK",
             name: "Aleanca për Ardhmërinë e Kosovës",
             short: "AAK",
-            leader: "Ardian Gjini / Ramush Haradinaj",
+            leader: "Ardian Gjini",
             deputyLeaders: ["Besnik Tahiri", "Time Kadrijaj", "Pal Lekaj"],
             orgSecretary: "Blerim Kuçi",
             color: "#d97706",
@@ -1183,16 +1183,17 @@ function createFreshState(mode = "REALITY_OCT2026", chosenParty = "LVV", customI
     if(typeof migrateLawImplementation==='function')migrateLawImplementation(s);
     if(typeof migrateInformalEconomy==='function')migrateInformalEconomy(s);
     if(typeof migrateLocalObstructions==='function')migrateLocalObstructions(s);
-    if(typeof migratePopulation==='function')migratePopulation(s);
+    if(typeof migratePopulation==='function')migratePopulation(s);if(typeof migrateLivingState==='function')migrateLivingState(s);if(typeof migrateGovernanceFields==='function')migrateGovernanceFields(s);
     if(typeof migrateStateEnterprises==='function')migrateStateEnterprises(s);migrateEnterpriseBoards(s);migrateSovereignFund(s);migrateTrepca(s);migrateSectorExpansion(s);
     if(typeof migrateNationalEmergencies==='function')migrateNationalEmergencies(s);
-    if(typeof migrateGovernmentCrises==='function')migrateGovernmentCrises(s);
+    if(typeof migrateGovernmentCrises==='function')migrateGovernmentCrises(s);if(typeof migrateGovernanceFields==='function')migrateGovernanceFields(s);
     if(typeof migrateOpposition==='function')migrateOpposition(s);
     migrateGovernmentCatalog(s);
     migrateMunicipalDevelopment(s);
     migrateElectionPreparation(s);
     migrateUrgentSituations(s);
     migrateExistingEffects(s);
+    if(typeof initialiseProduction==='function')initialiseProduction(s);
     return s;
 }
 
@@ -1449,12 +1450,11 @@ const DEFAULT_PRESIDENTIAL_CANDIDATES = {
     cand_jashari: { id: "cand_jashari", name: "Prof. Dr. Murat Jashari (ose Përfaqësues Jopartiak)", type: "Personalitet Unifikues Kombëtar (Jopartiak)", acceptParties: ["LVV", "PDK", "LDK", "AAK", "MIN_MULTI"], popBonus: 6.0 },
     cand_hasani: { id: "cand_hasani", name: "Prof. Dr. Enver Hasani", type: "Jurist / Ish-Kryetar i Gjykatës Kushtetuese", acceptParties: ["PDK", "LDK", "AAK", "MIN_MULTI"], popBonus: 2.5 },
     cand_bajrami: { id: "cand_bajrami", name: "Akademik Arsim Bajrami", type: "Akademik & Konstitucionalist", acceptParties: ["PDK", "LDK", "MIN_MULTI"], popBonus: 2.8 },
-    cand_haradinaj: { id: "cand_haradinaj", name: "Ramush Haradinaj / Ardian Gjini", type: "Kandidat nga AAK", acceptParties: ["AAK", "PDK"], popBonus: 2.0 }
+    cand_haradinaj: { id: "cand_haradinaj", name: "Ramush Haradinaj", independent: true, type: "Kandidat potencial i pavarur", acceptParties: ["AAK", "PDK"], popBonus: 2.0 }
 };
 
 function getAllPresCandidates() {
     var all=JSON.parse(JSON.stringify(Object.assign({},DEFAULT_PRESIDENTIAL_CANDIDATES,state.customPresCandidates || {})));
-    if(all.cand_haradinaj && state.parties.AAK)all.cand_haradinaj.name=state.parties.AAK.leader;
     return all;
 }
 
@@ -1624,6 +1624,8 @@ window.republikaCloudGame = {
         hideStartScreen();
         openNewScenarioModal();
     },
+    encodeJSON: function(json) { return encodeCloudSaveJSON(json); },
+    decodeJSON: function(json) { return decodeCloudSaveJSON(json); },
     exportJSON: function() {
         if (!state || weeklyProcessing || _committingVote || _voteInProgress) {
             throw new Error('Përfundoni përpunimin e javës ose votimin para ruajtjes.');
@@ -1927,8 +1929,10 @@ function migrateStateForDataFoundation(st) {
 function prepareLoadedState(rawState) {
     // Work on a detached copy: a failed validation/migration cannot damage the active game.
     var loaded = JSON.parse(JSON.stringify(rawState));
+    if(loaded?.parties){migrateGovernmentCrises(loaded);migrateGovernanceFields(loaded);}
     // Extend old sector snapshots before validating their now-expanded key set.
     if(loaded?.sectorManagement&&loaded.sectorManagement.expansion===undefined)migrateSectorExpansion(loaded);
+    if(loaded?.parties?.AAK)loaded.parties.AAK.leader='Ardian Gjini';
     repairPostElectionPublication(loaded);validateLoadedState(loaded);
     runAllMigrations(loaded);repairPostElectionPublication(loaded);reconcileAssociationUltimatum(loaded);
     validateLoadedState(loaded);
@@ -2032,6 +2036,10 @@ function migrateExistingEffects(st) {
 }
 
 function validateLoadedState(st) {
+    validateProductionResources(st);
+    validateGovernanceFields(st);
+    validateLivingState(st);
+    validateExecutiveStrategy(st);
     validatePoliticalEngagement(st);
     validateStrategicEconomy(st);
     function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
@@ -2247,10 +2255,10 @@ function runAllMigrations(st) {
     if(typeof migrateLawImplementation==='function')migrateLawImplementation(st);
     if(typeof migrateInformalEconomy==='function')migrateInformalEconomy(st);
     if(typeof migrateLocalObstructions==='function')migrateLocalObstructions(st);
-    if(typeof migratePopulation==='function')migratePopulation(st);
+    if(typeof migratePopulation==='function')migratePopulation(st);if(typeof migrateLivingState==='function')migrateLivingState(st);if(typeof migrateGovernanceFields==='function')migrateGovernanceFields(st);
     if(typeof migrateStateEnterprises==='function')migrateStateEnterprises(st);migrateEnterpriseBoards(st);migrateSovereignFund(st);migrateTrepca(st);migrateSectorExpansion(st);
     if(typeof migrateNationalEmergencies==='function')migrateNationalEmergencies(st);
-    if(typeof migrateGovernmentCrises==='function')migrateGovernmentCrises(st);
+    if(typeof migrateGovernmentCrises==='function')migrateGovernmentCrises(st);if(typeof migrateGovernanceFields==='function')migrateGovernanceFields(st);
     if(typeof migrateOpposition==='function')migrateOpposition(st);
     if(typeof migrateForeignInvestments==='function')migrateForeignInvestments(st);
     migrateGovernmentCatalog(st);
@@ -8003,7 +8011,7 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
         if(typeof processIMFCrisisWeek==='function')processIMFCrisisWeek(state.turnCount);
         processInternationalDiplomacyWeek();
         processDevelopmentWeek();
-        processGovernmentCatalogWeek();processWinterGreenAwards();
+        processGovernmentCatalogWeek();processWinterGreenAwards();processHighwayRoutesWeek(state.turnCount);
         updateMunicipalityProfilesWeek();
 
         checkPresidentialMandateExpiry();
@@ -8140,7 +8148,7 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
         if(typeof ensureRegularCampaign==='function')ensureRegularCampaign(state);
         processCampaignWeek();
         if(typeof processElectoralPromisesWeek==='function')processElectoralPromisesWeek(state.turnCount);
-        processSpecialPromisesWeek(state.turnCount);
+        processSpecialPromisesWeek(state.turnCount);processSectorHumanCapital(state.turnCount);processGovernanceFieldsWeek(state.turnCount);
         // Each simulated week gets the same update, including batched advances.
         var myP = state.parties[state.playerParty];
         if (!state.electionCampaign || state.electionCampaign.moduleVersion !== 3) {

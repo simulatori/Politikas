@@ -5,6 +5,7 @@ function createSecurityOpsState(st){return {version:1,lastTurn:st.turnCount,revi
 function enableSecurityOps(){if(state.securityOps)return false;return fiscalCommit(function(){state.securityOps=createSecurityOpsState(state);});}
 function securityCommit(change){return fiscalCommit(function(){change();validateSecurityOps(state);validateConstitutionDarkPolitics(state);});}
 function moveSecurityUnit(from,to,type,revision){
+ const readiness=fieldFSKReadiness(state);if(type==='special'&&readiness.commando<60||type==='army'&&readiness.equipment<50){showToast('Gatishmeria profesionale ose pajisjet nuk mjaftojne.');return false;}
  const s=state.securityOps,cost=.0001;if(!s || s.revision!==revision || !Object.hasOwn(SECURITY_REGIONS,from) || !Object.hasOwn(SECURITY_REGIONS,to) || from===to || !['army','special'].includes(type) || s.units[from][type]<1)return false;
  const ministry=state.ministries.find(m=>m.id==='mm'),spent=s.moves.filter(m=>m.year===state.year).reduce((n,m)=>n+m.costB,0),check=fiscalSpendingCheck(cost,false);
  if(!ministry || spent+cost>ministry.budget/1000 || !check.allowed || state.budgetTotalB<cost){showToast(check.message||'Nuk ka fonde të mbrojtjes për këtë lëvizje.');return false;}

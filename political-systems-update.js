@@ -1,6 +1,7 @@
 /* Shared appointment constraints and lossless local-save codec. */
-function packLocalSlots(slots){
+function packLocalSlots(slots,maxChars=64000000){
     const text=JSON.stringify(slots).replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
+    if(text.length>maxChars)throw Error('Ruajtja tejkalon kufirin e dekompresimit.');
     const dict=new Map();let next=256,word='',out=[];
     for(const ch of text){const joined=word+ch;if(word===''||dict.has(joined)){word=joined;continue;}
         out.push(String.fromCharCode((word.length===1?word.charCodeAt(0):dict.get(word))+1));
@@ -9,15 +10,30 @@ function packLocalSlots(slots){
     if(word)out.push(String.fromCharCode((word.length===1?word.charCodeAt(0):dict.get(word))+1));
     return 'RKS-LZW1:'+out.join('');
 }
-function unpackLocalSlots(raw){
+function unpackLocalSlots(raw,maxChars=64000000){
     if(!raw?.startsWith('RKS-LZW1:'))return JSON.parse(raw);
-    const data=raw.slice(9),dict=[];let next=256,word='',parts=[];
+    const data=raw.slice(9),dict=[];let next=256,word='',parts=[],size=0;
     for(let i=0;i<data.length;i++){const code=data.charCodeAt(i)-1;let entry=code<256?String.fromCharCode(code):dict[code];
         if(entry===undefined&&code===next&&word)entry=word+word[0];
         if(entry===undefined)throw Error('Ruajtja e kompresuar është e dëmtuar.');
+        size+=entry.length;if(size>maxChars)throw Error('Ruajtja e dekompresuar tejkalon kufirin.');
         parts.push(entry);if(word&&next<65534)dict[next++]=word+entry[0];word=entry;
     }
     return JSON.parse(parts.join(''));
+}
+// Transport UTF-16 codes as base64: Firestore strings cannot preserve lone surrogates.
+function encodeCloudSaveJSON(json){
+    const packed=packLocalSlots(JSON.parse(json),32000000).slice(9);let bytes='';
+    for(let i=0;i<packed.length;i++){const code=packed.charCodeAt(i);bytes+=String.fromCharCode(code>>>8,code&255);}
+    const encoded='RKS-LZW1:U16:'+btoa(bytes);
+    return new TextEncoder().encode(encoded).length<new TextEncoder().encode(json).length?encoded:json;
+}
+function decodeCloudSaveJSON(raw){
+    if(!raw.startsWith('RKS-LZW1:'))return raw;
+    if(!raw.startsWith('RKS-LZW1:U16:'))throw Error('Formati i Cloud nuk njihet.');
+    const data=atob(raw.slice(13));if(data.length%2)throw Error('Ruajtja në Cloud është e dëmtuar.');
+    let codes='';for(let i=0;i<data.length;i+=2)codes+=String.fromCharCode((data.charCodeAt(i)<<8)|data.charCodeAt(i+1));
+    return JSON.stringify(unpackLocalSlots('RKS-LZW1:'+codes,32000000));
 }
 function compactExistingLocalSlots(){
     const raw=localStorage.getItem(STORAGE_KEY_SLOTS);if(!raw||raw.startsWith('RKS-LZW1:'))return false;

@@ -24,7 +24,7 @@ function brainDrainCollapsed(st,id){return st.internalPressure?.sectors[id]?.epi
 function processInternalPressureWeek(turn){
     migrateInternalPressure(state);var db=state.internalPressure;if(turn<=db.lastTurn)return;db.lastTurn=turn;
     Object.values(db.sectors).forEach(r=>r.episodes.filter(e=>e.choice==='PRIVATE'&&e.contractDebt>0).forEach(e=>{var paid=Math.min(state.parties[e.owner].partyFunds,e.contractDebt);state.parties[e.owner].partyFunds-=paid;e.contractDebt-=paid;}));
-    Object.entries(db.sectors).forEach(([id,r])=>{if(brainDrainCollapsed(state,id)||!agendaExecutive())return;if(unionFundedStars(state,id)>=4||id==='sec_health'&&sectorExpansionLevel(state,id,'residents')>=6){r.lowWeeks=0;return;}r.lowWeeks++;if(r.lowWeeks<10)return;
+    Object.entries(db.sectors).forEach(([id,r])=>{if(brainDrainCollapsed(state,id)||!agendaExecutive())return;if(unionFundedStars(state,id)+(id==='sec_health'?medicineRetention(state):0)>=4||id==='sec_health'&&sectorExpansionLevel(state,id,'residents')>=6){r.lowWeeks=0;return;}if(id==='sec_health'&&medicineRetention(state)>0&&turn%Math.max(2,6-Math.floor(medicineRetention(state)*2))===0)return;r.lowWeeks++;if(r.lowWeeks<10)return;
         r.episodes.push({turn,choice:'PENDING',resolvedTurn:null,ledgerId:null,partyCost:0,contractDebt:0,owner:state.playerParty,imfId:null});crisisApproval(-15);state.historyLog.unshift('Eksod masiv i stafit: '+UNION_SECTORS[id].name+'. Ambasada e huaj lëshon viza pune; sektori bie në 1 yll.');recordCrisisPressEvent('STRIKE','brain-drain:'+id+':'+turn,'Eksod masiv i stafit',id);
     });
 }

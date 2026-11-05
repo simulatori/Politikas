@@ -1,5 +1,5 @@
 function migrateInformalEconomy(st){if(st.informalEconomy===undefined)st.informalEconomy=30;if(st.taxAdministration===undefined)st.taxAdministration={version:1,raids:[],protestRisk:0,lastTurn:st.turnCount};}
-function fiscalCollectionFactor(st){return (northSanctioned(st)?1-.1*councilShield(st):1)*populationFactor(st)*(typeof veteransProtestActive==='function'&&veteransProtestActive(st)?.95:1)*(typeof brusselsTaxFactor==='function'?brusselsTaxFactor(st):1)*sectorExpansionTaxFactor(st);}
+function fiscalCollectionFactor(st){return (northSanctioned(st)?1-.1*councilShield(st):1)*populationFactor(st)*(typeof veteransProtestActive==='function'&&veteransProtestActive(st)?.95:1)*(typeof brusselsTaxFactor==='function'?brusselsTaxFactor(st):1)*sectorExpansionTaxFactor(st)*domesticTaxFactor(st);}
 function taxCollectableAnnual(base,st){return laborTaxAnnual((Math.max(0,base)-(typeof securityCustomsLoss==='function'?securityCustomsLoss(st,base):0)+diasporaVATBonus(st))*fiscalCollectionFactor(st),st);}
 function raidTaxEvasion(){
     return governmentCrisisCommit(function(){migrateInformalEconomy(state);var a=state.taxAdministration;if(state.informalEconomy<=0||a.raids.some(r=>r.turn===state.turnCount))throw Error('Aksioni është kryer këtë javë ose ekonomia joformale është zero.');
