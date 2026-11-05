@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-05",
-  "cacheVersion": "v55",
+  "cacheVersion": "v56",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -394,8 +394,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 90063,
-      "sha256": "300e6e41fb223efdb0f037e989408c46800ba5f6e73d5a6d779800e867e4b030"
+      "bytes": 90319,
+      "sha256": "e8dc88e6d125eeb2ee71c675fe7e0c417564ae5337586c28e729abfe26f4995f"
     },
     {
       "file": "informal-economy.js",
@@ -670,7 +670,7 @@
     {
       "file": "service-worker.js",
       "bytes": 5690,
-      "sha256": "9815067e0d6c6474a23377cc08897c8573fb493fc59a792425683fd1d51e9d52"
+      "sha256": "e271168bd93e08e2ddd35a71c1fbacbc69cccc4ea750777a2284a364e0aad0e3"
     },
     {
       "file": "sovereign-fund.js",

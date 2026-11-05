@@ -24,7 +24,7 @@
          Pas ndryshimit të logos/kodit, rrit CACHE_VERSION te service-worker.js.
          manifest.json është JSON: komentet/instruksionet mbahen këtu, jo brenda tij.
          Instalimi kërkon HTTPS në publikim; localhost punon për testim. -->
-    <link rel="stylesheet" href="style.css?v=55">
+    <link rel="stylesheet" href="style.css?v=56">
 </head>
 <body>
 
@@ -761,6 +761,9 @@
 
             <!-- TAB 4: QEVERIA -->
             <section id="tab-government" class="tab-view">
+                <div style="margin:0 0 16px;display:flex;flex-wrap:wrap;gap:10px;">
+                    <button id="productionQuickAccess" class="action-btn" onclick="openProductionResources()">🏭 Prodhimi dhe Resurset</button>
+                </div>
                 <div class="sub-nav">
                     <button class="sub-pill active" onclick="switchSubTab('gov', 'cabinet', this)">💼 Kabineti & Ministrat</button>
                     <button class="sub-pill" onclick="switchSubTab('gov', 'sectors', this)">🏗️ Reformat Sektoriale</button>
