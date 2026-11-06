@@ -1,6 +1,6 @@
 ﻿# Republika — paketa për GitHub
 
-Përditësuar më **5 nëntor 2026**, cache PWA **v57**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
+Përditësuar më **6 nëntor 2026**, cache PWA **v61**. Përfshin zgjerimin e 15 sektorëve me 45 politika dhe 45 ndërtime, efektet fiskale dhe krizat përkatëse, Regjistrin e Kuadrove, Bombën Mediatike, Mega-Projektin e Autostradës, AKP/Fondin Sovran, Grevën e Trepçës, RTK-në, Komisionin Hetimor të Rrymës dhe të gjitha varësitë aktuale të lojës.
 
 Ngarko **përmbajtjen e folderit publikim** në rrënjën e repository-t. index.html duhet të jetë direkt aty, bashkë me JavaScript, CSS, manifestin, service worker-in, ikonat dhe folderin data. Mbaje .nojekyll. Nuk kërkohet build ose instalim paketash. Për GitHub Pages, zgjidh branch-in dhe folderin ku i vendos këta skedarë.
 
@@ -54,3 +54,9 @@ v54: Qeveria -> Fushat e Qeverisjes. Banesa sociale/urbanizim, arsim teknik dhe 
 Prodhimi dhe Resurset (v55): pese sektore fizike me nivele 1-5, ndertime me afat, paga, greve, punesim, importe dhe eksporte javore. Yjet ekzistues te sherbimeve ruhen. Ruajtjet e vjetra kane aktivizim te shprehur ne panel.
 
 V57: tete sektore fizike, centrale sipas teknologjise dhe miks KEK i lidhur me ndertimet e perfunduara; zinxhir Miniera-Industri, kosto jetese, subvencione, automatizim dhe bashkefinancim BE. Aktivizimi eshte automatik edhe per ruajtjet e vjetra.
+
+V58: Prodhimi, Reformat dhe Transporti jane seksione kryesore; buton global Mbrapa; shqyrtim ligjesh 1-2 jave; aktivizim vjetor i buxhetit me bartje; flota autobusesh/taksish/trenash/avionesh me kushte reale te simulimit dhe flukse javore.
+
+V60: transport i balancuar; 10 autobuse standarde kushtojne 2M EUR, 50k/jave operim dhe 70k/jave te hyra ne baze. Kontroll rezerve 10-javore per gjithe floten, fitim neto ne preview, histori e vjeter e ruajtur.
+
+V61: Fondi Patriotik / Kuizi Historik. 20 pyetje me burime, 5 pyetje per vit, 500M EUR per pergjigje te sakte dhe 3B EUR gjithsej per 5/5. Progresi dhe pagesat ruhen; rifreskimi nuk perserit shperblimet.

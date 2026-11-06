@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-05",
-  "cacheVersion": "v57",
+  "generated": "2026-11-06",
+  "cacheVersion": "v61",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -324,8 +324,8 @@
     },
     {
       "file": "executive-strategy.js",
-      "bytes": 28235,
-      "sha256": "184ec1fefd9a2040bafaded76edda8067ce08fb21a2574d7167cb8034eeeaf37"
+      "bytes": 28238,
+      "sha256": "d61c242715296198dba5fe9cd27c704d279f598e6bfd8bf19fa1c7e0498d81f3"
     },
     {
       "file": "finance-extension.js",
@@ -378,6 +378,11 @@
       "sha256": "1b572fd0bb66b1fa124a96768cc399e3bd3269eebd855b1b9b3e5e4e5e3734e8"
     },
     {
+      "file": "history-quiz.js",
+      "bytes": 15906,
+      "sha256": "8c88760cf245240f2194c3a9e01b7665c0ac8ea0c29b541e16fcd6fa453dcae6"
+    },
+    {
       "file": "icon-192.png",
       "bytes": 16171,
       "sha256": "ffb2a3f20fe76ae33420aa91dab26d4e7fbe02e07f7f21274edcc2674d5b9a33"
@@ -394,8 +399,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 90372,
-      "sha256": "6846919740b91003088e692dac4641f00c808d047cdaaf2c33fba57c5b6a5c88"
+      "bytes": 90457,
+      "sha256": "6c8a9a7c87622c709f058f13f97d57c58090ad1bc7c3b1e541d527aa918b3882"
     },
     {
       "file": "informal-economy.js",
@@ -604,8 +609,8 @@
     },
     {
       "file": "public-finance.js",
-      "bytes": 61491,
-      "sha256": "0ecb2db673535923fb061f1b9a4db43bece4de33ae4a6d82afa5a5a9e07360cc"
+      "bytes": 61860,
+      "sha256": "5e256c663d9c703dd9b40d121ec8935b6d35dfc0e3ff94e3976f363d3392c10d"
     },
     {
       "file": "public-support.js",
@@ -639,8 +644,8 @@
     },
     {
       "file": "script.js",
-      "bytes": 561407,
-      "sha256": "026fff556655d641451c7c57ee0b01cc00a586169557e009c0b2f49480624e60"
+      "bytes": 561427,
+      "sha256": "8c2cac043c473b022d4b59c121d605f0a90ad809fadf5c84fa857acdc8c6a2da"
     },
     {
       "file": "sector-expansion-data.js",
@@ -674,8 +679,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 5721,
-      "sha256": "8d4c2d638399f711cc7db1d03c2fa14de1c43828337184b0cb43630baacaec9e"
+      "bytes": 5778,
+      "sha256": "55005997dfe3d956742f0c8c2d98cf601b53548553e605249b1b18f7bc1342d6"
     },
     {
       "file": "sovereign-fund.js",
@@ -684,8 +689,8 @@
     },
     {
       "file": "state-calendar.js",
-      "bytes": 33117,
-      "sha256": "769d1dfb663bcbad8007afb0ab9cecca80b39dc09927ed209dfd91a624106e25"
+      "bytes": 33121,
+      "sha256": "2e14830c56a5e38515b0deeea2dbbdc02cf388df9d2d87de8eaea5e58fb6c856"
     },
     {
       "file": "state-development.js",
@@ -709,13 +714,18 @@
     },
     {
       "file": "style.css",
-      "bytes": 145376,
-      "sha256": "ecb08cf648f5784125ae76bbea8372d78aa751f1d3fc2e9fe84d4906b866b056"
+      "bytes": 147701,
+      "sha256": "c5082ccfa990cda51da7691d93016a276326c76942e35aedd3cff34520ca5971"
     },
     {
       "file": "survival-crises-ui.js",
       "bytes": 5965,
       "sha256": "845ae25d52db91e5f890de2713eeb542c3328a5bc1bc29dfcbb41c3ea6549808"
+    },
+    {
+      "file": "transport-workspace.js",
+      "bytes": 31942,
+      "sha256": "daa5ca0814a14a7b0c5820aaa12a1e5e7a1ca54f45aea03784df5b2dbbc781d2"
     },
     {
       "file": "trepca-strike.js",
