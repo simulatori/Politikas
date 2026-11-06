@@ -24,7 +24,7 @@
          Pas ndryshimit të logos/kodit, rrit CACHE_VERSION te service-worker.js.
          manifest.json është JSON: komentet/instruksionet mbahen këtu, jo brenda tij.
          Instalimi kërkon HTTPS në publikim; localhost punon për testim. -->
-    <link rel="stylesheet" href="style.css?v=57">
+    <link rel="stylesheet" href="style.css?v=61">
 </head>
 <body>
 
@@ -301,14 +301,14 @@
                         <span class="stat-val" id="statSeats" style="color: var(--accent-blue); text-shadow: 0 0 10px rgba(59,130,246,0.4);">62 / 120</span>
                     </div>
                 </div>
-                <div class="stat-box stat-vital stat-budget" onclick="switchMainTab('tab-government'); switchSubTab('gov','fiscal', document.querySelectorAll('#tab-government .sub-pill')[4]);">
+                <div class="stat-box stat-vital stat-budget" onclick="switchMainTab('tab-government'); switchSubTab('gov','fiscal', document.getElementById('governmentFiscalTab'));">
                     <div class="stat-icon-wrapper gold">💰</div>
                     <div class="stat-text-wrapper">
                         <span class="stat-label">Mjetet e lira</span>
                         <span class="stat-val" id="statBudget" style="color: var(--accent-gold); text-shadow: 0 0 10px rgba(251,191,36,0.4);">€3.32 Mld</span>
                     </div>
                 </div>
-                <div class="stat-box" onclick="switchMainTab('tab-government'); switchSubTab('gov','fiscal', document.querySelectorAll('#tab-government .sub-pill')[4]);">
+                <div class="stat-box" onclick="switchMainTab('tab-government'); switchSubTab('gov','fiscal', document.getElementById('governmentFiscalTab'));">
                     <div class="stat-icon-wrapper red">📉</div>
                     <div class="stat-text-wrapper">
                         <span class="stat-label">Rritja / Papunësia</span>
@@ -370,6 +370,7 @@
                 <div id="dash-overview" class="sub-content">
                     <div id="postElectionInvitation" hidden></div>
                     <div id="dashboardProgressPanel"></div>
+                    <section class="card" id="historyQuizPanel"></section>
                     <div class="dashboard-layout">
                     <div class="dashboard-main">
                     <div id="playerGuidancePanel"></div>
@@ -734,7 +735,7 @@
                         <div class="card-header">
                             <div class="card-title">🗓️ Seancat Parlamentare — Organizimi & Zhvillimi</div>
                             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                <button class="action-btn btn-gold" onclick="openSessionSchedulerModal()">+ Cakto Seancë të Re</button>
+                                <p>Ligjet kalojnë automatikisht shqyrtimin dhe shfaqen gati për votim.</p>
                                 <button class="action-btn btn-outline" onclick="openExtraordinarySessionModal()">⚡ Thirr Seancë të Jashtëzakonshme</button>
                             </div>
                         </div>
@@ -770,7 +771,7 @@
                     
                     <button class="sub-pill" onclick="switchSubTab('gov', 'meeting', this)">🗂️ Mbledhja e Qeverisë</button>
                     <button class="sub-pill" onclick="switchSubTab('gov', 'macro', this)">💶 Makroekonomia</button>
-                    <button class="sub-pill" onclick="switchSubTab('gov', 'fiscal', this)">📊 Buxheti & Ekonomia</button>
+                    <button class="sub-pill" id="governmentFiscalTab" onclick="switchSubTab('gov', 'fiscal', this)">📊 Buxheti & Ekonomia</button>
                     <button class="sub-pill" onclick="switchSubTab('gov', 'trade', this);renderBilateralTrade()">Tregtia</button>
                     <button class="sub-pill" onclick="switchSubTab('gov','war',this);renderSecurityOps()">War Room</button>
                     <button class="sub-pill" onclick="switchSubTab('gov','intelligence',this);renderSecurityOps()">Inteligjenca</button>
@@ -856,7 +857,7 @@
                 <div id="gov-energyinquiry" class="sub-content" style="display:none;"><section id="energyInquiryPanel" class="card"></section></div>
                 <div id="gov-rtk" class="sub-content" style="display:none;"><section id="rtkPanel" class="card"></section></div>
                 <div id="gov-sovereign" class="sub-content" style="display:none;"><section id="sovereignFundPanel" class="card"></section></div>
-                <div id="gov-highway" class="sub-content" style="display:none;"><section id="highwayProjectPanel" class="card"></section><section id="governmentHighwayRoutesPanel" class="card"></section></div>
+                <div id="gov-highway" class="sub-content" style="display:none;"><section id="highwayProjectPanel" class="card"></section></div>
                 <div id="gov-enterprises" class="sub-content" style="display:none;"><section class="card" id="enterpriseBoardsPanel"></section><section id="trepcaPanel" class="card"></section><div id="stateEnterprisesPanel"></div></div>
                 <div id="gov-investments" class="sub-content" style="display:none;"><div id="foreignInvestmentsPanel"></div></div>
             </section>
@@ -1127,6 +1128,8 @@
 <script src="governance-fields.js" defer></script>
 <script src="production-resources.js" defer></script>
 <script src="production-economy.js" defer></script>
+<script src="transport-workspace.js" defer></script>
+<script src="history-quiz.js" defer></script>
 <script src="pwa-registration.js" defer></script>
 <script src="government-notifications.js" defer></script>
 <script type="module">

@@ -5531,7 +5531,7 @@ function beginLawVote(law, continuation) {
     if(law?.annualBudgetYear && state.publicFinance.budgets[law.annualBudgetYear]?.lawId!==law.id){showToast('Kjo nuk është paraqitja aktive e projektbuxhetit.');return false;}
     if(law?.catalogId==='cat_budget_2027' && !law.annualBudgetYear && state.publicFinance.budgets[2027]?.status==='APPROVED'){showToast('Buxheti i vitit 2027 është tashmë i miratuar; nuk përsëritet pagesa ose votimi.');return false;}
     if (!assertAssemblyFunctional("Votimi")) return;
-    if (law && law.catalog13 && (law.status !== "SCHEDULED" || !law.debated || state.turnCount <= law.scheduledWeek) && !bureauExpeditedReady(law)) { showToast("Kërkohet seancë e caktuar dhe një javë për përgatitjen e votimit."); return; }
+    if (law && law.catalog13 && (law.status !== "SCHEDULED" || !law.debated || !law.shortReview && state.turnCount <= law.scheduledWeek) && !bureauExpeditedReady(law)) { showToast("Kërkohet seancë e caktuar dhe një javë për përgatitjen e votimit."); return; }
     if (law && !law.oppositionBill && !law.internationalAgreementId && (law.costB || 0) > state.budgetTotalB) { showToast("Buxheti nuk mbulon koston e zbatimit; votimi u shty."); return; }
     if (_voteInProgress || state.pendingVote) { showToast("Një votim është në zhvillim e sipër!"); return; }
     if (!law || ['PASSED','FAILED','WITHDRAWN','ANNULLED'].includes(law.status)) return;

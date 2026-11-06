@@ -130,7 +130,7 @@ function openStateCalendarItem(id){
     else if(r.source==='negotiation')openDiplomaticReportTarget(null,r.key,false);
     else if(['law','session','president'].includes(r.source)){switchMainTab('tab-assembly');var tab=r.source==='session'?3:r.source==='president'?5:2;switchSubTab('ass',r.source==='session'?'sessions':r.source==='president'?'president':'laws',document.querySelectorAll('#tab-assembly .sub-pill')[tab]);renderAssemblySection();}
     else if(r.source==='election'){switchMainTab('tab-elections');switchSubTab('elec','campaignplay',document.getElementById('campaignTabBtn'));renderCampaignPanel();}
-    else if(r.source==='fiscal'){switchMainTab('tab-government');switchSubTab('gov','fiscal',document.querySelectorAll('#tab-government .sub-pill')[4]);renderFiscalPanel();}
+    else if(r.source==='fiscal'){switchMainTab('tab-government');switchSubTab('gov','fiscal',document.querySelector('#tab-government [onclick*="fiscal"]'));renderFiscalPanel();}
     else if(r.source==='dialogue'){switchMainTab('tab-diplomacy');switchSubTab('dip','dialogue',document.querySelectorAll('#tab-diplomacy .sub-pill')[0]);renderDiplomacySection();}
     else if(r.source==='promise' || r.source==='development'){switchMainTab('tab-dashboard');switchSubTab('dash',r.source==='promise'?'promises':'development',document.querySelectorAll('#tab-dashboard .sub-pill')[r.source==='promise'?4:5]);}
     else if(r.source==='municipal'){index=state.municipalities.findIndex(function(m){return String(m.id)===String(r.target);});if(index>=0)openMuniProfile(index);}

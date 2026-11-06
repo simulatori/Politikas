@@ -2243,3 +2243,28 @@ details.media-ticker { display: block; padding: 0; }
 #productionResourcesPanel .production-subsidy{display:flex;align-items:center;gap:10px;min-height:44px;line-height:1.4}
 #productionResourcesPanel .production-subsidy input{width:20px;height:20px;flex:0 0 20px;accent-color:#f4b51c}
 .production-chain,#productionPlantPreview{padding:12px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(96,165,250,.22)}
+.workspace-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:90px;margin:0 0 12px;gap:6px}
+dialog .workspace-back,.modal-overlay .workspace-back{position:sticky;top:0;z-index:5;background:#14203a}
+.fleet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:16px;align-items:start}
+.fleet-card{min-width:0;overflow-wrap:anywhere}
+.fleet-illustration{display:grid;place-items:center;min-height:110px;border-radius:14px;background:linear-gradient(135deg,#142d52,#182137);border:1px solid #334c72;font-size:4rem}
+.fleet-card label{display:block;margin:12px 0}
+.fleet-card select{width:100%;min-width:0;min-height:44px}
+.fleet-card button{min-height:44px;white-space:normal}
+.history-quiz{max-width:720px;margin:auto;min-width:0}
+.history-quiz-kicker{color:#f6c54c;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem}
+.history-quiz progress{width:100%;height:12px;accent-color:#f4b51c}
+.history-quiz-question{font-size:1.12rem;line-height:1.6;margin:20px 0}
+.history-quiz-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.history-quiz-options button{min-height:56px;white-space:normal;line-height:1.5;padding:12px;text-align:left}
+.history-quiz-feedback{padding:18px;margin:18px 0;border:1px solid #748094;border-radius:14px;background:#192335}
+.history-quiz-feedback.is-correct{border-color:#37be8c;background:#102f29}
+.history-quiz-feedback.is-wrong{border-color:#d97878;background:#331e28}
+.history-quiz-feedback a{color:#93c5fd;text-decoration:underline}
+.history-quiz-grand{padding:16px;background:#4a3712;border:1px solid #f4b51c;border-radius:12px;color:#ffe39a;font-weight:700}
+@media(max-width:540px){.history-quiz-options{grid-template-columns:1fr}}
+@media(min-width:768px){.bottom-nav{overflow-y:auto;overscroll-behavior:contain}}
+@media(max-width:767px){
+ .bottom-nav{display:grid;grid-template-columns:none;grid-template-rows:repeat(2,44px);grid-auto-flow:column;grid-auto-columns:72px;justify-content:start;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity}
+ .bottom-nav .nav-item,.bottom-nav .dashboard-tools-launcher,.bottom-nav .urgent-launcher{width:72px;min-width:72px;scroll-snap-align:start;font-size:.6rem}
+}
