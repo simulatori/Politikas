@@ -32,7 +32,7 @@ function fdiPools(focus,metrics,weeks,excluded){
 function fdiDrawInvestor(draw){
     const pools=fdiPools(draw.focus,draw.metrics,draw.stableWeeks,draw.excluded),pool=draw.legendRoll<FDI_LEGEND_CHANCE&&pools.legendary.length?pools.legendary:pools.normal;
     if(!pool.length)return null;
-    const weights=pool.map(i=>(1+(draw.metrics[FDI_FAMILIES[i.family].primary]-2)*.5+(i.family==='TECH'?(draw.metrics.sec_edu-2)*.3:0))*(i.tier===2?1.5:i.tier===3?1.25:1));
+    const weights=pool.map(i=>(1+(draw.metrics[FDI_FAMILIES[i.family].primary]-2)*.5+(i.family==='TECH'?(draw.metrics.sec_edu-2)*.3:0))*(i.tier===2?1.5:i.tier===3?1.25:1)*(typeof socioInvestorWeight==='function'?socioInvestorWeight(i,draw):1));
     let position=draw.sampleRoll*weights.reduce((a,b)=>a+b,0);for(let n=0;n<pool.length;n++){position-=weights[n];if(position<0)return pool[n];}return pool.at(-1);
 }
 function startForeignInvestmentCampaign(revision,focus){
@@ -42,7 +42,7 @@ function startForeignInvestmentCampaign(revision,focus){
     if(!pools.normal.length){showToast('Nuk ka profile të reja të kualifikuara. Zhvilloni sektorët ose provoni një drejtim tjetër.');return false;}
     if(!check.allowed||state.budgetTotalB<.0005){showToast(check.message||'Arka nuk e mbulon fushatën.');return false;}
     return fdiCommit(function(){
-        const draw={focus,metrics,stableWeeks:weeks,excluded,legendRoll:Math.random(),sampleRoll:Math.random()},investor=fdiDrawInvestor(draw);if(!investor)throw Error('Nuk u gjet profil i vlefshëm.');
+        const draw={focus,metrics,stableWeeks:weeks,excluded,legendRoll:Math.random(),sampleRoll:Math.random(),societalReputation:typeof socioReputationSnapshot==='function'?socioReputationSnapshot(state):undefined},investor=fdiDrawInvestor(draw);if(!investor)throw Error('Nuk u gjet profil i vlefshëm.');
         fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-.0005),'IHD: fushatë tërheqjeje · '+(FDI_FAMILIES[focus]?.label||'të gjithë sektorët'),'EXPENSE');
         db.attractionCampaigns.push({id:'attract-campaign:'+db.attractionCampaigns.length,startTurn:state.turnCount,dueTurn:state.turnCount+3,status:'ACTIVE',paymentId:state.publicFinance.ledger.at(-1).id,investorId:investor.id,draw});db.revision++;
     });

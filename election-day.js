@@ -118,13 +118,13 @@ function generateElectionDayResults(cycle) {
     if(cycle.manifest.modelVersion===2)return generateMultiPreferenceResults(cycle);
     var manifest=cycle.manifest,random=electionRandom(cycle.seed),info=manifest.campaign;
     var turnoutRate=Math.max(0.30,Math.min(0.70,ELECTION_DAY_MODEL.baseTurnout+
-        Math.min(0.015,info.activities*0.0004)+Math.min(0.015,info.visibility*0.0003)+(random()-0.5)*0.04));
+        Math.min(0.015,info.activities*0.0004)+Math.min(0.015,info.visibility*0.0003)+(random()-0.5)*0.04+(manifest.civicTurnoutDelta||0)));
     var cast=Math.round(manifest.electorate*turnoutRate),invalid=Math.round(cast*(0.01+random()*0.02)),valid=cast-invalid;
     var weights=manifest.parties.map(function(party){
         var support=0.80*party.lastPoll+0.20*party.meanPoll;
         var performance=1+Math.max(-0.025,Math.min(0.025,(party.performance-50)*0.0005));
         var credibility=1+Math.max(-0.015,Math.min(0.015,(party.credibility-50)*0.0005));
-        return Math.max(0,support*performance*credibility*(1+(manifest.mediaEnvironment?.[party.partyId]||0))*(1+(random()-0.5)*0.016));
+        return Math.max(0,support*(manifest.civicMobilization?.[party.partyId]||1)*performance*credibility*(1+(manifest.mediaEnvironment?.[party.partyId]||0))*(1+(random()-0.5)*0.016));
     });
     var votes=distributeElectionVotes(valid,weights);votes=embassyAdjustedVotes(manifest.parties.map(p=>p.partyId),votes,valid,manifest.embassyMobilization,manifest.parties.map(p=>(manifest.preparedBallots||[]).filter(b=>b.partyId===p.partyId).length));
     votes=northGuaranteedVotes(manifest.parties.map(p=>p.partyId),votes,valid,manifest.northMandate,manifest.parties.map(p=>(manifest.preparedBallots||[]).filter(b=>b.partyId===p.partyId).length));

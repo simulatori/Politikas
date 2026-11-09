@@ -145,7 +145,7 @@ function processCampaignWeek() {
     campaign.lastProcessedTurn=state.turnCount;
     // Programme impact is applied once per elapsed week, capped irrespective of promise count.
     var sectors=new Set(campaign.programme.map(function(promise){return promise.sector;})).size;
-    var programmeEffect=Math.min(0.12,sectors*0.02);
+    var programmeEffect=Math.min(0.12,sectors*0.02)*(typeof electoralPromiseCredibility==='function'?electoralPromiseCredibility(state,state.playerParty):1);
     if(programmeEffect)recordCampaignShift(state.playerParty,programmeEffect,"Programi zgjedhor — vlerësimi javor");
     var mood=Math.max(-0.08,Math.min(0.08,(state.approval-50)*0.003));
     if(mood)recordCampaignShift(state.playerParty,mood,"Perceptimi publik — vlerësimi javor");

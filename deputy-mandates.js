@@ -148,7 +148,7 @@ function chooseCabinetDeputy(index,value){
     if(!constituentGovernmentGate() || !state.cabinetProposal || !state.cabinetProposal[index])return false;
     var item=state.cabinetProposal[index],mp=state.mps.find(function(mp){return String(mp.seatNumber)===value && mp.party===item.party;});if(!mp)return false;
     if(state.mandatar!==state.playerParty||item.party!==state.playerParty||!cabinetNomineeAvailable(state,mp.name,state.cabinetProposal,index)){showToast('Kandidati është i rezervuar ose mban një ministri tjetër.');return false;}
-    item.ministerName=mp.name;item.ministerCandidateId=mp.candidateId || null;item.competence=mp.loyalty || 50;item.loyalty=mp.loyalty || 50;state.cabinetApproved=false;renderCabinetSelectionModal();return true;
+    item.ministerName=mp.name;item.ministerCandidateId=mp.candidateId || null;item.competence=clamp((mp.loyalty||50)+(typeof shadowCandidateBonus==='function'?shadowCandidateBonus(state,mp.candidateId,mp.name,mp.party):0),0,100);item.loyalty=mp.loyalty || 50;state.cabinetApproved=false;renderCabinetSelectionModal();return true;
 }
 function renderDeputyMandateDirectory(){
     var host=document.getElementById("deputyMandatesPanel"),l=deputyLedger(state);if(!host || !l)return;
