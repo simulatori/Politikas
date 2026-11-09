@@ -16,6 +16,6 @@ function renderSurvivalCrises(){
         const ok=resolveRogueTender(current.id,button.dataset.rogueChoice);
         if(!ok){button.disabled=false;let error=content.querySelector('[role=alert]');if(!error){error=document.createElement('p');error.setAttribute('role','alert');content.appendChild(error);}error.textContent=governmentActionError||'Vendimi nuk u ruajt. Provoni përsëri pasi të përfundojë përpunimi.';}
     };
-    if(!dialog.open)dialog.showModal();
+    if(!dialog.open)if(!governmentCrisisPresentationBlocked('renderSurvivalCrises'))dialog.showModal();
 }
 document.addEventListener('DOMContentLoaded',()=>document.getElementById('survivalDecisionDialog')?.addEventListener('cancel',e=>{if(roguePendingReport(state)||veteransCrisisPending(state))e.preventDefault();}));

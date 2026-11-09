@@ -2,13 +2,27 @@
    Keep CORE_ASSETS aligned with local script dependencies in index.html.
    Cache only this game's static shell. Never cache Auth, Firestore or user saves.
    The next version activates after all windows using the previous version close. */
-const CACHE_VERSION='v61';
+const CACHE_VERSION='v87';
 const CACHE_PREFIX='republika-shell:'+self.registration.scope+':';
 const CACHE_NAME=CACHE_PREFIX+CACHE_VERSION;
 const CORE_ASSETS=[
     "./index.html",
     "./landing-shell.js",
     "./style.css",
+    "./executive-desk.css",
+    "./executive-desk.js",
+    "./political-life.js",
+    "./political-life-ui.js",
+    "./political-life.css",
+    "./societal-dynamics.js",
+    "./societal-dynamics-ui.js",
+    "./governing-challenges.js",
+    "./governing-challenges-ui.js",
+    "./institutional-economy.js",
+    "./institutional-economy-ui.js",
+    "./social-policy.js",
+    "./social-policy-ui.js",
+    "./societal-dynamics.css",
     "./manifest.json",
     "./logo.png",
     "./icon-192.png",
@@ -40,6 +54,23 @@ const CORE_ASSETS=[
     "./production-economy.js",
     "./transport-workspace.js",
     "./history-quiz.js",
+    "./production-grid.js",
+    "./state-services.js",
+    "./civil-registry.js",
+    "./electoral-memory.js",
+    "./party-strategies.js",
+    "./budget-battle.js",
+    "./minister-performance.js",
+    "./weekly-control.js",
+    "./political-accountability.js",
+    "./shadow-cabinet.js",
+    "./strategic-reserves.js",
+    "./coalition-trust.js",
+    "./project-readiness.js",
+    "./economic-forecast.js",
+    "./influence-network.js",
+    "./strategic-simulation.js",
+    "./assets/stema-kosoves.png",
     "./deputy-mandates.js",
     "./international-diplomacy.js",
     "./agreement-documents.js",

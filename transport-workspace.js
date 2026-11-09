@@ -84,7 +84,7 @@ function transportFlightReady(st){return st.transportFleets?.airport.level>=2&&!
 function fleetUtilization(st,type){
     if(type==='plane')return transportFlightReady(st)?1:0;
     if(['passenger','freight'].includes(type))return fieldStrength(st,'sec_rail','rail')>0?Math.min(1.8,.6+fieldStrength(st,'sec_rail','rail')*.15):0;
-    const roads=fieldStrength(st,'sec_roads','maintenance'),urban=fieldStrength(st,'sec_env','urbanisation'),routes=routeRows(st).filter(r=>r.status==='COMPLETED').length;
+    const roads=fieldStrength(st,'sec_roads','maintenance'),urban=fieldStrength(st,'sec_env','urbanisation'),routes=routeRows(st).filter(r=>r.status==='COMPLETED'&&(typeof commissionOpen!=='function'||commissionOpen(st,'ROUTE|'+r.id))).length;
     return Math.min(2,1+roads*.08+urban*.08+routes*.05);
 }
 function fleetVariant(st,p){return FLEET_TYPES[p.type].variants[p.level];}
