@@ -1779,7 +1779,9 @@ function migrateStateForFaza7(st) {
         if (typeof law.sector === "undefined") law.sector = "sec_econ";
         if (typeof law.submittedWeek === "undefined") law.submittedWeek = 1;
         if (typeof law.scheduledWeek === "undefined") law.scheduledWeek = null;
-        if (typeof law.applied === "undefined") law.applied = (law.status === "PASSED");
+        // Parliamentary approval does not imply implementation during judicial review.
+        // Infer missing legacy flags only; explicit invalid flags still fail validation.
+        if (typeof law.applied === "undefined") law.applied = law.status === "PASSED" && !courtMajorPending(law,st);
         if (!law.voteHistory) law.voteHistory = [];
         if (!law.stageHistory) law.stageHistory = [];
         if (typeof law.status === "undefined") law.status = "DRAFT";
@@ -2766,7 +2768,8 @@ function buildDefaultCabinetProposal() {
             ministryName: min.name,
             party: owner,
             ministerName: cand ? cand.name : '',
-            competence: cand ? Math.min(95, (cand.loyalty||75) + 5) : 85,
+            competence: cand ? Math.min(95, (cand.loyalty||75) + 5 + (typeof shadowCandidateBonus==='function'?shadowCandidateBonus(state,cand.id,cand.name,owner):0)) : 85,
+            ministerCandidateId: cand ? cand.id : null,
             loyalty: cand ? (cand.loyalty||75) : 90,
             isCustom: false
         });
@@ -2895,6 +2898,7 @@ function applyCabinetProposalToState(authorization) {
             min.ministerCandidateId = item.ministerCandidateId || null;
             min.competence = item.competence;
             min.loyalty = item.loyalty;
+            min.appointmentType='PARTY';min.independent=false;
         }
     });
 }
@@ -3174,6 +3178,7 @@ function voteNoConfidenceMotion(motionId) {
     var myPartyIsOpposition = !state.coalitionParties.includes(state.playerParty);
 
     state.mps.forEach(function(mp) {
+        if(motion.lifeNetwork){if(lifeNoConfidenceVote(mp,state))pro++;else kunder++;return;}
         if(motion.coalitionBlackmailId){if(coalitionBlackmailMotionVote(motion,mp))pro++;else kunder++;return;}
         if(motion.veteransBudgetMotion){if(!state.coalitionParties.includes(mp.party)||specialBlockedSeats(state).has(mp.seatNumber))pro++;else kunder++;return;}
         if(motion.northCrisisId){if(northMotionSupport(motion,mp,state))pro++;else kunder++;return;}
@@ -3487,8 +3492,8 @@ function summitPanel() {
         var action=!p || changed?'INVITE':p.status==='INVITED'?'ACCEPT':p.status==='ACCEPTED'?'ATTEND':null;
         if(action)html+='<button class="action-btn" onclick="summitParticipationAction(\''+action+'\')">'+({INVITE:'Fto kryeministrin aktual',ACCEPT:'Prano ftesën',ATTEND:'Merr pjesë si përfaqësues i Kosovës'}[action])+'</button>';
         if(p && !changed && ['INVITED','ACCEPTED'].includes(p.status))html+='<button class="btn-top" onclick="summitParticipationAction(\'ABSENT\')">Regjistro mungesën</button>';
-        if(p?.status==='ATTENDING' && !changed)html+='<p>Zgjidh mesazhin e fjalimit për dialogun dhe koordinimin me partnerët:</p>'+r.options.map(function(o,i){return '<button class="choice-btn" onclick="resolveActiveEvent('+i+',\''+r.id+'\')"><span class="choice-title">'+e(o.text)+'</span><span class="choice-impact">'+e(o.impactText)+'</span></button>';}).join('');
-        if(p?.status==='ABSENT' && !changed)html+='<p>Kryeministri mungon. Dosja mbetet për vendim ekzekutiv, pa fjalim në samit.</p>'+r.options.map(function(o,i){return '<button class="choice-btn" onclick="resolveActiveEvent('+i+',\''+r.id+'\')">'+e(o.text)+'</button>';}).join('');
+        if(p?.status==='ATTENDING' && !changed)html+='<p>Zgjidh mesazhin e fjalimit për dialogun dhe koordinimin me partnerët:</p>'+r.options.map(function(o,i){return '<button class="choice-btn" data-urgent-choice="'+i+'" onclick="resolveActiveEvent('+i+',\''+r.id+'\')"><span class="choice-title">'+e(o.text)+'</span><span class="choice-impact">'+e(o.impactText)+'</span></button>';}).join('');
+        if(p?.status==='ABSENT' && !changed)html+='<p>Kryeministri mungon. Dosja mbetet për vendim ekzekutiv, pa fjalim në samit.</p>'+r.options.map(function(o,i){return '<button class="choice-btn" data-urgent-choice="'+i+'" onclick="resolveActiveEvent('+i+',\''+r.id+'\')">'+e(o.text)+'</button>';}).join('');
     }
     return html+'</div>';
 }
@@ -5481,6 +5486,7 @@ function finalizeLawVote(law, result, sessionId) {
     if (!assertAssemblyFunctional("Miratimi i ligjit")) return false;
     if (["PASSED","FAILED","ANNULLED","WITHDRAWN"].includes(law.status)) return false;
     if(_committingVote && typeof coalitionDemandFinalize==='function')coalitionDemandFinalize(law,result);
+    if(typeof law.applied==='undefined')law.applied=false;
     var labels = { pro: "PRO", kunder: "KUNDËR", abstenim: "ABSTENIM", mungese: "MUNGON" };
     result.ballots.forEach(function(ballot) {
         var mp = state.mps.find(function(item) { return item.seatNumber === ballot.seatNumber; });
@@ -6152,6 +6158,7 @@ function renderGovernmentSection() {
                 '<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px; line-height:1.5;">' +
                     '• Ministër/e: <strong style="color:#fff;">' + m.minister + '</strong><br>' +
                     '• Kompetenca: <strong>' + m.competence + '/100</strong> • Besnikëria: <strong>' + m.loyalty + '%</strong><br>' +
+                    (typeof ministerMetricsMarkup==='function'?ministerMetricsMarkup(m):'') +
                     '• Dosja: <span style="color:var(--accent-gold);">' + (m.currentIssue || "Zbatimi i planit") + '</span>' +
                 '</div>' +
                 '<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">' +
@@ -6573,8 +6580,10 @@ function reshuffleMinister(idx, mode) {
     var m = state.ministries[idx];
     if (!m) return;
     if(m.party!==state.playerParty){showToast('Partneri i koalicionit propozon ministrin e vet.');return false;}
+    if(mode==='EXPERT'&&m.minister!=='I/E paemëruar'&&m.appointmentType==='EXPERT'&&m.independent){showToast('Ministria ka tashmë ekspert të pavarur. Përdorni listën e kuadrove për një zëvendësues tjetër.');return false;}
     if(governmentCrisisPending())return false;
     var beforeReshuffle=JSON.stringify(state);
+    if(typeof completeMinisterReviewReplacement==='function')completeMinisterReviewReplacement(undefined,m);
     var prevParty = m.party;
     m.ministerCandidateId=null;
     if (prevParty !== state.playerParty && state.coalitionParties.includes(prevParty)) {
@@ -6582,14 +6591,15 @@ function reshuffleMinister(idx, mode) {
         addMediaNews("Gazeta Express", "Tension pas shkarkimit të ministrit të " + state.parties[prevParty].short + "!", "CRITICAL");
     }
     if (mode === "EXPERT") {
-        m.minister = "Dr. Ekspert Jopartiak · "+m.id; m.competence = 92; m.risk = 6;
+        m.minister = "Dr. Ekspert Jopartiak · "+m.id; m.competence = 92; m.risk = 6;m.appointmentType="EXPERT";m.independent=true;m.loyalty=60;
         adjustPublicSupport((1.5), {source:"reshuffleMinister"}, state);
     } else {
         var myP = state.parties[state.playerParty];
-        var randomCand = cabinetReplacementCandidates(state.playerParty,m.id)[0];
+        var randomCand = cabinetReplacementCandidates(state.playerParty,m.id).find(c=>cabinetIdentity(c.name)!==cabinetIdentity(m.minister));
         if(!randomCand){state=JSON.parse(beforeReshuffle);showToast('Nuk ka kandidat të lirë për këtë ministri.');return false;}
         m.minister = randomCand.name;
-        m.party = state.playerParty; m.competence = 85;
+        m.ministerCandidateId=randomCand.id;
+        m.party = state.playerParty; m.competence = Math.min(100,85+(typeof shadowCandidateBonus==='function'?shadowCandidateBonus(state,randomCand.id,randomCand.name,m.party):0));m.appointmentType="PARTY";m.independent=false;m.loyalty=randomCand.loyalty||75;
     }
     syncDeputyGovernment();
     try{validateLoadedState(state);}catch(error){state=JSON.parse(beforeReshuffle);showToast("Emërimi nuk u krye: "+error.message);return false;}
@@ -6791,7 +6801,7 @@ function renderMunicipalities() {
     if (!grid) return;
     var expanded=new Set(Array.from(grid.querySelectorAll('details[open]')).map(d=>d.dataset.municipality));
     grid.innerHTML=list.map(function(m){
-        var e=catalogEscape,p=state.parties[m.mayorParty],profile=state.municipalityProfiles?.[m.id]||{},projects=municipal14Records(state).filter(x=>x.municipalityId===m.id),idx=state.municipalities.indexOf(m),active=projects.filter(x=>['FUNDED','ACTIVE','DELAYED'].includes(x.status)).length;
+        var e=catalogEscape,p=m.mayorIndependent?{short:'I pavarur',tagClass:'tag-min'}:state.parties[m.mayorParty],profile=state.municipalityProfiles?.[m.id]||{},projects=municipal14Records(state).filter(x=>x.municipalityId===m.id),idx=state.municipalities.indexOf(m),active=projects.filter(x=>['FUNDED','ACTIVE','DELAYED'].includes(x.status)).length;
         return '<details class="card municipality-overview" data-municipality="'+e(m.id)+'" '+(expanded.has(m.id)?'open':'')+'><summary><span class="municipality-card-heading"><strong>'+e(m.name)+'</strong><span class="tag '+e(p?.tagClass||'tag-min')+'">'+e(p?.short||m.mayorParty)+'</span></span><span class="municipality-card-meta">'+e(m.region)+' · '+e(m.mayorName)+'</span><span class="municipality-card-meta">'+active+' projekte aktive · €'+m.budgetM.toLocaleString('sq-AL',{maximumFractionDigits:2})+'M buxhet</span><span class="municipality-card-open">Infrastruktura dhe projektet</span></summary><div class="municipality-card-body"><div class="municipality-indicators">'+[['Infrastruktura','infrastructure'],['Shërbimet','services'],['Punësimi','employment'],['Zhvillimi','development']].map(([label,key])=>'<div><span>'+label+'</span><strong>'+displayLocalIndicator(profile,key)+'</strong></div>').join('')+'</div><p><strong>Prioriteti:</strong> '+e(m.issue)+'</p><div class="municipality-projects">'+projects.map(municipal14Card).join('')+'</div><div class="municipality-actions"><button class="btn-top" onclick="openMuniProfile('+idx+')">Profili i plotë</button><button class="btn-top" onclick="openMuniProjectModal('+idx+')">Projektet dhe financimi</button></div></div></details>';
     }).join('')||'<p>Nuk ka komuna për filtrat e zgjedhur.</p>';
 }
@@ -6800,7 +6810,7 @@ function openMuniProfile(mIdx) {
     var m = state.municipalities[mIdx];
     if (!m) return;
     var prof = (state.municipalityProfiles || {})[m.id] || {};
-    var p = state.parties[m.mayorParty] || state.parties.LVV;
+    var p = m.mayorIndependent?{short:'I pavarur',name:'I pavarur',leader:m.mayorName,color:'#64748b',tagClass:'tag-min'}:state.parties[m.mayorParty] || state.parties.LVV;
     var muniDevProjs = (state.developmentProjects || []).filter(function(dp){ return dp.municipalityId === m.id; });
 
     var box = document.getElementById("interactiveActionModalContent");
@@ -8005,6 +8015,7 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
         if(typeof processVeteransAuditWeek==='function')processVeteransAuditWeek(state.turnCount);
         if(typeof processVeteransEconomy==='function')processVeteransEconomy(state.turnCount);
         if(typeof processUnionsWeek==='function')processUnionsWeek(state.turnCount);
+        if(typeof processBudgetBattleWeek==='function')processBudgetBattleWeek(state.turnCount);
         processInternalPressureWeek(state.turnCount);processMediaDossiersWeek(state.turnCount);
         if(typeof processJusticeReformWeek==='function')processJusticeReformWeek(state.turnCount);
         if(typeof processConstitutionalCourtWeek==='function')processConstitutionalCourtWeek(state.turnCount);
@@ -8158,6 +8169,8 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
         }
         if(typeof processGovernmentCrisesWeek==='function')processGovernmentCrisesWeek(state.turnCount);processCoalitionBlackmailWeek(state.turnCount);
         if(typeof processNationalEmergenciesWeek==='function')processNationalEmergenciesWeek(state.turnCount);
+        if(typeof processMinisterPerformanceWeek==='function')processMinisterPerformanceWeek(state.turnCount);
+        if(typeof processStrategicSimulationWeek==='function')processStrategicSimulationWeek(state.turnCount);
         if(veteransProtestActive(state))state.gdpGrowth=Math.min(0,state.gdpGrowth);
         if(typeof syncInterestGroups==='function')syncInterestGroups(state);
         if(state.nationalEmergencies?.events.some(e=>e.status==='ACTIVE'&&!e.acknowledged||e.status==='FAILED'&&e.failedTurn===state.turnCount))break;

@@ -14,8 +14,45 @@ const CRISIS_QUESTIONS={
 };
 const CRISIS_ANSWERS=[{id:'SPIN',label:'Fajëso opozitën dhe kundërshto akuzat'},{id:'RESPONSIBILITY',label:'Merr përgjegjësi dhe prano mangësitë'},{id:'PROMISE',label:'Premto përmirësim konkret brenda 3 javëve'}];
 var governmentCrisisRetry=null;
+// Project existing cases into one list; never create duplicate crisis records.
+const GOVERNMENT_CRISIS_ROUTES=[
+ ['associationUltimatumPending','Ultimatumi i QUINT-it','renderAssociationUltimatum'],
+ ['sectorExpansionPending','Vendimi sektorial','renderSectorExpansion'],['energyInquiryPending','Komisioni i rrymës','renderEnergyInquiry'],
+ ['rtkPending','Bordi i RTK-së','renderRTK'],['pendingTrepca','Greva në Trepçë','renderTrepca'],['sovereignPending','Fondi Sovran','renderSovereignFund'],
+ ['pendingHighwayProject','Tenderi i autostradës','renderHighwayProject'],['bureauBattlePending','Byroja e Konfiskimit','renderBureauBattle'],
+ ['pendingDinarCrisis','Ndalimi i dinarit','renderDinarCrisis'],['laborExodusPending','Eksodi i fuqisë punëtore','renderLaborExodus'],
+ ['pendingCoalitionBlackmail','Shantazhi i koalicionit','renderCoalitionBlackmail'],['veteransBudgetPending','Listat e veteranëve','renderVeteransBudget'],
+ ['enterpriseBoardsPending','Bordet e ndërmarrjeve','renderEnterpriseBoards'],['municipalGrantPending','Grantet komunale','renderMunicipalGrants'],
+ ['generalStrikePending','Greva e përgjithshme','renderGeneralStrike'],['pendingWinterEnergy','Kriza energjetike','renderWinterEnergy'],
+ ['councilPending','Këshilli i Evropës','renderCouncilEurope'],['mediaDossierBlocked','Dosja mediatike','renderMediaDossiers'],
+ ['internalPressurePending','Ultimatumi i brendshëm','renderInternalPressure'],['northPending','Kriza e Veriut','renderNorthCrisis'],
+ ['diasporaPendingSeason','Organizimi i votimit të Mërgatës','renderDiasporaMobilization'],['institutionalConflictPending','Konflikti institucional','renderInstitutionalConflicts'],
+ ['imfPending','Pakoja e FMN-së','renderIMFCrisis'],['brusselsDecisionPending','Vendimi i dialogut','renderBrusselsSpecial'],
+ ['roguePendingReport','Raporti sekret i tenderit','renderSurvivalCrises'],['veteransCrisisPending','Auditimi i veteranëve','renderSurvivalCrises']
+];
+function pendingGovernmentDecisions(st){
+ st=st||state;if(!agendaExecutive(st))return [];
+ const rows=GOVERNMENT_CRISIS_ROUTES.filter(r=>typeof globalThis[r[0]]==='function'&&globalThis[r[0]](st)).map(r=>({key:r[0],title:r[1],renderer:r[2]}));
+ if(st.governance?.pendingScandal)rows.push({key:'SCANDAL',title:'Skandali i ministrit',renderer:'renderGovernmentCrisisUI'});
+ return rows.sort((a,b)=>crisisPriority(a.key)-crisisPriority(b.key));
+}
+function governmentWeekBlockReason(st){const rows=pendingGovernmentDecisions(st);return rows.length?'Java pret vendim: '+rows.map(r=>r.title).join(' · ')+'. Hapni vendimin urgjent te Qendra e Situatës.':'';}
+function openGovernmentDecision(key){
+ const row=pendingGovernmentDecisions(state).find(r=>r.key===key);if(!row)return false;
+ if(weeklyProcessing||weeklyVisualBusy||state.pendingVote){showToast('Përfundoni votimin ose përmbledhjen e javës.');return false;}
+ if(document.querySelector('dialog[open],.modal-overlay.show')){showToast('Përfundoni ose mbyllni dritaren e hapur përpara vendimit tjetër.');return false;}
+ callGameRenderer(row.renderer);return true;
+}
+function renderGovernmentDecisionStatus(){
+ const host=document.getElementById('governmentDecisionStatus');if(!host)return;const rows=pendingGovernmentDecisions(state);host.hidden=!rows.length;
+ host.innerHTML=rows.length?'<h3>Java pret vendim · '+rows.length+'</h3><p>Rastet shfaqen sipas urgjencës, një dritare në herë. Mbyllja e dritares nuk e zgjidh rastin dhe nuk rivendos afatin.</p>'+rows.map(r=>'<div class="crisis-decision-row"><strong>'+catalogEscape(r.title)+' <small>· '+(['Kritike','Urgjente','Vendim në pritje'][crisisPriority(r.key)])+'</small></strong><button class="action-btn" onclick="openGovernmentDecision(\''+r.key+'\')">Hap vendimin</button></div>').join(''):'';
+}
+function randomMinisterScandalAllowed(st){
+ const start=st.productionResources?.startTurn??1,latest=(st.governance?.scandals||[]).filter(s=>Number.isInteger(s.decisionTurn)).reduce((n,s)=>Math.max(n,s.decisionTurn),-Infinity);
+ return agendaExecutive(st)&&st.turnCount>start+3&&st.turnCount>latest+3&&!governmentCrisisPending(st);
+}
 function migrateGovernmentCrises(st){if(st.governance===undefined)st.governance={version:1,lastTurn:st.turnCount,counter:0,pendingScandal:null,scandals:[],grantsBlockedUntil:0,resentment:{},mediaTrust:70,credibility:50,spinUses:0,pressEvents:[],promises:[],ipaClaims:[],regionalDeals:[]};}
-function governmentCrisisPending(st){st=st||state;return (sectorExpansionPending(st)||energyInquiryPending(st)||rtkPending(st)||!!pendingTrepca(st)||sovereignPending(st)||!!pendingHighwayProject(st)||bureauBattlePending(st)||!!pendingDinarCrisis(st)||laborExodusPending(st)||!!pendingCoalitionBlackmail(st)||veteransBudgetPending(st)||enterpriseBoardsPending(st)||associationUltimatumPending(st)||municipalGrantPending(st)||generalStrikePending(st)||!!pendingWinterEnergy(st)||councilPending(st)||mediaDossierBlocked(st)||internalPressurePending(st)||(typeof northPending==='function'&&northPending(st))||(typeof diasporaPendingSeason==='function'&&!!diasporaPendingSeason(st))||(typeof institutionalConflictPending==='function'&&institutionalConflictPending(st))||!!st?.governance?.pendingScandal||(typeof imfPending==='function'&&imfPending(st))||(typeof brusselsDecisionPending==='function'&&brusselsDecisionPending(st))||(typeof roguePendingReport==='function'&&!!roguePendingReport(st))||(typeof veteransCrisisPending==='function'&&veteransCrisisPending(st)))&&agendaExecutive(st);}
+function governmentCrisisPending(st){return pendingGovernmentDecisions(st).length>0;}
 function foreignGrantsBlocked(st,turn){st=st||state;return mediaDossierFundsBlocked(st,turn)||(typeof foreignFundingBlocked==='function'&&foreignFundingBlocked(st))||!!st.governance&&st.governance.grantsBlockedUntil>0&&(turn??st.turnCount)<=st.governance.grantsBlockedUntil;}
 function foreignGrantBlockReason(st){st=st||state;if(associationTotalSanctions(st))return 'Sanksionet totale te Asociacionit kane bllokuar financimin e jashtem.';if(mediaDossierFundsBlocked(st))return 'Penalltia e Lirise se Medias: fondet jane ngrire per 12 jave pas sulmit ndaj mediave.';if(northSanctioned(st))return 'Sanksionet e Veriut kanë bllokuar fondet ndërkombëtare; zgjedhjet dhe ndryshimi i kabinetit nuk i heqin.';if(typeof internationalIsolation==='function'&&internationalIsolation(st))return 'Izolimi nderkombetar ka pezulluar fondet e huaja pergjithmone.';return typeof foreignFundingBlocked==='function'&&foreignFundingBlocked(st)?'Fondet pezullohen derisa autoritarizmi të zbresë nën 60/100.':'Grantet pezullohen edhe '+Math.max(0,(st.governance?.grantsBlockedUntil||0)-st.turnCount)+' javë.';}
 function crisisSectorMetric(st,id){return typeof sectorManagementAverage==='function'?sectorManagementAverage(st,id):((st.stateSectors||[]).find(s=>s.id===id)?.score||30)/10;}
@@ -69,8 +106,8 @@ function processGovernmentCrisesWeek(turn){
         if(crisisSectorMetric(state,p.sector)>p.baseline+.01){p.status='FULFILLED';d.credibility=clamp(d.credibility+5,0,100);}
         else if(turn>=p.dueTurn){p.status='FAILED';crisisApproval(-4);d.credibility=clamp(d.credibility-8,0,100);state.historyLog.unshift('Premtimi 3-javor dështoi: ndëshkim i dyfishtë në mbështetje (-4 pikë).');}
     });
-    if(!agendaExecutive()||d.pendingScandal)return;
-    var eligible=state.ministries.map((m,i)=>({m,i})).filter(x=>state.coalitionParties.includes(x.m.party)&&x.m.minister!=='I/E paemëruar');
+    if(!randomMinisterScandalAllowed(state))return;
+    var eligible=state.ministries.map((m,i)=>({m,i})).filter(x=>state.coalitionParties.includes(x.m.party)&&x.m.minister!=='I/E paemëruar'&&!d.scandals.some(s=>s.minister===x.m.minister&&Number.isInteger(s.decisionTurn)&&turn<s.decisionTurn+12));
     if(eligible.length&&Math.random()<.04)createGovernmentScandal(eligible[Math.min(eligible.length-1,Math.floor(Math.random()*eligible.length))].i);
 }
 function answerCrisisPress(id,answer){
@@ -95,8 +132,8 @@ function openCrisisPress(id){
 function closeCrisisScandalDialog(){var d=document.getElementById('governmentScandalDialog');if(d?.open)d.close();}
 function renderGovernmentCrisisUI(){
     var host=document.getElementById('contextualPressPanel');if(host){host.hidden=!agendaExecutive();if(!host.hidden){var d=state.governance,e=catalogEscape;host.innerHTML='<h3>Komunikimi në krizë</h3><p>Besimi te media: '+(d?.mediaTrust??70)+'/100 · Kredibiliteti: '+(d?.credibility??50)+'/100</p>'+(d?.pressEvents||[]).filter(x=>!x.answered).map(x=>'<article><strong>'+e(x.title)+'</strong><button class="action-btn" onclick="openCrisisPress(\''+x.id+'\')">Thirr Konferencë</button></article>').join('')+(d?.promises||[]).slice(-5).map(p=>'<p>Premtimi: '+e(state.stateSectors.find(s=>s.id===p.sector)?.name||p.sector)+' · '+(p.status==='OPEN'?Math.max(0,p.dueTurn-state.turnCount)+' javë':p.status==='FULFILLED'?'U përmbush':p.status==='CANCELLED'?'Mandati ndryshoi':'Dështoi')+'</p>').join('');}}
+    if(!state.governance?.pendingScandal||!agendaExecutive()){if(governmentCrisisRetry!==null){clearTimeout(governmentCrisisRetry);governmentCrisisRetry=null;}closeCrisisScandalDialog();return;}
     var dialog=document.getElementById('governmentScandalDialog');if(!dialog||typeof dialog.showModal!=='function')return;
-    if(!governmentCrisisPending()||!agendaExecutive()){closeCrisisScandalDialog();return;}
     var start=document.getElementById('startScreen');
     if(start&&!start.classList.contains('hidden')||weeklyProcessing||weeklyVisualBusy||state.pendingVote||document.querySelector('dialog[open]:not(#governmentScandalDialog)')){
         if(governmentCrisisRetry===null)governmentCrisisRetry=setTimeout(function(){governmentCrisisRetry=null;renderGovernmentCrisisUI();},250);return;
@@ -104,6 +141,6 @@ function renderGovernmentCrisisUI(){
     var s=state.governance.scandals.find(s=>s.id===state.governance.pendingScandal);if(!s)return;
     if(dialog.open&&dialog.dataset.scandal===s.id)return;dialog.dataset.scandal=s.id;
     var e=catalogEscape;document.getElementById('governmentScandalContent').innerHTML='<span class="tag tag-pdk">URGJENTE · SKANDAL QEVERITAR</span><h2 id="governmentScandalTitle">Dyshime për korrupsion</h2><p>'+e(s.minister)+' · '+e(state.parties[s.party].short)+'</p><p>Raportimi kërkon përgjigjen tuaj. Koha mbetet e ndalur deri në vendim.</p><button class="choice-btn" onclick="resolveGovernmentScandal(\'DISMISS\')"><strong>Shkarko Ministrin</strong><span>+5 pikë mbështetje · Rrezik abstenimi nga grupi i tij për 6 javë</span></button><button class="choice-btn" onclick="resolveGovernmentScandal(\'DEFEND\')"><strong>Mbro Ministrin</strong><span>−8 pikë mbështetje · Pezullim i granteve për 4 javë</span></button>';
-    if(!dialog.open){dialog.showModal();dialog.querySelector('button')?.focus();}
+    if(!dialog.open){if(!governmentCrisisPresentationBlocked('renderGovernmentCrisisUI'))dialog.showModal();dialog.querySelector('button')?.focus();}
 }
 if(typeof document.addEventListener==='function')document.addEventListener('DOMContentLoaded',function(){document.getElementById('governmentScandalDialog')?.addEventListener('cancel',function(e){if(governmentCrisisPending())e.preventDefault();});});

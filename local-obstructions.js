@@ -5,7 +5,7 @@ function localProjectBlocked(key,title,municipalityId){
     migrateLocalObstructions(state);var db=state.localObstructions,c=db.checks.find(c=>c.key===key);
     if(!c){
         var m=state.municipalities.find(m=>m.id===municipalityId)||state.municipalities[electionSeed(key)%state.municipalities.length];if(!m)return false;
-        var opposition=!state.coalitionParties.includes(m.mayorParty),roll=opposition?Math.random():null,blocked=opposition&&roll<.25;
+        var opposition=!!m.mayorIndependent||!state.coalitionParties.includes(m.mayorParty),roll=opposition?Math.random():null,blocked=opposition&&roll<.25;
         c={key,title:String(title).slice(0,500),municipalityId:m.id,party:m.mayorParty,turn:state.turnCount,roll,status:blocked?'WAITING':'CLEAR',grantB:key.startsWith('BUILD|')?.002:.005,decisionTurn:null,releaseTurn:null,paymentId:null};db.checks.push(c);
         if(blocked&&!agendaExecutive()){c.status='LEGAL';c.decisionTurn=state.turnCount;c.releaseTurn=state.turnCount+4;}
     }

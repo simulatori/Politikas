@@ -108,6 +108,17 @@ function validateMunicipalDevelopment(st){
 }
 function municipal14Find(id){return municipal14Records(state).find(function(p){return p.id===id;});}
 function municipal14Set(p,status,note){p.status=status;p.history.push({status:status,turn:state.turnCount,date:diplomaticDate(state.turnCount),note:note||''});}
+// Shared domain operation: player and weekly AI use the same paid project contract.
+var municipal14FundingError='';
+function fundMunicipal14Contract(p){
+    municipal14FundingError='';
+    if(!p||p.status!=='APPROVED'||p.fundingCommitted||municipalAusterity(state)||municipalCapitalBlocked(state))return false;
+    var error=municipalFundingMetricError(state,p.municipalityId,{[p.metric]:p.metricGain});if(error){municipal14FundingError=error;return false;}
+    if(!catalogFund(p)){p.blockReason='Financimi nuk mbulohet nga buxheti aktual.';return false;}
+    ensureProjectEffectComponents(p,true);p.blockReason='';p.approvedFundingB=p.costB;p.fundingCommitted=true;p.spentB=0;p.remainingB=p.costB;p.lastTurn=state.turnCount;p.deadlineTurn=state.turnCount+p.duration;
+    p.tasks=[{title:'Përgatitja dhe koordinimi',done:false},{title:'Zbatimi teknik',done:false},{title:'Kontrolli dhe dorëzimi',done:false}];
+    municipal14Set(p,'FUNDED','Financimi i plotë u zbrit një herë nga buxheti ekzistues.');return true;
+}
 function municipalProjectAction(id,action){
     if(!assertGovernmentAuthority('Vendimi për projektin komunal'))return false;
     if(state.pendingVote || weeklyProcessing || (state.weekCalendar?.transition && !weeklyVisualCommit)){showToast('Përfundoni votimin ose kalimin e javës para vendimit.');return false;}
@@ -124,13 +135,7 @@ function municipalProjectAction(id,action){
         p.blockReason='';
         municipal14Set(p,'APPROVED','Miratim në simulim; ende pa ndarje fondesh.');
     }else if(action==='FUND' && p.status==='APPROVED'){
-        var metricError=municipalFundingMetricError(state,p.municipalityId,{[p.metric]:p.metricGain});
-        if(metricError){showToast(metricError);return false;}
-        if(!catalogFund(p)){p.blockReason='Financimi i miratuar nuk mbulohet nga buxheti aktual; kërkohet vendim.';refreshAllUI();return false;}
-        ensureProjectEffectComponents(p,true);
-        p.blockReason='';p.approvedFundingB=p.costB;p.fundingCommitted=true;p.spentB=0;p.remainingB=p.costB;p.lastTurn=state.turnCount;p.deadlineTurn=state.turnCount+p.duration;
-        p.tasks=[{title:'Përgatitja dhe koordinimi',done:false},{title:'Zbatimi teknik',done:false},{title:'Kontrolli dhe dorëzimi',done:false}];
-        municipal14Set(p,'FUNDED','Financimi i plotë u zbrit një herë nga buxheti ekzistues.');
+        if(!fundMunicipal14Contract(p)){showToast(municipal14FundingError||p.blockReason||'Financimi është i bllokuar.');return false;}
     }else if(action==='REJECT' && ['PROPOSED','REVIEW','APPROVED','DEFERRED'].includes(p.status)){
         p.blockReason='';municipal14Set(p,'REJECTED','Propozimi u refuzua pa ndarje fondesh.');
     }else if(action==='DEFER' && ['PROPOSED','REVIEW','APPROVED'].includes(p.status)){
@@ -249,7 +254,7 @@ function applyMunicipal14Progress(p,target){
     if(p.metricGain>0)processProjectEffect(p,'metric:'+p.metric,target,municipalMetricValid(prof,p.metric),function(d){prof[p.metric]=+clamp(prof[p.metric]+p.metricGain*d,1,10).toFixed(6);},'Mungon ose është e pavlefshme metrika '+p.metric+' në '+p.municipalityId+'.');
     processProjectEffect(p,'satisfaction',target,!!prof,function(d){prof.citizenSatisfaction=+clamp((prof.citizenSatisfaction??50)+d,0,100).toFixed(6);},'Mungon profili komunal.');
     processProjectEffect(p,'relation',target,!!m,function(d){m.relationWithGov=+clamp((m.relationWithGov??60)+0.5*d,0,100).toFixed(6);},'Mungon komuna.');
-    processProjectEffect(p,'localSupport',target,!!m && !!prof,function(d){adjustLocalPublicSupport(m,d,prof);},'Mungon komuna ose profili.');
+    processProjectEffect(p,'localSupport',target,!!m && !!prof,function(d){if(!p.partyAIProject||p.partyAIProject===state.playerParty)adjustLocalPublicSupport(m,d,prof);},'Mungon komuna ose profili.');
     var sector=state.stateSectors.find(function(s){return s.id===p.sector;});
     if(p.sectorGain>0)processProjectEffect(p,'sector',target,!!sector,function(d){sector.score=+clamp(sector.score+p.sectorGain*d,10,100).toFixed(6);},'Mungon sektori.');
     p.appliedFraction=target;

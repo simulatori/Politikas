@@ -42,12 +42,13 @@ function renderVisibleWorkspace(){
 function renderPendingGovernmentDialogs(){
     const open=!!document.querySelector('dialog[open]');
     const checks={energyInquiryPending:'renderEnergyInquiry',rtkPending:'renderRTK',pendingTrepca:'renderTrepca',sovereignPending:'renderSovereignFund',pendingHighwayProject:'renderHighwayProject',bureauBattlePending:'renderBureauBattle',pendingDinarCrisis:'renderDinarCrisis',laborExodusPending:'renderLaborExodus',pendingCoalitionBlackmail:'renderCoalitionBlackmail',veteransBudgetPending:'renderVeteransBudget',enterpriseBoardsPending:'renderEnterpriseBoards',associationUltimatumPending:'renderAssociationUltimatum',municipalGrantPending:'renderMunicipalGrants',generalStrikePending:'renderGeneralStrike',pendingWinterEnergy:'renderWinterEnergy',councilPending:'renderCouncilEurope',mediaDossierBlocked:'renderMediaDossiers',internalPressurePending:'renderInternalPressure',northPending:'renderNorthCrisis',diasporaPendingSeason:'renderDiasporaMobilization',institutionalConflictPending:'renderInstitutionalConflicts',imfPending:'renderIMFCrisis',brusselsDecisionPending:'renderBrusselsSpecial',roguePendingReport:'renderSurvivalCrises',veteransCrisisPending:'renderSurvivalCrises',sectorExpansionPending:'renderSectorExpansion',activeNationalEmergency:'renderNationalEmergencies'};
-    for(const [condition,render] of Object.entries(checks))if(open||typeof globalThis[condition]==='function'&&globalThis[condition](state))callGameRenderer(render);
+    const rendered=new Set();
+    for(const [condition,render] of Object.entries(checks))if(!rendered.has(render)&&(open||typeof globalThis[condition]==='function'&&globalThis[condition](state))){rendered.add(render);callGameRenderer(render);}
     if(state.governance?.pendingScandal||document.getElementById('governmentScandalDialog')?.open)callGameRenderer('renderGovernmentCrisisUI');
 }
 function refreshVisibleGameUI(){
     if(!state)return;fiscalSyncBudgetStatuses();updateTopBar();renderVisibleWorkspace();
-    renderPoliticalRoleUI({light:true});renderPostElectionInvitation();reconcileGovernmentNotificationAudience();renderUrgentSituations();
+    renderPoliticalRoleUI({light:true});renderPostElectionInvitation();reconcileGovernmentNotificationAudience();renderUrgentSituations();renderGovernmentDecisionStatus();
     if(!weeklyProcessing)reconcileWeeklyTransition();renderPendingGovernmentDialogs();
     const view=document.querySelector('.tab-view.active');if(view)uiEnhanceDetails(view);
     saveGameAuto();

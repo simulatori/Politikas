@@ -24,7 +24,10 @@
          Pas ndryshimit të logos/kodit, rrit CACHE_VERSION te service-worker.js.
          manifest.json është JSON: komentet/instruksionet mbahen këtu, jo brenda tij.
          Instalimi kërkon HTTPS në publikim; localhost punon për testim. -->
-    <link rel="stylesheet" href="style.css?v=61">
+    <link rel="stylesheet" href="style.css?v=82">
+    <link rel="stylesheet" href="executive-desk.css?v=82">
+    <link rel="stylesheet" href="political-life.css?v=87">
+    <link rel="stylesheet" href="societal-dynamics.css?v=84">
 </head>
 <body>
 
@@ -119,6 +122,12 @@
         <button type="button" class="action-btn" onclick="downloadLocalGameBackup()">Shkarko kopje lokale JSON</button>
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
+        <section class="card" aria-labelledby="pwaUpdateTitle">
+            <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
+            <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
+            <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
+            <button type="button" class="action-btn" onclick="window.republikaPWA?.save()">Ruaj para mbylljes</button>
+        </section>
         <div style="display:flex; justify-content:space-between; margin-top:12px;">
             <button class="action-btn btn-outline" onclick="openNewScenarioModal()">🔄 Skenar i Ri</button>
             <button class="action-btn btn-danger" onclick="hardResetAllSaves()">🗑️ Fshi Të Gjitha</button>
@@ -224,6 +233,10 @@
             <span class="nav-icon">💼</span>
             <span>Qeveria</span>
         </button>
+        <button class="nav-item" id="stateServicesNav" onclick="switchMainTab('tab-services', this)">
+            <span class="nav-icon">🪪</span>
+            <span class="nav-label-wide">Shërbimet Shtetërore</span><span class="nav-label-compact">Shërbimet</span>
+        </button>
         <button class="nav-item" onclick="switchMainTab('tab-elections', this)">
             <span class="nav-icon">📍</span>
             <span class="nav-label-wide">38 Komunat</span><span class="nav-label-compact">Komunat</span>
@@ -268,7 +281,7 @@
                     <button class="btn-top" onclick="switchMainTab('tab-dashboard'); switchSubTab('dash', 'inbox', document.querySelectorAll('#tab-dashboard .sub-pill')[1])" id="inboxTopBtn" style="border-color:var(--accent-gold);">📥 Kërkesat</button>
                     <button class="btn-top" onclick="switchMainTab('tab-dashboard'); switchSubTab('dash', 'calendar', document.querySelectorAll('#tab-dashboard .sub-pill')[2])" id="calendarTopBtn">📅 Kalendari</button>
                     <button class="btn-top" id="uxNotificationsButton" onclick="openUXNotifications()">Njoftimet</button>
-                    <button class="btn-top" onclick="toggleModal('saveModal', true)">💾 Ruajtjet</button>
+                    <button class="btn-top" onclick="toggleModal('saveModal', true)">💾 Ruajtjet <span id="pwaUpdateBadge" hidden>· Version i ri</span></button>
                     </div>
                     <details class="profile-menu">
                         <summary aria-label="Hap llogarinë dhe ruajtjet në Cloud"><span aria-hidden="true">👤</span> <span id="cloudAccountName">Mysafir</span><span class="profile-chevron" aria-hidden="true">⌄</span></summary>
@@ -306,6 +319,7 @@
                     <div class="stat-text-wrapper">
                         <span class="stat-label">Mjetet e lira</span>
                         <span class="stat-val" id="statBudget" style="color: var(--accent-gold); text-shadow: 0 0 10px rgba(251,191,36,0.4);">€3.32 Mld</span>
+                        <button class="cash-report-shortcut" onclick="event.stopPropagation();openCashReport()">Ku shkuan paratë?</button>
                     </div>
                 </div>
                 <div class="stat-box" onclick="switchMainTab('tab-government'); switchSubTab('gov','fiscal', document.getElementById('governmentFiscalTab'));">
@@ -365,12 +379,17 @@
                     <button class="sub-pill" onclick="switchSubTab('dash', 'press', this)">🎙️ Media</button>
                     <button class="sub-pill" onclick="switchSubTab('dash', 'promises', this)">📌 Premtimet</button>
                     <button class="sub-pill" onclick="switchSubTab('dash', 'history', this)">📜 Arkivi</button>
+                    <button class="sub-pill" id="politicalLifeTab" onclick="openPoliticalLife()">◈ Shteti i Gjallë</button>
                 </div>
 
                 <div id="dash-overview" class="sub-content">
+                    <section id="executiveDesk" hidden aria-label="Tavolina e Kryeministrit"></section>
                     <div id="postElectionInvitation" hidden></div>
+                    <section class="card" id="governmentDecisionStatus" hidden aria-live="polite"></section>
+                    <section class="card" id="weeklyCommandSummary"></section>
                     <div id="dashboardProgressPanel"></div>
                     <section class="card" id="historyQuizPanel"></section>
+                    <section class="card" id="stateServicesPanel"></section>
                     <div class="dashboard-layout">
                     <div class="dashboard-main">
                     <div id="playerGuidancePanel"></div>
@@ -428,6 +447,7 @@
                     </div>
                 </div>
                 
+                <div id="dash-life" class="sub-content" style="display:none;"><section id="politicalLifePanel" class="card" aria-label="Shteti i Gjallë"></section></div>
                 <div id="dash-inbox" class="sub-content" style="display:none;">
                     <div class="card">
                         <div class="card-header">
@@ -564,12 +584,15 @@
 
             <!-- TAB 2: PARTIA -->
             <section id="tab-party" class="tab-view">
+                <button class="action-btn" id="shadowHQShortcut" hidden onclick="openShadowHeadquarters()">Qeveria në Hije · Shtabi i Partisë</button>
                 <div class="sub-nav">
                     <button class="sub-pill active" onclick="switchSubTab('party', 'structure', this)">🏛️ Struktura e Partisë</button>
                     <button class="sub-pill" onclick="switchSubTab('party', 'list', this)">📋 Lista Zgjedhore</button>
                     <button class="sub-pill" onclick="switchSubTab('party', 'coalition', this)">🤝 Negociatat & Koalicioni</button>
+                    <button class="sub-pill" id="partyRivalsTab" onclick="switchSubTab('party','rivals',this);renderPartyStrategies()">Rivalët & Strategjitë</button>
                 </div>
 
+                <div id="party-rivals" class="sub-content" style="display:none"><section class="card" id="partyAIStrategiesPanel"></section></div>
                 <div id="party-structure" class="sub-content"><section class="card" id="mediaWarfarePanel"></section>
                     <div id="partyDetailsContainer"></div>
                 </div>
@@ -772,6 +795,7 @@
                     <button class="sub-pill" onclick="switchSubTab('gov', 'meeting', this)">🗂️ Mbledhja e Qeverisë</button>
                     <button class="sub-pill" onclick="switchSubTab('gov', 'macro', this)">💶 Makroekonomia</button>
                     <button class="sub-pill" id="governmentFiscalTab" onclick="switchSubTab('gov', 'fiscal', this)">📊 Buxheti & Ekonomia</button>
+                    <button class="sub-pill" id="simulationTab" onclick="switchSubTab('gov','simulation',this);renderSimulationPanels()">🧭 Qeverisja Strategjike</button>
                     <button class="sub-pill" onclick="switchSubTab('gov', 'trade', this);renderBilateralTrade()">Tregtia</button>
                     <button class="sub-pill" onclick="switchSubTab('gov','war',this);renderSecurityOps()">War Room</button>
                     <button class="sub-pill" onclick="switchSubTab('gov','intelligence',this);renderSecurityOps()">Inteligjenca</button>
@@ -800,6 +824,7 @@
                 <div id="gov-production" class="sub-content" style="display:none;"><section class="card" id="productionResourcesPanel"></section></div>
                 <div id="gov-fields" class="sub-content" style="display:none;"><section class="card" id="governanceFieldsGovernmentPanel"></section></div>
                 <div id="gov-cabinet" class="sub-content">
+                    <section id="ministerPerformancePanel" class="card" hidden></section>
                     <section id="mediaBombStatus" class="card" hidden></section>
                     <div class="card">
                         <div class="card-header">
@@ -840,6 +865,7 @@
                     <div id="macroEconomyContainer"></div>
                 </div>
 
+                <div id="gov-simulation" class="sub-content" style="display:none;"><div id="strategicSimulationPanel"></div></div>
                 <div id="gov-fiscal" class="sub-content" style="display:none;">
                     <section id="imfCrisisPanel" class="card"></section>
                     <section id="informalEconomyPanel" class="card"></section>
@@ -907,6 +933,7 @@
                                 <label>Projektet e komunës<select id="muniProjectFilter" onchange="renderMunicipalities()"><option value="">Të gjitha gjendjet</option><option value="PROPOSED">Të propozuara</option><option value="ACTIVE">Në zbatim</option><option value="COMPLETED">Të përfunduara</option><option value="BLOCKED">Të bllokuara / shtyra</option></select></label>
                             </div>
                         </div>
+                        <div id="electoralMapPanel"></div>
                         <div id="municipalitiesSummaryBar" style="margin-bottom:12px;"></div>
                         <p class="candidate-note">Treguesit e shërbimeve, nevojat, buxhetet dhe skenari politik këtu janë të simuluara. Nuk paraqiten të dhëna të verifikuara të popullsisë.</p>
                         <div id="municipalDevelopment14"></div>
@@ -1130,6 +1157,33 @@
 <script src="production-economy.js" defer></script>
 <script src="transport-workspace.js" defer></script>
 <script src="history-quiz.js" defer></script>
+<script src="production-grid.js" defer></script>
+<script src="state-services.js" defer></script>
+<script src="civil-registry.js" defer></script>
+<script src="electoral-memory.js" defer></script>
+<script src="party-strategies.js" defer></script>
+<script src="budget-battle.js" defer></script>
+<script src="minister-performance.js" defer></script>
+<script src="weekly-control.js" defer></script>
+<script src="political-accountability.js" defer></script>
+<script src="shadow-cabinet.js" defer></script>
+<script src="strategic-reserves.js" defer></script>
+<script src="coalition-trust.js" defer></script>
+<script src="project-readiness.js" defer></script>
+<script src="economic-forecast.js" defer></script>
+<script src="influence-network.js" defer></script>
+<script src="strategic-simulation.js" defer></script>
+<script src="executive-desk.js" defer></script>
+<script src="political-life.js" defer></script>
+<script src="political-life-ui.js" defer></script>
+<script src="societal-dynamics.js" defer></script>
+<script src="societal-dynamics-ui.js" defer></script>
+<script src="governing-challenges.js" defer></script>
+<script src="governing-challenges-ui.js" defer></script>
+<script src="institutional-economy.js" defer></script>
+<script src="institutional-economy-ui.js" defer></script>
+<script src="social-policy.js" defer></script>
+<script src="social-policy-ui.js" defer></script>
 <script src="pwa-registration.js" defer></script>
 <script src="government-notifications.js" defer></script>
 <script type="module">

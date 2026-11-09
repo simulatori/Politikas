@@ -73,6 +73,30 @@ function fiscalOrderValid(p){
     return true;
 }
 function fiscalRound(n){return +n.toFixed(9);}
+// The ledger is the source of truth, including payments outside the fiscal tick.
+function fiscalWeekSummary(st,turn,year){
+    var rows=(st.publicFinance?.ledger||[]).filter(r=>r.turn===turn&&r.year===year),cash=rows.filter(r=>r.account==='budgetTotalB');
+    var sum=rs=>fiscalRound(rs.reduce((n,r)=>n+r.amountB,0));
+    var revenues=sum(rows.filter(r=>r.type==='REVENUE'));
+    var expenses=-sum(rows.filter(r=>['EXPENSE','CAPITAL_PAYMENT','RESERVE_EXPENSE','INTEREST'].includes(r.type)));
+    var inflow=sum(cash.filter(r=>r.amountB>0)),outflow=-sum(cash.filter(r=>r.amountB<0));
+    return {revenues,expenses,balance:fiscalRound(revenues-expenses),inflow,outflow,cashChange:fiscalRound(inflow-outflow),
+        openingCash:cash.length?fiscalRound(cash[0].balanceAfterB-cash[0].amountB):null,
+        closingCash:cash.length?cash[cash.length-1].balanceAfterB:null,rows:cash};
+}
+function syncFiscalWeekReport(st,turn,year){
+    var row=(st.fiscalHistory||[]).find(r=>r.week===turn&&r.year===year);if(!row)return;
+    var s=fiscalWeekSummary(st,turn,year);
+    Object.assign(row,{revenues:s.revenues,expenses:s.expenses,balance:s.balance});
+    var report=(st.weeklyReports||[]).find(r=>r.week===turn&&r.year===year);if(report)Object.assign(report,row);
+    if(turn===st.turnCount&&year===st.year){st.lastWeekRevenues=s.revenues;st.lastWeekExpenses=s.expenses;}
+}
+function fiscalWeekMarkup(st){
+    var row=st.fiscalHistory?.[0];if(!row)return '<section class="card"><h3>Pasqyra javore e arkës</h3><p>Kaloni javën për raportin e parë financiar.</p></section>';
+    var s=fiscalWeekSummary(st,row.week,row.year),e=catalogEscape,m=n=>'€'+(n*1000).toFixed(3)+'M';
+    var groups=new Map();s.rows.forEach(r=>{var key=r.type+':'+r.source,g=groups.get(key)||{source:r.source,type:r.type,amount:0};g.amount=fiscalRound(g.amount+r.amountB);groups.set(key,g);});
+    return '<section class="card" id="fiscalWeekSummary"><h3>Pasqyra javore e arkës · Java '+row.week+' / '+row.year+'</h3><div class="fiscal-kpi-grid"><div>Hynë në arkë<strong>'+m(s.inflow)+'</strong></div><div>Dolën nga arka<strong>'+m(s.outflow)+'</strong></div><div>Ndryshimi i arkës<strong>'+m(s.cashChange)+'</strong></div></div>'+(s.openingCash!==null?'<p>Arka në fillim: '+m(s.openingCash)+' → Arka në fund: '+m(s.closingCash)+'</p>':'')+'<p>Huamarrja, shlyerja e borxhit dhe transferimet përfshihen në lëvizjen e arkës; paraqiten veçmas nga të hyrat dhe shpenzimet fiskale. Vendimet e marra brenda javës përfshihen gjithashtu.</p><details><summary>Pse ndryshoi arka?</summary>'+Array.from(groups.values()).map(g=>'<p><strong>'+e(fiscalSourceLabel(g.source))+'</strong> · '+m(g.amount)+(g.type==='BORROWING'?' · Huamarrje':g.type==='DEBT_REPAYMENT'?' · Shlyerje borxhi':g.type==='TRANSFER'?' · Transferim':'')+'</p>').join('')+'</details></section>';
+}
 function fiscalEconomicIndex(st){return (st.gdpGrowth-3.9)*.035+(10.8-st.unemployment)*.015;}
 function fiscalExpectedRevenues(){
     var extraFDI=typeof foreignInvestmentAnnualTax==='function'?foreignInvestmentAnnualTax(state):0;
@@ -115,7 +139,7 @@ function fiscalSetBalance(st,field,value,source,type){
         else type=delta<0?'EXPENSE':'REVENUE';
     }
     if(type==='CAPITAL_PAYMENT'&&delta<0&&municipalCapitalBlocked(st)){st[field]=before;throw Error('Gjykata ka bllokuar buxhetin kapital.');}
-    var entry=fiscalEntry(st,type,delta,source);if(entry){entry.account=field;entry.balanceAfterB=value;}
+    var entry=fiscalEntry(st,type,delta,source);if(entry){entry.account=field;entry.balanceAfterB=value;syncFiscalWeekReport(st,st.turnCount,st.year);}
 }
 function fiscalCommit(change){
     if(!assertGovernmentAuthority('Vendimi financiar') || state.pendingVote || weeklyProcessing)return false;
@@ -217,7 +241,7 @@ function processFiscalWeek(turn){
     processPrivateFinanceWeek(state);
     state.lastWeekRevenues=revenue;state.lastWeekExpenses=fiscalRound(transport.paidB+production.paidB+living.paidB+expansionPay.paidB+paidInterest+paidOperating+sectorQuality.paidB+enterprises.paidB+veterans.paidB+north.paidB+generalPay.paidB+laborPay.paidB+highwayPay.paidB+sovereignPay.paidB);state.plannedRevenues=fiscalRound(sectorExpansionWeeklyRevenue(state)*FISCAL_WEEKS+taxCollectableAnnual(state.taxRevenueB+(typeof foreignInvestmentAnnualTax==='function'?foreignInvestmentAnnualTax(state):0)+(typeof regionalCustomsAnnual==='function'?regionalCustomsAnnual(state,state.turnCount+1):0),state)+(typeof stateEnterpriseAnnualDividends==='function'?stateEnterpriseAnnualDividends(state):0)+(councilMember(state)&&!sectorExpansionCoal(state)&&!internationalIsolation(state)&&!associationTotalSanctions(state)?.003*FISCAL_WEEKS:0));
     var entry={week:turn,year:state.year,month:MONTHS_SQ[state.monthIndex],revenues:revenue,expenses:state.lastWeekExpenses,balance:fiscalRound(revenue-state.lastWeekExpenses),interest:paidInterest,debtPct:state.publicDebtPct,reserve:state.fiscalReserve,gdpGrowth:state.gdpGrowth,inflation:state.inflation,events:unpaid>0?['Pagesa të papërmbushura për mungesë mjetesh.']:[]};
-    state.fiscalHistory.unshift(entry);state.weeklyReports.unshift(Object.assign({},entry));return true;
+    state.fiscalHistory.unshift(entry);state.weeklyReports.unshift(Object.assign({},entry));syncFiscalWeekReport(state,turn,state.year);return true;
 }
 function fiscalPreview(kind,data){
     if(!assertGovernmentAuthority('Vendimi financiar') || state.pendingVote || weeklyProcessing)return false;migratePublicFinance(state);
@@ -356,10 +380,13 @@ function renderPublicFinance(){
     function k(label,value,sub){return '<div class="fiscal-kpi"><div class="fiscal-kpi-label">'+label+'</div><div class="fiscal-kpi-value">'+value+'</div><div class="fiscal-kpi-sub">'+sub+'</div></div>';}
     var budgetLabels={LEGACY:'Financim i trashëguar; pa votim të regjistruar',MISSING:'Pa buxhet të miratuar',DRAFT:'Në përgatitje',SUBMITTED:'Dërguar në Kuvend',UNDER_REVIEW:'Në shqyrtim',SCHEDULED:'Në pritje të votimit',APPROVED:'I miratuar',REJECTED:'I refuzuar',WITHDRAWN:'I tërhequr'};
     var html='<div class="fiscal11"><h2>Financat publike · '+state.year+'</h2><p>'+e(budgetLabels[b?.status || 'MISSING'])+'. '+(b?.status==='MISSING'?'Huaja e likuiditetit mund të shqyrtohet më poshtë, por nuk zëvendëson miratimin e buxhetit. Arka, kontratat dhe detyrimet ruhen.':'')+'</p><div class="fiscal-kpi-grid">'+k('Mjetet e lira',money(state.budgetTotalB),'Arka ekzistuese; nuk është tavani vjetor')+k('Plani vjetor',money(b?.plannedB||0),b?.status==='APPROVED'?'I votuar nga Kuvendi':'Pa miratim parlamentar të regjistruar')+k('Të hyra të realizuara',money(state.realizedRevenues),'Arkëtimet e vitit; huamarrja përjashtohet')+k('Pagesa të realizuara',money(state.realizedExpenses),'Përfshin financimin e zotuar paraprakisht')+k(balance>=0?'Suficit':'Deficit',money(balance),'Të hyrat minus pagesat')+k('Borxhi publik',money(state.publicDebtPct/100*FISCAL_GDP_B),state.publicDebtPct.toFixed(2)+'% e bazës ekonomike të modelit')+k('Rezerva',money(state.fiscalReserve),'Mjetet janë të ndara nga arka')+k('Detyrime të papaguara',money(f.arrearsB),'Pagesat javore që nuk u mbuluan')+'</div><p>Të hyrat vjetore të pritshme nga ATK dhe Dogana: '+money(state.taxRevenueB)+'. Rritja ekonomike '+state.gdpGrowth.toFixed(1)+'% · Inflacioni '+state.inflation.toFixed(1)+'% · Papunësia '+state.unemployment.toFixed(1)+'% · Interesi '+state.debtInterestRate.toFixed(1)+'%. Remitancat nuk trajtohen si të hyra publike.</p>';
+    html+=fiscalWeekMarkup(state);
+    html+='<button class="action-btn" onclick="openCashReport()">Ku shkuan paratë? · Regjistri i pagesave</button>';
+    if(typeof budgetBattleDashboardMarkup==='function')html+=budgetBattleDashboardMarkup(state);
     var capacity=fiscalBorrowingCapacity(state),audit=fiscalReconciliation(state);
     html+='<details><summary>Borxhi, interesi dhe kontrolli financiar</summary><p>Interesi vjetor i llogaritur mbi stokun aktual: '+money(fiscalAnnualInterestB(state))+'. Borxhi i brendshëm përdor normën e përgjithshme; kreditë e lëvruara përdorin normën e kontratës. Kryegjëja e huasë dhe shlyerja e saj janë financim, jo të hyra ose shpenzime.</p><p>Huamarrje e regjistruar këtë vit: '+money(capacity.issuedB)+'. Hapësirë për obligacione të reja: '+money(capacity.availableB)+'. Kufijtë janë supozime simulimi: huamarrje vjetore deri 25% e të hyrave, stok deri dyfishin e tyre dhe interes deri 20% të tyre. Nuk janë pragje ligjore të Kosovës dhe nuk autorizojnë shpenzime jashtë buxhetit.</p><p>Deficiti më sipër mat arkëtimet minus pagesat e realizuara; detyrimet e papaguara paraqiten veçmas. Fondi i miratuar vjetor aktivizohet në janar; huamarrja kërkon vendim. Kreditimi privat paraqitet veçmas më poshtë; matja e çmimeve mbetet e kufizuar te shporta ekzistuese.</p>'+ (audit.issues.length?audit.issues.map(function(s){return '<p>'+e(s)+'</p>';}).join(''):'<p>Arkëtimet dhe pagesat e regjistruara përputhen me realizimin aktual.</p>')+'</details>';
     if(f.legacyBaseline.revenues || f.legacyBaseline.expenses)html+='<p>Realizimi përfshin vlerat e trashëguara nga ruajtja e vjetër, pa regjistër të hollësishëm të transaksioneve të kaluara.</p>';
-    if(agendaExecutive())html+='<div class="candidate-actions"><button class="action-btn btn-gold" onclick="fiscalAnnualBudgetForm()">Përgatit projektbuxhetin</button><button class="action-btn" onclick="openTaxPolicyModal()">Normat tatimore</button><button class="action-btn" onclick="openBorrowingModal()">Huamarrja dhe shlyerja</button><button class="action-btn" onclick="applyFiscalPolicy(\'DIGITAL_ATK\')">Digjitalizimi i ATK-së dhe Doganës</button><button class="action-btn" onclick="applyFiscalPolicy(\'LOWER_VAT_FOOD\')">TVSH e shportës bazë</button><button class="action-btn" onclick="auditPublicSpending()">Auditimi</button><button class="action-btn" onclick="transferToReserve()">Transferimi në rezervë</button></div>';
+    if(agendaExecutive())html+='<div class="candidate-actions"><button class="action-btn btn-gold" onclick="openBudgetBattle()">Negocio projektbuxhetin</button><button class="action-btn" onclick="openTaxPolicyModal()">Normat tatimore</button><button class="action-btn" onclick="openBorrowingModal()">Huamarrja dhe shlyerja</button><button class="action-btn" onclick="applyFiscalPolicy(\'DIGITAL_ATK\')">Digjitalizimi i ATK-së dhe Doganës</button><button class="action-btn" onclick="applyFiscalPolicy(\'LOWER_VAT_FOOD\')">TVSH e shportës bazë</button><button class="action-btn" onclick="auditPublicSpending()">Auditimi</button><button class="action-btn" onclick="transferToReserve()">Transferimi në rezervë</button></div>';
     html+='<h3>Projektbuxhetet dhe votimet</h3>'+Object.values(f.budgets).map(function(x){var idx=state.laws.findIndex(function(l){return l.id===x.lawId;});return '<article><strong>'+x.year+' · '+e(budgetLabels[x.status])+'</strong><p>'+money(x.plannedB)+' · Kapitale: '+money(x.capitalB||0)+'</p>'+(idx>=0?'<button class="btn-top" onclick="catalogBillDetails('+idx+')">Shqyrtimi dhe procedura në Kuvend</button>':'')+(x.status==='REJECTED'&&agendaExecutive()?'<button class="action-btn" onclick="fiscalAnnualBudgetForm(\''+e(x.lawId)+'\')">Rishiko dhe riparaqit</button>':'')+'</article>';}).join('');
     html+='<h3>Planet e ministrive</h3><p>Totali operativ: '+money(calculatePlannedMinistriesBudget())+'. Ndryshimi i planit nuk është pagesë.</p>'+state.ministries.map(function(m,i){return '<div class="budget-row"><span>'+e(m.name)+'</span><strong>'+money(m.budget/1000)+'</strong>'+(agendaExecutive()?'<input aria-label="Plani i '+e(m.name)+' në milionë euro" type="number" min="0" max="1200" value="'+m.budget+'" onchange="adjustMinistryBudget('+i+',this.value)">':'')+'</div>';}).join('');
     var capitalPaid=f.ledger.filter(function(r){return r.year===state.year && r.type==='CAPITAL_PAYMENT';}).reduce(function(sum,r){return sum+Math.abs(r.amountB);},0);

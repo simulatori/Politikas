@@ -44,6 +44,7 @@ function showGovernmentNotification(options){
     pumpGovernmentNotifications();return true;
 }
 function governmentNoticeCanPresent(n){
+    if(!n.critical&&typeof governmentCrisisPending==='function'&&governmentCrisisPending(state))return false;
     if(typeof document.createElement!=='function')return false;
     if(typeof weeklyProcessing!=='undefined'&&weeklyProcessing||typeof weeklyVisualBusy!=='undefined'&&weeklyVisualBusy)return false;
     const start=document.getElementById('startScreen');if(start&&!start.classList.contains('hidden'))return false;
