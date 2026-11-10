@@ -31,6 +31,9 @@
 <link rel="stylesheet" href="world-opportunities.css">
 </head>
 <body>
+<aside id="pwaUpdateNotice" hidden role="status" style="position:fixed;bottom:12px;left:12px;right:12px;z-index:100000;padding:12px;background:#14243b;color:#fff;border:1px solid #d8b465;border-radius:12px;max-height:40dvh;overflow:auto">
+<p id="pwaUpdateNoticeText"></p><button type="button" class="action-btn" style="min-height:44px;white-space:normal" onclick="window.republikaPWA?.apply()">Ruaj dhe aktivizo përditësimin</button>
+</aside>
 
 <!-- TRUKU I TRANZICIONIT -->
 <div id="pageTransition" class="page-transition">
@@ -58,7 +61,7 @@
         
         <div class="start-footer">
             <span class="start-tag">Legjislatura XI</span>
-            <span class="start-tag">v4.8 VisionOS</span>
+            <span class="start-tag">Loja v93</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -124,10 +127,12 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
+            <p id="pwaVersion">Loja v93</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.save()">Ruaj para mbylljes</button>
+            <button type="button" class="action-btn" data-pwa-apply hidden onclick="window.republikaPWA?.apply()">Ruaj dhe aktivizo përditësimin</button>
         </section>
         <div style="display:flex; justify-content:space-between; margin-top:12px;">
             <button class="action-btn btn-outline" onclick="openNewScenarioModal()">🔄 Skenar i Ri</button>
