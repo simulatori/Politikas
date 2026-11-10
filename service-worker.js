@@ -2,7 +2,7 @@
    Keep CORE_ASSETS aligned with local script dependencies in index.html.
    Cache only this game's static shell. Never cache Auth, Firestore or user saves.
    The next version activates after all windows using the previous version close. */
-const CACHE_VERSION='v92';
+const CACHE_VERSION='v93';
 const CACHE_PREFIX='republika-shell:'+self.registration.scope+':';
 const CACHE_NAME=CACHE_PREFIX+CACHE_VERSION;
 const CORE_ASSETS=[
@@ -186,6 +186,18 @@ self.addEventListener('activate',event=>{
     event.waitUntil((async()=>{
         const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&k!==CACHE_NAME).map(k=>caches.delete(k)));
         await self.clients.claim();
+    })());
+});
+self.addEventListener('message',event=>{
+    if(event.data?.type==='GET_VERSION'){event.ports?.[0]?.postMessage({version:CACHE_VERSION});return;}
+    if(event.data?.type!=='ACTIVATE_UPDATE')return;
+    event.waitUntil((async()=>{
+        const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+        const scoped=windows.filter(client=>new URL(client.url).pathname.startsWith(SCOPE_PATH));
+        // Other open games must finish/save before their controller changes.
+        if(scoped.length!==1||scoped[0].id!==event.source?.id){event.ports?.[0]?.postMessage({ok:false,reason:'OTHER_WINDOWS'});return;}
+        event.ports?.[0]?.postMessage({ok:true});
+        await self.skipWaiting();
     })());
 });
 self.addEventListener('fetch',event=>{
