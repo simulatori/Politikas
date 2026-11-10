@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-10",
-  "cacheVersion": "v92",
+  "cacheVersion": "v93",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -474,8 +474,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 95263,
-      "sha256": "b31e3f32b72025b1cb4c57608161aa9bd0be0bbc958d8be07d2ced42b7e830c1"
+      "bytes": 95903,
+      "sha256": "ff15adfe36c7d48b623018fa11dc004f4f4fc987d0d662a37e8e641f54caca8a"
     },
     {
       "file": "influence-network.js",
@@ -499,8 +499,8 @@
     },
     {
       "file": "institutional-economy.js",
-      "bytes": 48248,
-      "sha256": "a9a96d76603c323e5ea369f47008f2672e129dcec60b9adc9a67358b0c48cc56"
+      "bytes": 48304,
+      "sha256": "e9519c0b406c7c645fb8514c0369a7cf881ce875486b613d756845979ebfbceb"
     },
     {
       "file": "intelligence-agency.js",
@@ -754,8 +754,8 @@
     },
     {
       "file": "pwa-registration.js",
-      "bytes": 3256,
-      "sha256": "ec4d7b46b629088441a6ef7b8f72e03bfc39f58c0dfa0d651d6e469300f2156d"
+      "bytes": 5260,
+      "sha256": "21d0fe5194979b4ba36a96815fe3354f51389769e7eb97299fa6a736e3674be3"
     },
     {
       "file": "responsive-ui.js",
@@ -809,8 +809,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 7031,
-      "sha256": "0510395c0c6d1135fa9b9448c93a128911ed73746ca3d1e0d39ba1be2b9b7ad1"
+      "bytes": 7766,
+      "sha256": "ccabd6d9c048ef21f17207f59acd99f31dfcc6aaa2d09a38d729334da2ec31d3"
     },
     {
       "file": "shadow-cabinet.js",
