@@ -8173,6 +8173,7 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
         if(typeof processStrategicSimulationWeek==='function')processStrategicSimulationWeek(state.turnCount);
         if(veteransProtestActive(state))state.gdpGrowth=Math.min(0,state.gdpGrowth);
         if(typeof syncInterestGroups==='function')syncInterestGroups(state);
+        if(typeof worldAttentionInterrupt==='function'&&worldAttentionInterrupt(state))break;
         if(state.nationalEmergencies?.events.some(e=>e.status==='ACTIVE'&&!e.acknowledged||e.status==='FAILED'&&e.failedTurn===state.turnCount))break;
         if(typeof governmentCrisisPending==='function'&&governmentCrisisPending())break;
         if(typeof electoralObjectiveRequired==='function'&&electoralObjectiveRequired(state))break;

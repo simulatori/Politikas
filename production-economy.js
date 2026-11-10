@@ -55,7 +55,7 @@ function productionPrivateReport(st,id,allocation,miningOutput){
 }
 function productionBlackout(st){const s=st.winterEnergy?.seasons.at(-1);return !!s&&((s.status==='PENDING')||(s.choice==='BLACKOUT'&&st.turnCount<(s.resolvedTurn||s.turn)+12));}
 function productionLivingCost(st){const p=st.productionResources,base=p?.livingBase||700,weeks=Math.max(0,st.turnCount-(p?.lastCostTurn??st.turnCount));return Math.round(base*Math.pow(1+Math.max(-50,st.inflation||0)/100,weeks/FISCAL_WEEKS)*(productionBlackout(st)?1.25:1));}
-function productionWorkerMood(st,id,paid=true){const r=st.productionResources.sectors[id],cost=productionLivingCost(st),effectiveWage=paid?r.wage*(r.subsidized?1.2:1):0;return {effectiveWage,cost,satisfaction:Math.round(clamp(effectiveWage/cost*70,0,100)),factor:effectiveWage<cost? .4:1};}
+function productionWorkerMood(st,id,paid=true){const r=st.productionResources.sectors[id],cost=productionLivingCost(st),effectiveWage=paid?r.wage*(r.subsidized&&!(typeof economySubsidyFrozen==='function'&&economySubsidyFrozen(st,id))?1.2:1):0;return {effectiveWage,cost,satisfaction:Math.round(clamp(effectiveWage/cost*70,0,100)),factor:effectiveWage<cost? .4:1};}
 function productionEUAvailable(st){return st.diplomacy.EU.score>60&&!foreignGrantsBlocked(st)&&!securityIPABlocked(st);}
 function productionEUSuspended(st){return st.diplomacy.EU.score<40||foreignGrantsBlocked(st)||securityIPABlocked(st);}
 function productionGrantRate(st,sector,source){if(!productionEUAvailable(st)||!(sector==='agriculture'||sector==='energy'&&source!=='FOSSIL'))return 0;return Math.min(.8,.5+Math.floor((st.diplomacy.EU.score-60)/10)*.1);}
@@ -129,7 +129,7 @@ processProductionFiscal=function(turn){
     state.unemployment=clamp(state.unemployment+p.lastEmploymentPct-employmentPct,0,100);p.lastEmploymentPct=employmentPct;
     for(const [id,def] of Object.entries(PRODUCTION_SECTORS)){
         if(!productionSectorPublic(state,id)){row.sectors[id]=productionPrivateReport(state,id,allocation,row.sectors.mines?.output);continue;}
-        const r=p.sectors[id],wageB=fiscalRound(allocation.workers[id]*r.wage/4/1e9),wages=productionPay(wageB,'Pagat e prodhimit: '+id),subsidyB=r.subsidized?fiscalRound(wageB*.2):0,subsidy=productionPay(subsidyB,'Subvencioni i prodhimit: '+id),maintenanceB=fiscalRound(typeof productionActiveMaintenance==='function'?productionActiveMaintenance(state,id):p.assets.filter(a=>a.sector===id).reduce((n,a)=>n+a.level*def.maintenanceB,0)),maintenance=productionPay(maintenanceB,'Mirëmbajtja e prodhimit: '+id);
+        const r=p.sectors[id],wageB=fiscalRound(allocation.workers[id]*r.wage/4/1e9),wages=productionPay(wageB,'Pagat e prodhimit: '+id),subsidyB=r.subsidized&&!(typeof economySubsidyFrozen==='function'&&economySubsidyFrozen(state,id))?fiscalRound(wageB*.2):0,subsidy=productionPay(subsidyB,'Subvencioni i prodhimit: '+id),maintenanceB=fiscalRound(typeof productionActiveMaintenance==='function'?productionActiveMaintenance(state,id):p.assets.filter(a=>a.sector===id).reduce((n,a)=>n+a.level*def.maintenanceB,0)),maintenance=productionPay(maintenanceB,'Mirëmbajtja e prodhimit: '+id);
         // A promised but unpaid wage top-up cannot raise satisfaction or productivity.
         const paid=wages.paidB+1e-9>=wageB,subsidyPaid=subsidy.paidB+1e-9>=subsidyB;
         let s;if(r.subsidized&&!subsidyPaid){r.subsidized=false;s=productionSectorReport(state,id,allocation,paid,row.sectors.mines?.output);r.subsidized=true;}else s=productionSectorReport(state,id,allocation,paid,row.sectors.mines?.output);
