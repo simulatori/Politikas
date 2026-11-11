@@ -62,6 +62,7 @@ chooseWorldCase=function(id,choice){
   }
   if(r.kind==='SEASONAL'&&choice==='COMMUTE'&&worldPaidBuses(state)<5)throw Error('Kërkohen të paktën pesë autobusë me operim të paguar këtë javë.');
   if(['SEASONAL','LANDFILL'].includes(r.kind))governingCapital();
+  if(r.kind==='SUCCESSION'&&choice==='WORKERS'&&typeof innovationWorkerPlan==='function')e.cooperativePlan=innovationWorkerPlan(r);
   lifeTime(r.id+':decision',1);if(opt.costB)worldPay(r,opt.costB,choice,['SEASONAL','LANDFILL'].includes(r.kind));
   Object.assign(r,{choice,startTurn:state.turnCount,dueTurn:state.turnCount+opt.weeks,status:'ACTIVE'});
   if(r.kind==='SUBSIDY_FRAUD'&&choice==='FREEZE')crisisApproval(-1);
