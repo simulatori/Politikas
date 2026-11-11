@@ -11,7 +11,7 @@ function uxPageRows(key,rows,signature){
 function uxListPage(key,page){
     var render={deputies:renderDeputyMandateDirectory,projects:filterGovernmentCatalog,sectorLaws:renderSectorLawList}[key],view=uxListPages[key];
     if(!render || !view || view.owner!==state || !Number.isInteger(page) || page<0 || page>=view.pages)return false;
-    view.page=page;render();document.getElementById(key==='deputies'?'deputyMandatesPanel':key==='sectorLaws'?'sectorLawList':'catalog13Projects')?.scrollIntoView?.({block:'start',behavior:'smooth'});return true;
+    view.page=page;render();document.getElementById(key==='deputies'?'deputyMandatesPanel':key==='sectorLaws'?'sectorLawList':'catalog13Projects')?.scrollIntoView?.({block:'start',behavior:'instant'});return true;
 }
 function uxPageControls(key){
     var v=uxListPages[key];if(!v || !v.total)return '<p role="status">Nuk ka rezultate me këta filtra.</p>';
@@ -105,5 +105,5 @@ function renderUXNotifications(){
 }
 function openUXNotifications(){
     switchMainTab('tab-dashboard');switchSubTab('dash','overview',document.querySelectorAll('#tab-dashboard .sub-pill')[0]);renderUXNotifications();
-    var panel=document.getElementById('uxNotificationsPanel');panel.open=true;panel.tabIndex=-1;panel.focus({preventScroll:true});panel.scrollIntoView({block:'start',behavior:'smooth'});
+    var panel=document.getElementById('uxNotificationsPanel');panel.open=true;panel.tabIndex=-1;panel.focus({preventScroll:true});panel.scrollIntoView({block:'start',behavior:'instant'});
 }

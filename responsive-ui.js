@@ -72,8 +72,11 @@
         launcher.setAttribute('aria-expanded', 'false');
         document.body.classList.remove('dashboard-sheet-open');
         document.body.style.removeProperty('--sheet-scroll-y');
-        window.scrollTo({ top: scrollY, behavior: 'instant' });
-        if (mobile.matches) launcher.focus({ preventScroll: true });
+        if (!sheet.dataset.workspaceNavigation) {
+            window.scrollTo({ top: scrollY, behavior: 'instant' });
+            if (mobile.matches) launcher.focus({ preventScroll: true });
+        }
+        delete sheet.dataset.workspaceNavigation;
     });
     sheet.addEventListener('click', function (event) {
         if (event.target === sheet) {
@@ -81,11 +84,13 @@
             if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeSheet();
         }
         const action = event.target.closest('button[onclick]');
-        if (action && /\b(openUXWorkspace|openUXRoleWorkspace|openUXAgenda|openSectorLaws|createConstitutionProposal)\s*\(/.test(action.getAttribute('onclick'))) {
-            scrollY = 0;
+        if (action && /\b(openUXWorkspace|openUXRoleWorkspace|openUXAgenda|openSectorLaws|createConstitutionProposal|openPoliticalLife|openGoverningChallenges|openStateDevelopment|switchMainTab|switchSubTab|openProductionResources)\s*\(/.test(action.getAttribute('onclick'))) {
+            sheet.dataset.workspaceNavigation='true';
+            document.body.classList.remove('dashboard-sheet-open');
+            document.body.style.removeProperty('--sheet-scroll-y');
             closeSheet();
         }
-    });
+    }, true);
     mobile.addEventListener('change', syncLayout);
     syncLayout();
 

@@ -57,6 +57,7 @@ function processShortLawReview(){
     if(legislativeCampaignClosed())return;
     for(const l of state.laws){
         if(!['SUBMITTED','UNDER_REVIEW'].includes(l.status))continue;
+        if(courtLawFrozen(l,state)||state.constitutionalCourt?.cases.some(c=>c.lawId===l.id&&c.status==='PENDING')||typeof bureauVoteBlocked==='function'&&bureauVoteBlocked(l))continue;
         if(!l.shortReview){l.shortReview={startTurn:l.reviewTurn??l.submittedWeek??state.turnCount,weeks:2};}
         if(l.status==='SUBMITTED'){l.status='UNDER_REVIEW';l.govStage='APPROVED';l.reviewTurn=l.shortReview.startTurn;}
         if(state.turnCount<l.shortReview.startTurn+l.shortReview.weeks)continue;

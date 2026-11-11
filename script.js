@@ -2428,7 +2428,7 @@ function updateTopBar() {
     var p = state.parties[state.playerParty];
 
     var roleEl = document.getElementById("roleDisplay");
-    if (roleEl) roleEl.textContent = getPlayerRoleLabel() + " • Legjislatura XI";
+    if (roleEl) roleEl.textContent = getPlayerRoleLabel() + " • " + legislatureLabel(state);
 
     var dateEl = document.getElementById("dateDisplay");
     if (dateEl) dateEl.textContent = MONTHS_SQ[state.monthIndex] + " " + state.year + " • Java " + state.week;
@@ -3593,7 +3593,7 @@ function renderDashboard() {
         instSummary.innerHTML =
             '<div>• <strong>Faza Institucionale:</strong> <span style="color:var(--accent-gold);">' + phaseLabel + '</span></div>' +
             '<div>• <strong>President/e e Republikës:</strong> ' + state.presidentName + ' ' + (!state.presidentElected ? '<span style="color:var(--danger);">(Kërkohet votim brenda ' + state.presidentialDeadlineWeeks + ' javësh!)</span>' : '<span style="color:var(--success);">(Në mandat kushtetues)</span>') + '</div>' +
-            '<div>• <strong>Kryetar/e e Kuvendit (Legjislatura XI):</strong> ' + state.speakerOfAssembly + '</div>' +
+            '<div>• <strong>Kryetar/e e Kuvendit (' + legislatureLabel(state) + '):</strong> ' + state.speakerOfAssembly + '</div>' +
             '<div>• <strong>Kryeministër & Koalicioni:</strong> ' + state.primeMinister + ' (' + coalNames + ' — <strong>' + coalSeats + '/120 ulëse</strong>)</div>' +
             '<div>• <strong>Kërkesa Hyrëse në Agjendën e KM:</strong> <strong style="color:var(--accent-gold);">' + reqCount + ' kërkesa</strong> | <strong>Sektorë Shtetërorë në Zhvillim:</strong> <strong>' + activeSectorProjs + '/15</strong></div>' +
             '<div>• <strong>Projekte Zhvillimore Aktive:</strong> <strong style="color:var(--accent-gold);">' + activeDevProjects + '</strong> projekte në zbatim</div>' +
@@ -4957,7 +4957,7 @@ function openMpProfile(mpIdx, chatStep, lastFeedback) {
     var box = document.getElementById("mpModalContent");
     if (!box) return;
     var vHist = (mp.votingHistory || ["Seanca Konstituive: Pjesëmarrës"]).slice(-3).join(" • ");
-    var fbText = lastFeedback || ("Përshëndetje. Si deputet i Legjislaturës XI nga rajoni i " + mp.region + ", jam i gatshëm të diskutojmë për projektligjet dhe prioritetet e zonës sime.");
+    var fbText = lastFeedback || ("Përshëndetje. Si deputet i " + legislatureLabel(state) + " nga rajoni i " + mp.region + ", jam i gatshëm të diskutojmë për projektligjet dhe prioritetet e zonës sime.");
 
     box.innerHTML =
         '<div class="card-header">' +
@@ -5380,6 +5380,7 @@ function scheduleBillForSession(lawIdx) {
     if (!assertAssemblyFunctional("Caktimi i projektligjit për seancë")) return;
     var law = state.laws[lawIdx];
     if (!law || law.status !== "UNDER_REVIEW") return;
+    if(courtLawFrozen(law,state)||state.constitutionalCourt?.cases.some(c=>c.lawId===law.id&&c.status==='PENDING')||typeof bureauVoteBlocked==='function'&&bureauVoteBlocked(law)){showToast("Projektligji pret përfundimin e shqyrtimit të pavarur.");return false;}
     if (law.catalog13 && (!law.debated || state.turnCount <= law.reviewTurn || law.amendments.some(function(a){return a.status === "PENDING";}))) { showToast("Përfundoni debatin, vendimet për amendamentet dhe një javë shqyrtimi."); return; }
     law.status = "SCHEDULED";
     law.stage = "Caktuar për Seancë Plenare";
@@ -8197,6 +8198,15 @@ function processExistingTimeAdvance(weeksCount, silentToast) {
    41. TAB NAVIGATION
    ============================================================================ */
 
+// Navigation reveals content immediately; later deep links may select a more precise target.
+function revealWorkspaceTarget(target) {
+    if(!target || !target.getBoundingClientRect)return;
+    var stats=document.querySelector('.stats-grid');
+    var inset=stats && window.getComputedStyle && getComputedStyle(stats).position==='sticky'?stats.getBoundingClientRect().height+12:12;
+    document.documentElement.style.setProperty('--workspace-scroll-offset',inset+'px');
+    target.style.scrollMarginTop=inset+'px';
+    target.scrollIntoView({block:'start',inline:'nearest',behavior:'instant'});
+}
 function switchMainTab(tabId, navBtn) {
     if(tabId==='tab-government' && typeof oppositionActive==='function' && oppositionActive()){showToast('Jeni në opozitë. Veprimet tuaja gjenden te Shtabi i Partisë.');tabId='tab-dashboard';navBtn=null;}
     document.querySelectorAll(".tab-view").forEach(function(el) { el.classList.remove("active"); });
@@ -8215,10 +8225,10 @@ function switchMainTab(tabId, navBtn) {
     renderVisibleWorkspace();
     if(window.matchMedia && window.matchMedia('(max-width: 1024px)').matches){
         var activeNavigation=document.querySelector('.bottom-nav .nav-item.active');
-        if(activeNavigation)activeNavigation.scrollIntoView({block:'nearest',inline:'nearest'});
+        if(activeNavigation){var strip=activeNavigation.closest('.bottom-nav'),item=activeNavigation.getBoundingClientRect(),bounds=strip.getBoundingClientRect();if(item.left<bounds.left)strip.scrollLeft-=bounds.left-item.left;else if(item.right>bounds.right)strip.scrollLeft+=item.right-bounds.right;}
     }
     if(tabId === "tab-assembly") revealAssemblyTab(document.querySelector(".assembly-tabs .active"));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    revealWorkspaceTarget(target);
 }
 
 function revealAssemblyTab(button) {
@@ -8281,6 +8291,7 @@ function switchSubTab(prefix, subKey, pillBtn) {
     }
 
     renderVisibleWorkspace();stopConstituentAnimation();
+    revealWorkspaceTarget(target);
 }
 
 window.addEventListener("DOMContentLoaded", initApp);

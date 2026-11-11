@@ -72,7 +72,7 @@ function openWorldAttention(key){
  closeUrgentSituations();
  if(row.worldType==='CASE')openWorldCases();else openWorldEvents();
  const selector=row.worldType==='CASE'?'[data-world-case="'+row.record.id+'"]':row.worldType==='HOST'?'[data-world-hosting="'+row.record.id+'"]':'[data-world-event="'+row.record.source+'"]';
- const card=document.querySelector('#politicalLifePanel '+selector);if(card){card.closest('details')?.setAttribute('open','');card.querySelectorAll('details').forEach(d=>d.open=true);card.scrollIntoView?.({block:'start',behavior:'smooth'});card.querySelector('button')?.focus?.({preventScroll:true});}return true;
+ const card=document.querySelector('#politicalLifePanel '+selector);if(card){card.closest('details')?.setAttribute('open','');card.querySelectorAll('details').forEach(d=>d.open=true);card.scrollIntoView?.({block:'start',behavior:'instant'});card.querySelector('button')?.focus?.({preventScroll:true});}return true;
 }
 toggleModal=function(id,open,...args){const result=attentionModalBase(id,open,...args);if(!open&&typeof scheduleUrgentNotification==='function')scheduleUrgentNotification();return result;};
 if(typeof document.addEventListener==='function')document.addEventListener('close',()=>scheduleUrgentNotification(),true);

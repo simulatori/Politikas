@@ -46,7 +46,7 @@ function validateStreetProtests(st){
         ids.add(p.id);
     });
 }
-function openStreetProtests(){switchMainTab('tab-dashboard');switchSubTab('dash','overview',document.querySelector('#tab-dashboard .sub-pill'));document.getElementById('streetProtestsPanel')?.scrollIntoView?.({block:'start',behavior:'smooth'});}
+function openStreetProtests(){switchMainTab('tab-dashboard');switchSubTab('dash','overview',document.querySelector('#tab-dashboard .sub-pill'));document.getElementById('streetProtestsPanel')?.scrollIntoView?.({block:'start',behavior:'instant'});}
 function renderStreetProtests(){
     var host=document.getElementById('streetProtestsPanel'),alert=document.getElementById('streetProtestAlert');if(!host || !state)return;var db=state.streetProtests,p=activeStreetProtest(state),e=catalogEscape;if(alert)alert.hidden=!p;
     var hasBlocks=db && db.events.some(function(event){return event.status==='IGNORED' && event.blockUntil!==null && state.turnCount<=event.blockUntil;});

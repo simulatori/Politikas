@@ -3,3 +3,8 @@
 .urgent-world-detail .life-card{min-width:0;padding:14px;overflow-wrap:anywhere}.urgent-world-detail button{min-height:44px;max-width:100%;white-space:normal;margin:5px 0}.urgent-world-detail .world-grid{grid-template-columns:minmax(0,1fr)}
 
 #urgentSituationContent button{min-height:44px;max-width:100%;white-space:normal}
+/* Leader directory and event diplomacy share the existing responsive cards. */
+.summit-program,.summit-directory{min-width:0;max-width:100%;margin-top:18px;padding-top:14px;border-top:1px solid var(--border-glass)}
+.summit-program input,.summit-program select,.summit-directory input,.summit-directory select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:44px}
+.summit-program button,.summit-directory button{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.summit-program .life-card,.summit-directory .life-card{min-width:0;overflow-wrap:anywhere}

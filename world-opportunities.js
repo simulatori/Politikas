@@ -147,7 +147,7 @@ function worldBidReason(st,eventId,city,model){
 }
 function bidWorldEvent(eventId,city,model='STANDARD'){return lifeCommit(()=>{
  const reason=worldBidReason(state,eventId,city,model);if(reason)throw Error(reason);governingCapital();lifeTime('world-bid:'+eventId,2);
- const d=WORLD_HOST_EVENTS[eventId],r={id:worldId(),eventId,city,model,owner:state.playerParty,openedTurn:state.turnCount,status:'BIDDING',awardTurn:state.turnCount+2,dueTurn:state.turnCount+2+d.prep,endTurn:null,completedTurn:null,roll:Math.random(),receipts:[],revenues:[],liabilities:[],paidWeeks:[],checks:[],goodWeeks:0,elapsed:0,postponed:false};
+ const d=WORLD_HOST_EVENTS[eventId],r={id:worldId(),eventId,city,model,owner:state.playerParty,openedTurn:state.turnCount,status:'BIDDING',awardTurn:state.turnCount+2,dueTurn:state.turnCount+2+d.prep,endTurn:null,completedTurn:null,roll:Math.random(),receipts:[],revenues:[],liabilities:[],paidWeeks:[],checks:[],goodWeeks:0,elapsed:0,postponed:false,hosting:typeof worldHostingPlan==='function'?worldHostingPlan(eventId):undefined};
  worldPay(r,d.bidB,'Kandidatura');worldDB().events.push(r);
  });}
 function worldEventWeekly(r){const d=WORLD_HOST_EVENTS[r.eventId];return fiscalRound(d.weeklyB*(r.model==='TEMPORARY'?1.6:r.model==='JOINT'?1.2:1));}
@@ -195,6 +195,7 @@ function worldProcessWeek(turn){
   if(r.status==='BIDDING'&&turn>=r.awardTurn){
    const relation=Math.min(state.diplomacy.EU.score,state.diplomacy.USA.score),eligible=!resilienceBlocked(state)&&relation>=40,won=eligible&&r.roll>=Math.max(.1,.5-relation/200);
    if(!won){r.status='REJECTED';r.completedTurn=turn;continue;}
+   if(r.hosting)worldHostingAward(r);
    const setup=worldEventSetup(r);if(!worldCanPay(setup,true)||municipalCapitalBlocked(state)||municipalAusterity(state)){r.status='FAILED';r.completedTurn=turn;r.failureReason='Kandidatura fitoi, por buxheti nuk mbuloi kontratën e organizimit.';continue;}
    worldPay(r,setup,'Kontrata e organizimit',true);r.status='PREPARING';addMediaNews('Organizimet',d.name+' · kandidatura fitoi; kontrollo kushtet dhe afatin.','NEUTRAL');
   }
@@ -260,14 +261,14 @@ function validateWorld(st){
    const weeks=new Set();for(const p of r.paidWeeks){if(!turn(p.turn)||p.turn<=r.awardTurn||weeks.has(p.turn)||!r.receipts.some(q=>q.id===p.receiptId&&q.turn===p.turn&&q.costB===worldEventWeekly(r)&&q.title==='Operimi javor'))bad();weeks.add(p.turn);}
    if(r.postponed&&!r.receipts.some(p=>p.title==='Shtyrja e organizimit'&&p.costB===fiscalRound(worldEventSetup(r)*.25)))bad();
    if(r.inspectedTurn!==undefined){
-    const expected=worldHostRequirements(st,r.eventId,r.city,r.model).map(t=>t.key),keys=r.checks.map(t=>t.key);
+    const expected=worldHostRequirements(st,r.eventId,r.city,r.model,r).map(t=>t.key),keys=r.checks.map(t=>t.key);
     if(!turn(r.inspectedTurn)||r.inspectedTurn!==r.dueTurn||keys.length!==expected.length||new Set(keys).size!==keys.length||expected.some(k=>!keys.includes(k))||r.checks.some(t=>!Number.isFinite(t.have)||!Number.isFinite(t.need)||t.have<0||t.need<0||typeof t.ok!=='boolean'||t.ok!==(t.have>=t.need)))bad();
     if(!r.receipts.some(p=>p.title==='Kontrata e organizimit'&&p.costB===worldEventSetup(r)&&p.capital))bad();
    }
    if(r.startedTurn!==undefined&&(!turn(r.startedTurn)||r.startedTurn!==r.dueTurn||r.endTurn!==r.startedTurn+d.duration||r.inspectedTurn!==r.startedTurn))bad();
    if(r.status==='RUNNING'&&r.startedTurn===undefined)bad();
    if(['DONE','REJECTED','FAILED','WITHDRAWN'].includes(r.status)&&!turn(r.completedTurn))bad();
-   if(r.actualVisitors!==undefined){if(r.actualVisitors!==Math.floor(d.visitors*r.goodWeeks/d.duration)||r.visitorSpendingB!==fiscalRound(r.actualVisitors*d.spend/1e9)||!Number.isFinite(r.taxRate)||r.taxRate<0||r.taxRate>.2||r.revenues.reduce((n,p)=>n+p.amountB,0)!==fiscalRound(r.visitorSpendingB*r.taxRate)||r.completedTurn!==r.endTurn)bad();}
+   if(r.actualVisitors!==undefined){if(r.actualVisitors!==Math.floor(d.visitors*r.goodWeeks/d.duration)||r.visitorSpendingB!==fiscalRound(r.actualVisitors*d.spend/1e9)||!Number.isFinite(r.taxRate)||r.taxRate<0||r.taxRate>.2||fiscalRound(r.revenues.filter(p=>p.title==='TVSH nga vizitorët e organizimit').reduce((n,p)=>n+p.amountB,0))!==fiscalRound(r.visitorSpendingB*r.taxRate)||r.completedTurn!==r.endTurn)bad();}
    if(r.status==='DONE'&&(r.goodWeeks!==d.duration||!r.success||r.actualVisitors!==d.visitors||r.completedTurn!==r.endTurn||!r.checks.length||r.checks.some(t=>!t.ok)))bad();
   }else{
    if(!WORLD_CASE_DEFS[r.kind]||!['OPEN','ACTIVE','REVIEW','STOPPED','COLLAPSED','DONE'].includes(r.status)||r.responseTurn!==r.openedTurn+4||typeof r.qualified!=='boolean'||!Array.isArray(r.spreadCities)||r.spreadCities.some(id=>!worldCity(st,id))||!Number.isFinite(r.coverage)||r.coverage<0||r.coverage>100)bad();
