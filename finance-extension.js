@@ -81,12 +81,13 @@ function privateCommit(revision,change){
     if(!state.privateFinance || revision!==state.privateFinance.revision)return false;
     return fiscalCommit(function(){change(state.privateFinance);state.privateFinance.revision++;validatePrivateFinance(state);});
 }
-function issuePrivateLoan(amountM,rate,weeks,revision){
-    return privateCommit(revision,function(p){var amount=fiscalRound(amountM/1000);if(!Number.isFinite(amount)||amount<=0||amount>p.bank.cashB||!Number.isFinite(rate)||rate<0||rate>100||!Number.isInteger(weeks)||weeks<1||weeks>96||p.loans.some(function(l){return l.status!=='REPAID';}))throw Error('Kushtet, likuiditeti bankar ose kredia ekzistuese nuk lejojnë lëvrimin.');
-        var l={id:'private:'+p.revision,issuedTurn:state.turnCount,lastTurn:state.turnCount,principalB:amount,remainingB:amount,rate:rate,weeks:weeks,interestDueB:0,principalDueB:0,status:'ACTIVE'};
-        p.bank.cashB=fiscalRound(p.bank.cashB-amount);p.borrower.cashB=fiscalRound(p.borrower.cashB+amount);p.loans.push(l);privateEntry(p,'DISBURSEMENT',amount,l.id);
-    });
+function createPrivateLoanRecord(p,amount,rate,weeks){
+    if(typeof institutionRows==='function'&&institutionRows(state,'BANK').some(r=>r.freezeUntil>state.turnCount))throw Error('Kreditimi është pezulluar nga ristrukturimi bankar.');
+    amount=fiscalRound(amount);if(!Number.isFinite(amount)||amount<=0||amount>p.bank.cashB||!Number.isFinite(rate)||rate<0||rate>100||!Number.isInteger(weeks)||weeks<1||weeks>96||p.loans.some(l=>l.status!=='REPAID'))throw Error('Kushtet, likuiditeti bankar ose kredia ekzistuese nuk lejojnë lëvrimin.');
+    var l={id:'private:'+p.revision,issuedTurn:state.turnCount,lastTurn:state.turnCount,principalB:amount,remainingB:amount,rate,weeks,interestDueB:0,principalDueB:0,status:'ACTIVE'};
+    p.bank.cashB=fiscalRound(p.bank.cashB-amount);p.borrower.cashB=fiscalRound(p.borrower.cashB+amount);p.loans.push(l);privateEntry(p,'DISBURSEMENT',amount,l.id);return l;
 }
+function issuePrivateLoan(amountM,rate,weeks,revision){return privateCommit(revision,p=>createPrivateLoanRecord(p,amountM/1000,rate,weeks));}
 function payPrivateLoan(p,l,limit,turn){
     var interest=fiscalRound(Math.min(limit,p.borrower.cashB,l.interestDueB));
     p.borrower.cashB=fiscalRound(p.borrower.cashB-interest);p.bank.cashB=fiscalRound(p.bank.cashB+interest);p.bank.interestIncomeB=fiscalRound(p.bank.interestIncomeB+interest);l.interestDueB=fiscalRound(l.interestDueB-interest);privateEntry(p,'INTEREST',interest,l.id,turn);

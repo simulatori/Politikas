@@ -251,19 +251,20 @@ function completeInternationalCommunication(c){
     if(c.kind==='CONSULTATION' && c.executive){state.dialogueConsultations[c.partnerId]={method:'CONSULTATION',topic:c.topic,communicationId:c.id,date:state.year+'/'+state.week};state.dialogueAlliesConsulted=true;}
     return true;
 }
-function requestInternationalCommunication(partnerId,topic,kind,goal){
-    return communicationCommit(function(db){
+function createInternationalCommunicationRecord(db,partnerId,topic,kind,goal,details=null){
         var p=db.institutions[partnerId],executive=agendaExecutive();
         if(!p || !p.facts.topics.includes(topic) || !['CALL','CONSULTATION','VISIT'].includes(kind) || !Object.hasOwn(INTERNATIONAL_COMMUNICATION_GOALS,goal))throw Error('Zgjidhni kontaktin, temën dhe qëllimin nga lista.');
         if(goal==='FOLLOWUP' && !executive)throw Error('Vetëm Qeveria mund të premtojë një dosje shtetërore.');
         if(db.communications.some(function(c){return c.ownerParty===state.playerParty && c.partnerId===partnerId && c.topic===topic && (c.status==='SCHEDULED' || c.createdTurn===state.turnCount);}))throw Error('Ky komunikim është regjistruar tashmë; vazhdoni procesin ekzistues.');
         var c={id:'communication:'+(++db.counter),ownerParty:state.playerParty,executive:executive,partnerId:partnerId,topic:topic,kind:kind,goal:goal,createdTurn:state.turnCount,dueTurn:state.turnCount+(kind==='VISIT'?1:0),status:'SCHEDULED',response:'Takimi pret zhvillimin në agjendë.',history:[]};
+        if(details){c.leaderActorId=details.actorId;c.leaderName=details.name;c.summitHostId=details.hostId||null;c.summitMode=details.mode;}
         db.communications.push(c);
         if(kind==='VISIT'){
-            c.meetingId=c.id+':meeting';state.scheduledMeetings.unshift({id:c.meetingId,communicationId:c.id,internationalPartnerId:partnerId,ownerParty:state.playerParty,categoryKey:'INTL_DIPLOMATS',category:'Kontakt ndërkombëtar',targetName:p.facts.name,topic:INTERNATIONAL_TOPICS[topic].name,goal:INTERNATIONAL_COMMUNICATION_GOALS[goal],hour:'10:00',createdTurn:state.turnCount,dueTurn:c.dueTurn,status:'SCHEDULED',outcome:null,agenda6:executive,requiresExecutive:executive,political9:!executive,origin:'ORGANIZED',importance:'Mesatare'});
+            c.meetingId=c.id+':meeting';state.scheduledMeetings.unshift({id:c.meetingId,communicationId:c.id,internationalPartnerId:partnerId,ownerParty:state.playerParty,categoryKey:'INTL_DIPLOMATS',category:'Kontakt ndërkombëtar',targetName:details?.name||p.facts.name,topic:INTERNATIONAL_TOPICS[topic].name,goal:INTERNATIONAL_COMMUNICATION_GOALS[goal],hour:'10:00',createdTurn:state.turnCount,dueTurn:c.dueTurn,status:'SCHEDULED',outcome:null,agenda6:executive,requiresExecutive:executive,political9:!executive,origin:'ORGANIZED',importance:'Mesatare'});
         }else completeInternationalCommunication(c);
-    });
+    return c;
 }
+function requestInternationalCommunication(partnerId,topic,kind,goal){return communicationCommit(db=>createInternationalCommunicationRecord(db,partnerId,topic,kind,goal));}
 function finishInternationalCommunicationMeeting(m){
     if(!m.communicationId)return;
     var c=state.internationalDiplomacy.communications.find(function(c){return c.id===m.communicationId;});

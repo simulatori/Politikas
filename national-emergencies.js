@@ -4,7 +4,7 @@ function migrateNationalEmergencies(st){if(st.nationalEmergencies===undefined)st
 function activeNationalEmergency(st){st=st||state;return st?.nationalEmergencies?.events.find(x=>x.status==='ACTIVE')||null;}
 function startNationalEmergency(kind){
     if(!NATIONAL_EMERGENCIES[kind]||!agendaExecutive())return false;migrateNationalEmergencies(state);var db=state.nationalEmergencies;if(activeNationalEmergency()||state.turnCount<db.cooldownUntil)return false;
-    db.events.push({id:'national-emergency:'+(++db.counter),kind,createdTurn:state.turnCount,dueTurn:state.turnCount+3,governmentKey:crisisGovernmentKey(state),status:'ACTIVE',acknowledged:false,fundedTurn:null,failedTurn:null,paymentId:null,account:null});db.cooldownUntil=state.turnCount+12;
+    db.events.push({id:'national-emergency:'+(++db.counter),kind,createdTurn:state.turnCount,dueTurn:state.turnCount+3+(kind==='FLOOD'&&typeof developmentFloodWarning==='function'&&developmentFloodWarning(state)?1:0),earlyWarningCaseId:kind==='FLOOD'&&typeof developmentFloodWarning==='function'?developmentFloodWarning(state):null,governmentKey:crisisGovernmentKey(state),status:'ACTIVE',acknowledged:false,fundedTurn:null,failedTurn:null,paymentId:null,account:null});db.cooldownUntil=state.turnCount+12;
     state.historyLog.unshift('GJENDJE EMERGJENTE: '+NATIONAL_EMERGENCIES[kind].title+'. Fondi kërkohet brenda 3 javëve.');return true;
 }
 function acknowledgeNationalEmergency(){
@@ -42,7 +42,7 @@ function renderNationalEmergencies(){
 }
 function validateNationalEmergencies(st){
     var d=st.nationalEmergencies;if(d===undefined)return;var fail=()=>{throw Error('Emergjencat kombëtare janë të pavlefshme.');};if(!d||d.version!==1||!Number.isInteger(d.lastTurn)||d.lastTurn<0||d.lastTurn>st.turnCount||!Number.isInteger(d.counter)||d.counter<0||!Number.isInteger(d.cooldownUntil)||!Array.isArray(d.events)||d.counter!==d.events.length||d.events.filter(e=>e.status==='ACTIVE').length>1)fail();
-    var ids=new Set();d.events.forEach((e,i)=>{if(!NATIONAL_EMERGENCIES[e.kind]||e.id!=='national-emergency:'+(i+1)||ids.has(e.id)||!Number.isInteger(e.createdTurn)||e.createdTurn<0||e.createdTurn>st.turnCount||e.dueTurn!==e.createdTurn+3||typeof e.governmentKey!=='string'||typeof e.acknowledged!=='boolean'||!['ACTIVE','FUNDED','FAILED','CANCELLED'].includes(e.status))fail();ids.add(e.id);
+    var ids=new Set();d.events.forEach((e,i)=>{if(!NATIONAL_EMERGENCIES[e.kind]||e.id!=='national-emergency:'+(i+1)||ids.has(e.id)||!Number.isInteger(e.createdTurn)||e.createdTurn<0||e.createdTurn>st.turnCount||e.dueTurn!==e.createdTurn+3+(e.earlyWarningCaseId?1:0)||e.earlyWarningCaseId&&e.kind!=='FLOOD'||typeof e.governmentKey!=='string'||typeof e.acknowledged!=='boolean'||!['ACTIVE','FUNDED','FAILED','CANCELLED'].includes(e.status))fail();ids.add(e.id);
         if(e.status==='FUNDED'){var l=st.publicFinance.ledger.find(l=>l.id===e.paymentId);if(!Number.isInteger(e.fundedTurn)||e.fundedTurn<e.createdTurn||e.fundedTurn>=e.dueTurn||e.fundedTurn>st.turnCount||!l||l.turn!==e.fundedTurn||l.account!==e.account||l.source!=='Fond Emergjent: '+e.id||l.type!==(e.account==='fiscalReserve'?'RESERVE_EXPENSE':'EXPENSE')||!['fiscalReserve','budgetTotalB'].includes(e.account)||Math.abs(l.amountB+NATIONAL_EMERGENCIES[e.kind].fundB)>1e-8||e.failedTurn!==null)fail();}
         else if(e.paymentId!==null||e.account!==null||e.fundedTurn!==null)fail();
         if(e.status==='FAILED'){if(!Number.isInteger(e.failedTurn)||e.failedTurn<e.dueTurn||e.failedTurn>st.turnCount)fail();}else if(e.failedTurn!==null)fail();

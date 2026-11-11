@@ -87,7 +87,7 @@ function filterResourceCards(value){if(!['ALL','ENERGY','MINES','FOOD'].includes
 function focusProductionResource(kind){
  productionResourceFilter=kind==='food'?'FOOD':kind==='energy'?'ENERGY':'MINES';renderProductionResources();
  const select=document.getElementById('productionMineType');if(select&&RESOURCE_TYPES[kind]){select.value=kind;updateResourceBuildLabel();}
- document.getElementById(kind==='food'?'production-sector-agriculture':kind==='energy'?'production-sector-energy':'production-sector-mines')?.scrollIntoView({block:'start',behavior:'smooth'});
+ document.getElementById(kind==='food'?'production-sector-agriculture':kind==='energy'?'production-sector-energy':'production-sector-mines')?.scrollIntoView({block:'start',behavior:'instant'});
 }
 function updateResourceBuildLabel(){const section=document.getElementById('production-sector-mines'),select=document.getElementById('productionMineType');if(!section||!select)return;const button=section.querySelector('.action-btn');if(button)button.textContent='Ndërto '+RESOURCE_TYPES[select.value].name;}
 function resourceOverview(){

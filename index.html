@@ -60,8 +60,8 @@
         </div>
         
         <div class="start-footer">
-            <span class="start-tag">Legjislatura XI</span>
-            <span class="start-tag">Loja v93</span>
+            <span class="start-tag" data-legislature-label>Legjislatura XI</span>
+            <span class="start-tag">Loja v101</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -127,7 +127,7 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
-            <p id="pwaVersion">Loja v93</p>
+            <p id="pwaVersion">Loja v101</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
@@ -681,7 +681,7 @@
                 <div id="ass-hemicycle" class="sub-content">
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">🏛️ Kuvendi i Republikës së Kosovës — Legjislatura XI (120 Ulëse)</div>
+                            <div class="card-title">🏛️ Kuvendi i Republikës së Kosovës — <span data-legislature-label>Legjislatura XI</span> (120 Ulëse)</div>
                             <span class="tag tag-lvv" id="speakerNameBadge">Kryetare: Albulena Haxhiu</span>
                         </div>
                         <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;">
@@ -1163,6 +1163,7 @@
 <script src="production-economy.js" defer></script>
 <script src="transport-workspace.js" defer></script>
 <script src="history-quiz.js" defer></script>
+<script src="history-kosovo-questions.js" defer></script>
 <script src="production-grid.js" defer></script>
 <script src="state-services.js" defer></script>
 <script src="civil-registry.js" defer></script>
@@ -1201,6 +1202,19 @@
 <script src="pwa-registration.js" defer></script>
 <script src="government-notifications.js" defer></script>
 <script src="world-attention.js" defer></script>
+<script src="hosting-development.js" defer></script>
+<script src="development-events.js" defer></script>
+<script src="civic-innovation.js" defer></script>
+<script src="world-leaders-data.js" defer></script>
+<script src="summit-diplomacy.js" defer></script>
+<script src="future-opportunities.js" defer></script>
+<script src="history-quiz-safety.js" defer></script>
+<script src="cinematic-stories-data.js" defer></script>
+<script src="cinematic-stories.js" defer></script>
+<script src="legislature-sequence.js" defer></script>
+<script src="personal-life-data.js" defer></script>
+<script src="personal-life.js" defer></script>
+<script src="mandate-press.js" defer></script>
 <script type="module">
     // Dynamic CDN imports keep guest play working even when Firebase cannot load.
     try {
