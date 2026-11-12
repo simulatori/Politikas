@@ -2,10 +2,15 @@
    Keep CORE_ASSETS aligned with local script dependencies in index.html.
    Cache only this game's static shell. Never cache Auth, Firestore or user saves.
    The next version activates after all windows using the previous version close. */
-const CACHE_VERSION='v101';
+const CACHE_VERSION='v105';
 const CACHE_PREFIX='republika-shell:'+self.registration.scope+':';
 const CACHE_NAME=CACHE_PREFIX+CACHE_VERSION;
 const CORE_ASSETS=[
+    "./governance-flow-repairs.js",
+    "./live-speech-data.js",
+    "./live-speech.js",
+    "./live-speech-ui.js",
+    "./live-speech.css",
     "./world-leaders-data.js",
     "./summit-diplomacy.js",
     "./future-opportunities.js",
@@ -17,6 +22,11 @@ const CORE_ASSETS=[
     "./personal-life-data.js",
     "./personal-life.js",
     "./mandate-press.js",
+    "./dynamic-conference-data.js",
+    "./dynamic-conference-sources.js",
+    "./dynamic-conference.js",
+    "./dynamic-conference-ui.js",
+    "./dynamic-conference.css",
     "./civic-innovation.js",
     "./hosting-development.js",
     "./development-events.js",

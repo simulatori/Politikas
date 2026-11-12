@@ -1,6 +1,6 @@
 /* Explicit, saved updates. Incomplete installations keep the previous offline release. */
 (function(){
-    const PAGE_VERSION='v101';
+    const PAGE_VERSION='v105';
     let registration=null,checking=false,applying=false,reloadForUpdate=false;
     function status(message){for(const id of ['pwaUpdateStatus','pwaUpdateNoticeText']){const el=document.getElementById(id);if(el)el.textContent=message;}}
     function waiting(){return !!registration?.waiting;}

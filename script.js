@@ -1249,11 +1249,11 @@ function getInitialLaws() {
         {
             id: "law_budget_2027",
             catalogId: "cat_budget_2027",
-            title: "Projektligji për Ndarjet Buxhetore dhe Rritjen e Koeficientit të Pagave në 125€",
+            title: "Projektbuxheti i vitit 2027",
             ministry: "Ministria e Financave, Punës dhe Transfereve",
             proposer: "Qeveria e Kosovës (Ministria e Financave)",
             sector: "sec_econ",
-            desc: "Rrit koeficientin e pagave në sektorin publik dhe shton investimet kapitale në komuna.",
+            desc: "Përcakton ndarjet vjetore të ministrive, investimet kapitale dhe detyrimet e planifikuara për vitin 2027.",
             majorityType: "SIMPLE_61",
             requiredVotes: 61,
             costB: 0.14,
@@ -1595,6 +1595,7 @@ function saveGameAuto() {
 
 // Narrow bridge for the optional Firebase module; state remains owned by the game.
 window.republikaCloudGame = {
+    notify: function(message) { showToast(message); },
     returnToLogin: function() {
         window.republikaNewGameRequested = false;
         window.republikaResumeAfterLogin = true;
@@ -2459,7 +2460,12 @@ function updateTopBar() {
     if (budEl) budEl.textContent = "€" + state.budgetTotalB.toFixed(2) + " Mld";
 
     var econEl = document.getElementById("statEconomy");
-    if (econEl) econEl.textContent = (state.gdpGrowth>=0?"+":"") + state.gdpGrowth + "% | " + state.unemployment + "%";
+    if (econEl) {
+        var growth=state.gdpGrowth.toFixed(1), unemployment=state.unemployment.toFixed(1);
+        econEl.style.color='var(--text-primary)';econEl.style.textShadow='none';
+        econEl.innerHTML='<span style="color:'+(state.gdpGrowth<0?'var(--danger)':state.gdpGrowth>0?'var(--success)':'var(--text-muted)')+'">'+(state.gdpGrowth>0?'+':'')+growth+'%</span> <span style="color:var(--text-muted)">| '+unemployment+'%</span>';
+        econEl.setAttribute('aria-label','Rritja ekonomike '+growth+' përqind; papunësia '+unemployment+' përqind');
+    }
 
     var avgDip = Math.round((state.diplomacy.USA.score + state.diplomacy.EU.score + state.diplomacy.GERMANY.score) / 3);
     var intlEl = document.getElementById("statIntl");
@@ -4198,142 +4204,11 @@ function finalizeMeetingScene(meetIdx, decisionCode) { return decideScheduledVis
    25. KONFERENCA PËR MEDIA
    ============================================================================ */
 
-function startPressConference() {
-    if(!assertGovernmentAuthority('Veprimi i Qeverisë'))return false;
-    if (!isPlayerInGovernment()) {
-        showToast("Konferencat për media nga Kryeministria janë vetëm për Qeverinë në detyrë.");
-        return;
-    }
-    if(state.activePressSession){renderCurrentPressQuestion();return;}
-    var topicEl = document.getElementById("pressTopicSelect");
-    var toneEl = document.getElementById("pressToneSelect");
-    var partnerEl = document.getElementById("pressPartnerSelect");
-    var topic = topicEl ? topicEl.value : "Temë e përgjithshme";
-    var tone = toneEl ? toneEl.value : "INSTITUTIONAL";
-    var partner = partnerEl ? partnerEl.value : "SOLO";
-
-    state.activePressSession = {
-        topic: topic, tone: tone, partner: partner, step: 1, maxSteps: 3, transcript: [],
-        questions: [
-            { journalist: "Gazetari Politik (KOHA / KTV)", q: "Z. Kryeministër, në lidhje me temën e sotme (" + topic + "), qytetarët dhe opozita kërkojnë afate konkrete. A po merrni sot zotim me afat apo po kërkoni më shumë kohë?" },
-            { journalist: "Gazetarja Hulumtuese (Betimi për Drejtësi / Kallxo)", q: "Pyetje përcjellëse: Koalicioni aktual ka " + getCoalitionSeats() + " deputetë në Kuvend dhe buxheti është €" + state.budgetTotalB.toFixed(2) + " Mld. Si do t'i siguroni votat në Kuvend pa kompromis me opozitën?" },
-            { journalist: "Korrespondenti Diplomatik (T7 / Klan Kosova)", q: "Pyetja e tretë: Ambasadat e QUINT-it (Raporti: " + state.diplomacy.USA.score + "/100) vëzhgojnë vendimet e Qeverisë. Cili është mesazhi juaj për Uashingtonin dhe Brukselin sot?" }
-        ]
-    };
-    renderCurrentPressQuestion();saveGameAuto();
-}
-
-function renderCurrentPressQuestion() {
-    var sess = state.activePressSession;
-    var stage = document.getElementById("pressLiveStage");
-    if (!sess || !stage) { if (stage) stage.style.display = "none"; return; }
-    stage.style.display = "block";
-
-    var currQ = sess.questions[sess.step - 1];
-    var transHtml = sess.transcript.length > 0
-        ? '<div style="margin-bottom:10px; max-height:140px; overflow-y:auto; padding:8px; background:#090e1a; border-radius:8px; font-size:0.75rem;">' +
-            sess.transcript.map(function(t) { return '<div style="margin-bottom:4px;"><strong>' + t.who + ':</strong> ' + t.text + '</div>'; }).join("") +
-          '</div>'
-        : "";
-
-    stage.innerHTML =
-        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-            '<span style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">🔴 DREJTPËRDREJT — PYETJA ' + sess.step + ' NGA ' + sess.maxSteps + '</span>' +
-            '<button class="btn-top" onclick="finishFullPressConference()">Përfundo</button>' +
-        '</div>' +
-        transHtml +
-        '<div style="background:#0f172a; padding:12px; border-radius:8px; border-left:4px solid var(--accent-blue); margin-bottom:12px;">' +
-            '<div style="font-size:0.74rem; color:var(--text-muted); margin-bottom:4px;">🎤 Pyetja #' + sess.step + ' nga <strong>' + currQ.journalist + '</strong>:</div>' +
-            '<div style="font-size:0.86rem; font-style:italic;">"' + currQ.q + '"</div>' +
-        '</div>' +
-        '<div style="margin-bottom:10px;">' +
-            '<div style="display:flex; gap:6px;">' +
-                '<input type="text" id="freePressAnswerInput" placeholder="Shkruaj deklaratën tënde të lirë këtu..." style="flex:1;">' +
-                '<button class="action-btn btn-gold" onclick="submitPressAnswer(\'FREE_TEXT\')">Deklaro ▶</button>' +
-            '</div>' +
-        '</div>' +
-        '<div>' +
-            '<button class="choice-btn" onclick="submitPressAnswer(\'DIRECT_FACTS\')">' +
-                '<span class="choice-title">1. Përgjigje e drejtpërdrejtë me shifra dhe fakte institucionale</span>' +
-                '<span class="choice-impact">Sqarimi u ofrohet mediave; besimi varet nga saktësia dhe rezultatet</span>' +
-            '</button>' +
-            '<button class="choice-btn" onclick="submitPressAnswer(\'PUBLIC_PROMISE\')">' +
-                '<span class="choice-title">2. Premto veprim konkret brenda 14 javëve</span>' +
-                '<span class="choice-impact">Regjistrohet një zotim me afat; publiku pret realizimin</span>' +
-            '</button>' +
-            '<button class="choice-btn" onclick="submitPressAnswer(\'COOPERATIVE_ALLIES\')">' +
-                '<span class="choice-title">3. Fto opozitën dhe partnerët ndërkombëtarë për bashkëpunim shtetëror</span>' +
-                '<span class="choice-impact">+4 pikë diplomaci & raport ndërpartiak</span>' +
-            '</button>' +
-        '</div>';
-    decoratePoliticalScene("pressLiveStage","PRESS",{name:currQ.journalist,role:"Pyetje nga media",topic:sess.topic,detail:currQ.q,stage:"Pyetja "+sess.step+" nga "+sess.maxSteps});
-}
-
-function submitPressAnswer(ansType) {
-    if(!assertGovernmentAuthority('Ky veprim ekzekutiv'))return false;
-    var sess = state.activePressSession;
-    if (!sess) return;
-    if(!["FREE_TEXT","DIRECT_FACTS","PUBLIC_PROMISE","COOPERATIVE_ALLIES"].includes(ansType))return false;
-    var currQ = sess.questions[sess.step - 1];
-    var freeTxtEl = document.getElementById("freePressAnswerInput");
-    var freeTxt = freeTxtEl ? freeTxtEl.value.trim() : "";
-
-    if(ansType==="FREE_TEXT" && !freeTxt){showToast("Shkruani deklarat\u00ebn p\u00ebrpara d\u00ebrgimit.");return false;}
-    var answerSummary = "";
-    if (ansType === "FREE_TEXT" && freeTxt) {
-        answerSummary = freeTxt;
-        adjustPublicSupport((1.8), {source:"submitPressAnswer"}, state);
-    } else if (ansType === "PUBLIC_PROMISE") {
-        answerSummary = "Qeveria merr zotim zyrtar që brenda 14 javëve të përmbushë këtë masë.";
-        adjustPublicSupport((2.8), {source:"submitPressAnswer"}, state);
-        state.promises.push({
-            id: "prom_press_" + Date.now(),
-            title: "Zotim në Konferencë (" + sess.topic + "): Paketa e re ekzekutive",
-            deadlineWeeks: 14,
-            costB: 0.06,
-            progress: 15,
-            fulfilled: false,
-            source: "Konferencë për Shtyp (" + MONTHS_SQ[state.monthIndex] + " " + state.year + ")"
-        });
-    } else if (ansType === "COOPERATIVE_ALLIES") {
-        answerSummary = "Shtrijmë dorën e bashkëpunimit për opozitën dhe aleatët tanë strategjikë SHBA e BE.";
-        state.diplomacy.USA.score = clamp(state.diplomacy.USA.score + 4, 10, 100);
-        state.diplomacy.EU.score = clamp(state.diplomacy.EU.score + 4, 10, 100);
-        adjustPublicSupport((1.2), {source:"submitPressAnswer"}, state);
-    } else {
-        answerSummary = "Të dhënat tona buxhetore dhe ligjore tregojnë përparim të qëndrueshëm.";
-        adjustPublicSupport((1.5), {source:"submitPressAnswer"}, state);
-    }
-
-    sess.transcript.push({ who: currQ.journalist, text: currQ.q });
-    sess.transcript.push({ who: "Kryeministri", text: answerSummary });
-
-    if (sess.step < sess.maxSteps) {
-        sess.step++;
-        renderCurrentPressQuestion();saveGameAuto();
-    } else {
-        finishFullPressConference();
-    }
-}
-
-function finishFullPressConference() {
-    if(!assertGovernmentAuthority('Ky veprim ekzekutiv'))return false;
-    var sess = state.activePressSession;
-    state.activePressSession = null;
-    var stage = document.getElementById("pressLiveStage");
-    if (stage) stage.style.display = "none";
-    if (!sess) return;
-    politicalSceneJournal("press:"+state.turnCount+":"+sess.topic,"PRESS",sess.transcript.map(t=>t.who+": "+t.text).join(" | "),"COMPLETED");
-    var fullReport = sess.transcript.map(function(t) { return t.who + ': "' + t.text + '"'; }).join(" | ");
-    addMediaNews("KTV / T7 / RTK", "Përfundon konferenca për media me " + sess.step + " raunde pyetjesh mbi temën: " + sess.topic + ".", "POSITIVE", fullReport);
-    refreshAllUI();
-    showMajorAnnouncement({
-        badge: "KONFERENCË PËR MEDIA",
-        title: "Përmbledhja Mediatike e Konferencës",
-        reason: "U zhvilluan " + sess.step + " pyetje me gazetarët e akredituar.",
-        immediateImpact: "Deklaratat dhe zotimet u regjistruan. Reagimi i qëndrueshëm i publikut varet nga rezultatet."
-    });
-}
+// Saved links route to the single dynamic media room; free-text conferences are retired.
+function startPressConference(){return typeof openDynamicConference==='function'?openDynamicConference():false;}
+function renderCurrentPressQuestion(){if(typeof renderConferenceHub==='function')renderConferenceHub();}
+function submitPressAnswer(){return false;}
+function finishFullPressConference(){if(typeof closeDynamicConference==='function')closeDynamicConference();}
 
 function publishPressRelease() {
     if(!assertGovernmentAuthority('Veprimi i Qeverisë'))return false;
@@ -6206,8 +6081,8 @@ function renderGovernmentSection() {
                     '</div>' +
                     '<div class="card" style="background:#0f172a; margin-bottom:0;">' +
                         '<span class="stat-label">BPV & Inflacioni</span>' +
-                        '<div style="font-size:1.1rem; font-weight:800; color:' + (state.gdpGrowth>=0?'var(--success)':'var(--danger)') + ';">' + (state.gdpGrowth>=0?'+':'') + state.gdpGrowth + '% | ' + state.inflation + '%</div>' +
-                        '<small style="color:var(--text-muted);">Papunësia: ' + state.unemployment + '%</small>' +
+                        '<div style="font-size:1.1rem; font-weight:800; color:' + (state.gdpGrowth>=0?'var(--success)':'var(--danger)') + ';">' + (state.gdpGrowth>=0?'+':'') + state.gdpGrowth.toFixed(1) + '% | ' + state.inflation.toFixed(1) + '%</div>' +
+                        '<small style="color:var(--text-muted);">Papunësia: ' + state.unemployment.toFixed(1) + '%</small>' +
                     '</div>' +
                     '<div class="card" style="background:#0f172a; margin-bottom:0;">' +
                         '<span class="stat-label">Remitancat & Borxhi</span>' +
