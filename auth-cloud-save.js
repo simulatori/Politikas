@@ -1,4 +1,4 @@
-// Firebase is injected by index.html. No timers, realtime listeners or autosave hooks.
+// Firebase is injected by index.html. No timers, realtime listeners or generic autosave hooks.
 export function initAuthCloudSave(sdk, game, root = document) {
     const firebaseConfig = {
         apiKey: "AIzaSyCyWd3ANLIKxBRFkm_8WTNpBa4fruXEmwo",
@@ -93,8 +93,11 @@ export function initAuthCloudSave(sdk, game, root = document) {
         catch (error) { message(errorMessage(error)); }
         finally { busy = false; render(); }
     });
-    save.addEventListener('click', async () => {
-        if (!user || busy || checking || !checked) return;
+    async function saveCloud(speechId = null) {
+        if (!user || busy || checking || !checked) {
+            if (speechId) message('Cloud kërkon llogari aktive, kontroll të përfunduar dhe asnjë ruajtje tjetër në proces.');
+            return false;
+        }
         if (!online()) { message('Nuk ka internet. Përdorni ruajtjen lokale.'); return; }
         const uid = user.uid, version = generation;
         busy = true;
@@ -113,7 +116,7 @@ export function initAuthCloudSave(sdk, game, root = document) {
                 message('Prisni 60 sekonda mes ruajtjeve në Cloud.');
                 return;
             }
-            if (cloudJSON && !window.confirm('Ruajtja ekzistuese në Cloud do të zëvendësohet. Vazhdo?')) return;
+            if (!speechId && cloudJSON && !window.confirm('Ruajtja ekzistuese në Cloud do të zëvendësohet. Vazhdo?')) return;
             message('Duke ruajtur në Cloud…');
             // Exactly one fixed-document write. Never call from saveGameAuto().
             await sdk.setDoc(ref(uid), { schemaVersion: 1, gameJSON: payload, updatedAt: sdk.serverTimestamp() });
@@ -121,10 +124,19 @@ export function initAuthCloudSave(sdk, game, root = document) {
             lastJSON = cloudJSON = json;
             lastWrite = Date.now();
             message('U ruajt me sukses në Cloud.');
+            if (speechId) game.notify?.('Fjalimi dhe gjendja e lojës u ruajtën në Cloud.');
+            return true;
         } catch (error) {
             if (version === generation) message(errorMessage(error));
         } finally { busy = false; render(); }
-    });
+    }
+    save.addEventListener('click', () => saveCloud());
+    // Explicit final-speech action only. Uses the same account, codec and cooldown.
+    window.republikaSaveSpeechCloud = async speechId => {
+        const saved = await saveCloud(speechId);
+        if (!saved) game.notify?.('Fjalimi u ruajt lokalisht. ' + status.textContent);
+        return !!saved;
+    };
     function loadCloudGame() {
         if (!user || !cloudJSON || busy || checking) return;
         if (!window.confirm('Ngarko lojën nga Cloud? Gjendja aktuale dhe autosave-i lokal do të zëvendësohen. Slotet lokale ruhen.')) return;
