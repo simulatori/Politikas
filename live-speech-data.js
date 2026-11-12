@@ -1,0 +1,15 @@
+/* Speech fragments describe the actual file; no promise is counted as implementation. */
+const LIVE_SPEECH_STEPS=['Hyrja','Aktualiteti','Qëndrimi','Përgjegjësia','Mbyllja'];
+const LIVE_SPEECH_APPROACHES={
+ BRIDGE:{label:'Ndërto ura',hint:'Koordinim dhe ulje e përplasjes',approval:.12,international:.16,opposition:-.35},
+ FACTS:{label:'Fol me fakte',hint:'Prova, kufizime dhe përgjegjësi',approval:.18,international:.08,opposition:-.12},
+ ASSERT:{label:'Qëndrim i prerë',hint:'Mobilizim publik dhe rrezik tensioni',approval:.28,international:-.25,opposition:.55}
+};
+const LIVE_SPEECH_FRAGMENTS=[
+ {BRIDGE:'{audience}, ju drejtohem me respekt për dallimet tona dhe me detyrimin për të gjetur një rrugë të përbashkët.',FACTS:'{audience}, sot flas për «{title}». Do të ndaj vendimet e regjistruara nga rezultatet që ende mungojnë.',ASSERT:'{audience}, Kosova ka nevojë për një qëndrim të qartë. Nuk do t’i shmangemi debatit për «{title}».'},
+ {BRIDGE:'Kjo është dosja që kemi para nesh: {facts} Përgjigjja kërkon bashkëpunim, jo garanci të shpikura.',FACTS:'Gjendja e dokumentuar është kjo: {facts} Këto janë të dhënat mbi të cilat duhet të na gjykoni.',ASSERT:'«{title}» është provë politike për ne. {facts} Do ta mbrojmë pozicionin tonë edhe përballë kritikave.'},
+ {BRIDGE:'Propozoj konsultim me palët e prekura dhe partnerët. Asnjë deklaratë nga kjo foltore nuk e zëvendëson miratimin ligjor ose financimin.',FACTS:'Hapi vijues duhet të kalojë në procedurat përkatëse. Do të kërkoj dokumentim të kostos, afatit dhe përgjegjësit para çdo angazhimi të ri.',ASSERT:'Kërkoj mbështetje për drejtimin tonë. Kundërshtarët politikë duhet të paraqesin alternativën e tyre dhe të mbajnë përgjegjësi për të.'},
+ {BRIDGE:'Do ta dëgjojmë kritikën dhe do të raportojmë për pengesat. Përparimi nuk mund të shpallet nga njëra palë pa u verifikuar.',FACTS:'Përgjegjësia ime është të mos ngatërroj një pagesë me një shërbim të hapur ose një takim me një marrëveshje të zbatuar.',ASSERT:'Do t’i kundërshtoj akuzat politike, por nuk kërkoj që kjo sallë ta pranojë fjalën time si provë të një pune të kryer.'},
+ {BRIDGE:'Ju ftoj ta vazhdojmë punën në institucionet përkatëse. Suksesi i Kosovës kërkon koordinim dhe rezultate që mund të kontrollohen.',FACTS:'Ky është qëndrimi im për «{title}». Dokumentet dhe zhvillimet pas këtij fjalimi do të tregojnë çfarë kemi arritur. Ju faleminderit.',ASSERT:'Do ta mbrojmë këtë qëndrim para qytetarëve dhe partnerëve. Debati vazhdon; verdiktin për punën tonë do ta japin rezultatet.'}
+];
+function liveSpeechOptions(source,step){const audience=({GOVERNMENT:'Të nderuar deputetë dhe qytetarë',REPORT:'Të nderuar deputetë të Kuvendit të Kosovës',BRUSSELS:'Të nderuar përfaqësues të Bashkimit Evropian dhe të partnerëve tanë',HOST:'Të nderuara delegacione dhe pjesëmarrës',MEDIA:'Të nderuar qytetarë dhe përfaqësues të mediave'})[source.kind];return Object.entries(LIVE_SPEECH_APPROACHES).map(([code,t])=>({code,label:t.label,hint:t.hint,text:LIVE_SPEECH_FRAGMENTS[step][code].replaceAll('{audience}',audience).replaceAll('{title}',source.title).replaceAll('{facts}','Dosja e javës '+(source.snapshotTurn??source.turn)+': '+source.facts)}));}

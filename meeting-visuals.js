@@ -30,37 +30,6 @@ function scheduledVisualContext(m){
     var name=m.targetName.replace(/\s*\([^)]*\)\s*$/,''),partner=internationalMeetingPartner(m),minister=state.ministries.find(function(x){return x.minister===name;}),party=Object.keys(state.parties).find(function(id){var p=state.parties[id];return p.leader===name || (p.deputyLeaders||[]).includes(name);}),institution=partner && state.internationalDiplomacy.institutions[partner];
     return {partner:partner,minister:minister,party:party,kind:partner?politicalSceneKind(partner):minister?'MINISTER':'LEADERS',name:m.targetName,role:m.category,topic:m.topic,detail:institution?institution.facts.interests:minister?minister.currentIssue:m.goal || 'Shqyrtim i çështjeve të përbashkëta.'};
 }
-function scheduledMeetingTopics(m){
-    var c=scheduledVisualContext(m),topics=[];
-    function add(id,label,statements,lawId){topics.push({id:id,label:label,statements:statements.map(function(text,i){return {id:String(i),text:text};}),lawId:lawId});}
-    add('agenda',m.topic,['Kërkoj sqarime për çështjen: '+m.topic+'.','Propozoj të shqyrtojmë hapat dhe përgjegjësitë për '+m.topic+'.','Kërkoj të bashkërendojmë qëndrimet për '+m.topic+'.']);
-    if(c.minister)add('minister',c.minister.currentIssue,['Kërkoj raport mbi '+c.minister.currentIssue+'.','Propozoj shqyrtimin e planit dhe buxhetit të ministrisë për këtë çështje.']);
-    if(c.partner)state.internationalDiplomacy.institutions[c.partner].facts.topics.forEach(function(t){var label=INTERNATIONAL_TOPICS[t].name;add('international:'+t,label,['Kërkoj sqarimin e kushteve për '+label+'.','Propozoj hapjen e negociatave për '+label+'.']);});
-    if(c.party)(state.laws||[]).filter(lawNegotiationEligible).slice(0,6).forEach(function(l){add('law:'+l.id,l.title,['Kërkoj mbështetjen e grupit për '+l.title+'.','Propozoj shqyrtimin e ndryshimeve dhe kushteve për '+l.title+'.','Kërkoj sqarimin e rezervave të grupit për '+l.title+'.'],l.id);});
-    if(agendaExecutive())urgentSituationQueue().slice(0,2).forEach(function(r){add('issue:'+r.key,r.title,['Kërkoj vlerësimin tuaj për '+r.title+'.','Propozoj bashkërendimin e përgjigjes ndaj çështjes: '+r.title+'.']);});
-    var scene=state.meetingScenes['visual:scheduled:'+m.id];
-    topics.forEach(function(t){
-        var spoken=(scene?.decisions || []).filter(function(d){return d.code==='PROPOSE' && d.topicId===t.id;});
-        if(spoken.length){t.statements=spoken.some(function(d){return d.statementId==='conclude';})?[]:[{id:'conclude',text:'Përmbledh qëndrimet dhe përfundo takimin.'}];if(spoken.length===1 && spoken[0].statementId==='0')t.statements.unshift({id:'next',text:'Cili është hapi konkret pas këtij sqarimi?'});}
-    });
-    return topics;
-}
-function scheduledMeetingSelection(m){
-    var topicId=document.getElementById('meetingSceneTopic')?.value,statementId=document.getElementById('meetingSceneStatement')?.value;
-    var topic=scheduledMeetingTopics(m).find(function(t){return t.id===topicId;});
-    return {topic:topic,statement:topic?.statements.find(function(s){return s.id===statementId;}),topicId:topicId};
-}
-function renderScheduledMeetingStatements(index){
-    var m=state.scheduledMeetings[index],host=document.getElementById('meetingSceneStatement');if(!m || !host)return;
-    var selected=scheduledMeetingSelection(m),esc=electoralEscape;
-    host.innerHTML='<option value="">Zgjidh çfarë dëshiron të thuash</option>'+(selected.topic?selected.topic.statements.map(function(s){return '<option value="'+s.id+'">'+esc(s.text)+'</option>';}).join(''):'');
-    var link=document.getElementById('meetingSceneTopicLink');if(link){link.hidden=!selected.topic?.lawId;link.style.display=selected.topic?.lawId?'inline-flex':'none';}
-}
-function openScheduledMeetingLaw(index){
-    var m=state.scheduledMeetings[index];if(!m || !assertPoliticalMeeting(m) || m.status!=='SCHEDULED' || m.dueTurn>state.turnCount)return false;
-    var topic=scheduledMeetingSelection(m).topic,i=topic?.lawId?state.laws.findIndex(function(l){return l.id===topic.lawId;}):-1;
-    if(i<0)return false;closePoliticalMeeting();openLawNegotiations(i);return true;
-}
 function openScheduledVisualMeeting(index){
     if(!assertPoliticalMeeting(state.scheduledMeetings[index]))return false;
     var guarded=state.scheduledMeetings[index];if(guarded && guarded.requiresExecutive && !agendaExecutive()){showToast('Takimi kërkon mandat ekzekutiv të plotë.');return false;}
@@ -74,53 +43,35 @@ function openScheduledVisualMeeting(index){
 }
 function renderScheduledVisualMeeting(index){
     if(strategyMeetingSupported(state.scheduledMeetings[index]))return renderStrategyMeeting(index);
-    var m=state.scheduledMeetings[index];if(!m)return;var c=scheduledVisualContext(m),scene=state.meetingScenes['visual:scheduled:'+m.id],esc=electoralEscape,box=document.getElementById('meetingSceneModalContent');
-    var html='<div class="scene-toolbar"><strong>Takim '+(m.political9?'politik i partisë':'institucional')+' · Ora '+esc(m.hour || 'Nuk ka të dhëna')+'</strong><button class="btn-top" id="sceneClose" onclick="closePoliticalMeeting()" aria-label="Mbyll takimin">Mbyll ×</button></div>'+politicalSceneMarkup(c.kind,c)+'<div class="scene-dialogue" aria-live="polite">'+scene.lines.map(function(l){return '<p><strong>'+esc(l.who)+':</strong> '+esc(l.text)+'</p>';}).join('')+'</div>';
-    if(m.status==='COMPLETED')html+='<div class="scene-result"><h3>Takimi përfundoi</h3><p>'+esc(m.outcome || 'Shih procesverbalin e regjistruar.')+'</p></div>';
-    else {
-        html+='<label>Tema që dëshiron të diskutosh<select id="meetingSceneTopic" onchange="renderScheduledMeetingStatements('+index+')"><option value="">Zgjidh temën</option>'+scheduledMeetingTopics(m).map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.label)+'</option>';}).join('')+'</select></label><label>Çfarë dëshiron të thuash<select id="meetingSceneStatement"><option value="">Zgjidh fillimisht temën</option></select></label><input type="hidden" id="meetingSceneCustomMsg" value=""><p>Zgjedhja regjistrohet në procesverbal. Marrëveshjet dhe financimi kërkojnë procedurat përkatëse.</p><button class="btn-top" id="meetingSceneTopicLink" hidden style="display:none" onclick="openScheduledMeetingLaw('+index+')">Hap negociatat e këtij projektligji</button><div class="scene-choices">';
-        var choices=c.partner && agendaExecutive()?[['CLARIFY','Kërko sqarime mbi kushtet'],['NEGOTIATE','Vazhdo te propozimi dhe negociatat']]:[['CLARIFY','Kërko sqarime mbi çështjen'],['PROPOSE','Paraqit propozimin për shqyrtim']];
-        if(c.party)choices.push(['COMPROMISE','Kërko kompromis për agjendën e takimit']);
-        if(c.minister && agendaExecutive())choices.push(['MINISTER','Hap dosjen dhe vendimet e ministrit']);
-        choices.forEach(function(pair){if(['PROPOSE','NEGOTIATE','MINISTER'].includes(pair[0]) || !scene.decisions.some(function(d){return d.code===pair[0];}))html+='<button class="choice-btn" data-scene-action="'+pair[0]+'" onclick="finalizeMeetingScene('+index+',\''+pair[0]+'\')">'+(pair[0]==='PROPOSE'?'Thuaje zgjedhjen dhe vazhdo bisedën':pair[1])+'</button>';});
+    var m=state.scheduledMeetings[index];if(!m)return;var c=scheduledVisualContext(m),scene=state.meetingScenes['visual:scheduled:'+m.id],esc=electoralEscape,box=document.getElementById('meetingSceneModalContent');if(!box||!scene)return;
+    var html='<div class="scene-toolbar"><strong>Dosja e takimit</strong><button class="btn-top" id="sceneClose" onclick="closePoliticalMeeting()" aria-label="Mbyll dosjen">Mbyll ×</button></div><h2>'+esc(m.topic)+'</h2><p><strong>Pjesëmarrësi:</strong> '+esc(m.targetName)+'</p><p>'+esc(m.category||'Takim institucional')+' · '+esc(diplomaticDate(m.dueTurn))+' · '+esc(m.hour||'Ora nuk është caktuar')+'</p><p>'+esc(m.goal||c.detail)+'</p>';
+    if(m.status==='COMPLETED')html+='<section class="scene-result"><h3>Takimi përfundoi</h3><p>'+esc(m.outcome||'Takimi është regjistruar.')+'</p></section>';
+    else{
+        html+='<p>Veprimet për këtë dosje kryhen në institucionin përkatës.</p><div class="scene-choices">';
+        if(c.partner&&agendaExecutive())html+='<button class="action-btn" data-scene-action="NEGOTIATE" onclick="finalizeMeetingScene('+index+',\'NEGOTIATE\')">Hap negociatat dhe propozimin zyrtar</button>';
+        if(c.minister&&agendaExecutive())html+='<button class="action-btn" data-scene-action="MINISTER" onclick="finalizeMeetingScene('+index+',\'MINISTER\')">Hap dosjen e ministrit</button>';
+        (state.laws||[]).filter(l=>lawNegotiationEligible(l)&&(l.id===m.lawId||l.title===m.topic)).forEach(l=>{const li=state.laws.indexOf(l);html+='<button class="action-btn" onclick="closePoliticalMeeting();openLawNegotiations('+li+')">Negociatat për '+esc(l.title)+'</button>';});
         html+='<button class="action-btn" data-scene-action="DEFER" onclick="finalizeMeetingScene('+index+',\'DEFER\')">Shtyje për javën e ardhshme</button><button class="action-btn btn-gold" data-scene-action="FINISH" onclick="finalizeMeetingScene('+index+',\'FINISH\')">Përfundo takimin</button></div>';
     }
-    box.innerHTML=html;
-    if(m.status!=='COMPLETED'){var topics=scheduledMeetingTopics(m),last=scene.decisions.filter(function(d){return d.topicId;}).at(-1),chosen=topics.find(function(t){return t.id===last?.topicId && t.statements.length;}) || topics.find(function(t){return t.statements.length;});if(chosen){document.getElementById('meetingSceneTopic').value=chosen.id;renderScheduledMeetingStatements(index);}}
-    var close=document.getElementById('sceneClose');if(close && close.focus)close.focus();
+    if(scene.lines.length>1)html+='<details><summary>Procesverbali i ruajtur</summary>'+scene.lines.map(l=>'<p><strong>'+esc(l.who)+':</strong> '+esc(l.text)+'</p>').join('')+'</details>';
+    box.innerHTML=html;document.getElementById('sceneClose')?.focus?.({preventScroll:true});
 }
 function closePoliticalMeeting(){toggleModal('meetingSceneModal',false);if(politicalSceneReturnFocus && politicalSceneReturnFocus.isConnected && politicalSceneReturnFocus.focus)politicalSceneReturnFocus.focus();politicalSceneReturnFocus=null;}
 function decideScheduledVisualMeeting(index,code){
     if(strategyMeetingSupported(state.scheduledMeetings[index]))return false;
     if(!assertPoliticalMeeting(state.scheduledMeetings[index]))return false;
-    if(code==='NEGOTIATE' && !assertGovernmentAuthority('Marrëveshjet shtetërore'))return false;
-    if(state.scheduledMeetings[index]?.requiresExecutive && !agendaExecutive())return false;
-    var m=state.scheduledMeetings[index],scene=m && state.meetingScenes['visual:scheduled:'+m.id];if(!m || !scene || m.status!=='SCHEDULED' || m.dueTurn>state.turnCount || state.pendingVote)return false;
-    var c=scheduledVisualContext(m),allowed=c.partner && agendaExecutive()?['CLARIFY','NEGOTIATE','DEFER','FINISH']:['CLARIFY','PROPOSE','DEFER','FINISH'];if(c.party)allowed.push('COMPROMISE');if(c.minister)allowed.push('MINISTER');if(!allowed.includes(code) || scene.decisions.some(function(d){return d.code===code && !['PROPOSE','DEFER','MINISTER','NEGOTIATE'].includes(code);}))return false;
-    var selected=scheduledMeetingSelection(m),input=document.getElementById('meetingSceneCustomMsg'),legacyInput=!selected.topicId || (selected.topic && !document.getElementById('meetingSceneStatement')?.value),text=selected.statement?selected.statement.text:(legacyInput && input?input.value.trim():'');
-    if(code==='PROPOSE' && (text.length<10 || text.length>600)){showToast('Zgjidh temën dhe çfarë dëshiron të thuash.');return false;}
-    if(code==='PROPOSE' && !selected.statement && scene.decisions.some(function(d){return d.code==='PROPOSE';}))return false;
-    var concluding=code==='PROPOSE' && selected.statement?.id==='conclude';
-    if(code==='MINISTER' && !assertGovernmentAuthority('Takimi me ministrin'))return false;
-    if(['NEGOTIATE','MINISTER'].includes(code) && scene.decisions.some(function(d){return d.code===code;})){closePoliticalMeeting();if(code==='NEGOTIATE')openInternationalDiplomacy(c.partner);else openMinisterOneOnOneModal(state.ministries.indexOf(c.minister));return true;}
-    var before=JSON.stringify(state),reply='',decision={code:code,text:text.slice(0,600),turn:state.turnCount};if(selected.topic && selected.statement){decision.topicId=selected.topic.id;decision.statementId=selected.statement.id;}scene.decisions.push(decision);
-    if(code==='CLARIFY')reply=c.partner?state.internationalDiplomacy.institutions[c.partner].facts.limits:c.minister?'Dosja: '+c.minister.currentIssue+'. Buxheti i ministrisë: €'+c.minister.budget+'M. Vendimet kërkojnë shqyrtim të veçantë.':c.party?'Partia përfaqëson '+state.parties[c.party].seats+' deputetë. Çdo dakordim për koalicion kërkon negociatat përkatëse.':m.goal || 'Nevojitet propozim konkret; ky takim nuk garanton dakordim.';
-    if(code==='PROPOSE'){
-        scene.lines.push({who:'Ju',text:text,turn:state.turnCount});
-        if(selected.topic?.lawId){var discussed=state.laws.find(function(l){return l.id===selected.topic.lawId;});reply='Për '+discussed.title+', qëndrimi dhe kushtet e grupit duhet të shqyrtohen në negociatat e projektligjit. Hapni butonin e negociatave më poshtë; kjo bisedë nuk jep vota ose mbështetje automatikisht.';}
-        else if(c.minister)reply='Çështja në dosje është: '+c.minister.currentIssue+'. Buxheti i regjistruar është €'+c.minister.budget+'M. Për vendim ose ndryshim fondesh, hapni dosjen e ministrit. Këtu mund ta përmbyllim konsultimin.';
-        else if(selected.statement?.id==='next')reply='Për këtë bashkëbisedues nuk ka procedurë vendimmarrëse të lidhur me temën në këtë takim. Qëndrimi juaj mbetet në procesverbal; nuk është krijuar detyrim ose raport i ardhshëm. Mund të përfundoni konsultimin ose të zgjidhni një temë tjetër të disponueshme.';
-        else if(selected.statement?.id==='0')reply='Për këtë temë nuk ka raport të ri të regjistruar në këtë takim. Nuk mund të konfirmoj rezultate pa të dhëna. Mund të kërkoni hapin konkret vijues ose ta përmbyllni konsultimin.';
-        else reply='E regjistrova qëndrimin tuaj për '+(selected.topic?.label || m.topic)+'. Ky konsultim nuk cakton vetë përgjegjësi, fonde apo marrëveshje. Hapi vijues është shqyrtimi në dosjen ose negociatat përkatëse; tani mund ta përmbyllim takimin.';
-    }
-    if(code==='CLARIFY' && selected.topic?.lawId){var law=state.laws.find(function(l){return l.id===selected.topic.lawId;});reply='Projektligji: '+law.title+'. Gjendja: '+getBillStatusLabel(law.status)+'. Kostoja e deklaruar: €'+((law.costB||0)*1000).toFixed(2)+'M. Mbështetja dhe kushtet e grupit shqyrtohen te negociatat e këtij projektligji.';}
-    if(code==='COMPROMISE'){var relation=state.parties[state.playerParty].relations[c.party];reply=Number.isFinite(relation) && relation>=60?'Ka gatishmëri për të bashkërenduar agjendën. Kushtet politike mbeten për negociata; nuk është arritur marrëveshje koalicioni.':'Pala kërkon sqarimin e kushteve përpara kompromisit. Nuk është arritur dakordim.';}
-    if(code==='NEGOTIATE')reply='Takimi vazhdon në negociatat me '+state.internationalDiplomacy.institutions[c.partner].facts.name+'. Propozimet dhe efektet regjistrohen atje.';
-    if(code==='MINISTER')reply='Dosja iu përcoll ministrit për shqyrtim dhe vendim. Nuk u miratuan fonde nga ky veprim.';
-    if(code==='DEFER'){m.dueTurn=state.turnCount+1;if(m.communicationId){var communication=state.internationalDiplomacy.communications.find(function(v){return v.id===m.communicationId;});if(communication)communication.dueTurn=m.dueTurn;sealInternationalState(state.internationalDiplomacy);}scene.status='DEFERRED';reply='Takimi u shty për '+diplomaticDate(m.dueTurn)+'. Çështja mbetet e hapur.';}
-    if(code==='FINISH' || concluding){m.status='COMPLETED';scene.status='COMPLETED';m.outcome='Takimi për '+m.topic+' përfundoi. '+(scene.decisions.some(function(d){return d.code==='PROPOSE';})?'Qëndrimet u regjistruan në procesverbal. ':'')+'Nuk u nënshkrua marrëveshje në këtë takim.';finishInternationalCommunicationMeeting(m);agendaMeetingFinished(m,scene);applyThematicMeetingOutcome(m,scene);reply=m.outcome;}
-    scene.lines.push({who:m.targetName,text:reply,turn:state.turnCount});scene.updatedTurn=state.turnCount;
+    var m=state.scheduledMeetings[index],scene=m&&state.meetingScenes['visual:scheduled:'+m.id];
+    if(!m||!scene||m.status!=='SCHEDULED'||m.dueTurn>state.turnCount||state.pendingVote||m.requiresExecutive&&!agendaExecutive())return false;
+    var c=scheduledVisualContext(m),allowed=['DEFER','FINISH'];if(c.partner&&agendaExecutive())allowed.push('NEGOTIATE');if(c.minister&&agendaExecutive())allowed.push('MINISTER');if(!allowed.includes(code))return false;
+    if(['NEGOTIATE','MINISTER'].includes(code)&&!assertGovernmentAuthority('Veprimi institucional'))return false;
+    if(['NEGOTIATE','MINISTER'].includes(code)&&scene.decisions.some(d=>d.code===code)){closePoliticalMeeting();if(code==='NEGOTIATE')openInternationalDiplomacy(c.partner);else openMinisterOneOnOneModal(state.ministries.indexOf(c.minister));return true;}
+    var before=JSON.stringify(state),reply='';scene.decisions.push({code,text:'',turn:state.turnCount});
+    if(code==='NEGOTIATE')reply='Dosja vazhdon në negociatat me '+state.internationalDiplomacy.institutions[c.partner].facts.name+'.';
+    if(code==='MINISTER')reply='Dosja iu përcoll ministrit për shqyrtim dhe vendim.';
+    if(code==='DEFER'){m.dueTurn=state.turnCount+1;if(m.communicationId){var communication=state.internationalDiplomacy.communications.find(v=>v.id===m.communicationId);if(communication)communication.dueTurn=m.dueTurn;sealInternationalState(state.internationalDiplomacy);}scene.status='DEFERRED';reply='Takimi u shty për '+diplomaticDate(m.dueTurn)+'.';}
+    if(code==='FINISH'){m.status='COMPLETED';scene.status='COMPLETED';m.outcome='Takimi për '+m.topic+' përfundoi. Nuk u nënshkrua marrëveshje në këtë takim.';finishInternationalCommunicationMeeting(m);agendaMeetingFinished(m,scene);applyThematicMeetingOutcome(m,scene);reply=m.outcome;}
+    scene.lines.push({who:'Procesverbali',text:reply,turn:state.turnCount});scene.updatedTurn=state.turnCount;
     if(!saveGameAuto()){state=JSON.parse(before);return false;}
-    if(m.status==='COMPLETED'){closePoliticalMeeting();refreshAllUI();showToast(m.outcome);if(m.thematic)openThematicOutcome(m);}else if(code==='NEGOTIATE'){closePoliticalMeeting();openInternationalDiplomacy(c.partner);var topicField=document.getElementById('internationalTopic');if(topicField && selected.topic?.id.startsWith('international:'))topicField.value=selected.topic.id.slice(14);}else if(code==='MINISTER'){closePoliticalMeeting();openMinisterOneOnOneModal(state.ministries.indexOf(c.minister));}else if(code==='DEFER'){closePoliticalMeeting();refreshAllUI();}else renderScheduledVisualMeeting(index);return true;
+    if(m.status==='COMPLETED'){closePoliticalMeeting();refreshAllUI();showToast(m.outcome);if(m.thematic)openThematicOutcome(m);}else if(code==='NEGOTIATE'){closePoliticalMeeting();openInternationalDiplomacy(c.partner);}else if(code==='MINISTER'){closePoliticalMeeting();openMinisterOneOnOneModal(state.ministries.indexOf(c.minister));}else{closePoliticalMeeting();refreshAllUI();}return true;
 }
 window.addEventListener('keydown',function(event){var modal=document.getElementById('meetingSceneModal');if(!modal || !modal.classList.contains('show'))return;if(event.key==='Escape'){event.preventDefault();closePoliticalMeeting();}if(event.key==='Tab' && modal.querySelectorAll){var controls=Array.from(modal.querySelectorAll('button,textarea,input,select,a[href]')).filter(function(el){return !el.disabled && el.getClientRects().length;}),first=controls[0],last=controls.at(-1);if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}}});

@@ -110,25 +110,8 @@ function processGovernmentCrisesWeek(turn){
     var eligible=state.ministries.map((m,i)=>({m,i})).filter(x=>state.coalitionParties.includes(x.m.party)&&x.m.minister!=='I/E paemëruar'&&!d.scandals.some(s=>s.minister===x.m.minister&&Number.isInteger(s.decisionTurn)&&turn<s.decisionTurn+12));
     if(eligible.length&&Math.random()<.04)createGovernmentScandal(eligible[Math.min(eligible.length-1,Math.floor(Math.random()*eligible.length))].i);
 }
-function answerCrisisPress(id,answer){
-    if(!CRISIS_ANSWERS.some(a=>a.id===answer)||governmentCrisisPending())return false;var delta=0,message='';
-    var ok=governmentCrisisCommit(function(){var d=state.governance,e=d.pressEvents.find(e=>e.id===id);if(!e||e.answered)throw Error('Konferenca është përfunduar.');
-        if(answer==='SPIN'){d.spinUses++;d.mediaTrust=clamp(d.mediaTrust-12,0,100);delta=crisisApproval(d.spinUses>=(d.credibility>=70?4:3)||d.mediaTrust<40?-3:1);message=delta<0?'Gazetarët kundërshtuan justifikimin; strategjia u kthye në bumerang.':'Mesazhi mbrojti përkohësisht Qeverinë, por uli besimin te media.';}
-        if(answer==='RESPONSIBILITY'){delta=crisisApproval(-1);d.credibility=clamp(d.credibility+8,0,100);d.mediaTrust=clamp(d.mediaTrust+5,0,100);message='Pranimi i përgjegjësisë rriti kredibilitetin institucional.';}
-        if(answer==='PROMISE'){
-            if(d.promises.some(p=>p.sector===e.sector&&p.status==='OPEN'))throw Error('Keni një premtim aktiv për këtë sektor.');
-            d.promises.push({eventId:id,sector:e.sector,governmentKey:crisisGovernmentKey(state),baseline:crisisSectorMetric(state,e.sector),createdTurn:state.turnCount,dueTurn:state.turnCount+3,status:'OPEN'});message='U regjistrua afati prej 3 javësh për përmirësim real të cilësisë sektoriale.';
-        }
-        e.answered=true;e.answer=answer;
-        if(typeof completeExecutivePress==='function')state.laws.forEach(completeExecutivePress);
-    });
-    if(ok){toggleModal('crisisPressModal',false);showGovernmentNotification({title:'Konferenca përfundoi',message,status:delta<0?'failure':'success',supportDelta:delta||null});}return ok;
-}
-function openCrisisPress(id){
-    if(!agendaExecutive()||governmentCrisisPending()||state.pendingVote||weeklyProcessing||weeklyVisualBusy)return false;
-    var e=state.governance?.pressEvents.find(e=>e.id===id&&!e.answered);if(!e)return false;var esc=catalogEscape;
-    document.getElementById('crisisPressContent').innerHTML='<h2>Konferencë për shtyp</h2><p>'+esc(e.title)+'</p><blockquote>'+esc(CRISIS_QUESTIONS[e.kind].question)+'</blockquote>'+CRISIS_ANSWERS.map(a=>'<button class="choice-btn" onclick="answerCrisisPress(\''+esc(e.id)+'\',\''+a.id+'\')">'+esc(a.label)+'</button>').join('')+'<button class="btn-top" onclick="toggleModal(\'crisisPressModal\',false)">Kthehu</button>';toggleModal('crisisPressModal',true);return true;
-}
+function answerCrisisPress(){return false;}
+function openCrisisPress(id){return typeof openDynamicConference==='function'?openDynamicConference():false;}
 function closeCrisisScandalDialog(){var d=document.getElementById('governmentScandalDialog');if(d?.open)d.close();}
 function renderGovernmentCrisisUI(){
     var host=document.getElementById('contextualPressPanel');if(host){host.hidden=!agendaExecutive();if(!host.hidden){var d=state.governance,e=catalogEscape;host.innerHTML='<h3>Komunikimi në krizë</h3><p>Besimi te media: '+(d?.mediaTrust??70)+'/100 · Kredibiliteti: '+(d?.credibility??50)+'/100</p>'+(d?.pressEvents||[]).filter(x=>!x.answered).map(x=>'<article><strong>'+e(x.title)+'</strong><button class="action-btn" onclick="openCrisisPress(\''+x.id+'\')">Thirr Konferencë</button></article>').join('')+(d?.promises||[]).slice(-5).map(p=>'<p>Premtimi: '+e(state.stateSectors.find(s=>s.id===p.sector)?.name||p.sector)+' · '+(p.status==='OPEN'?Math.max(0,p.dueTurn-state.turnCount)+' javë':p.status==='FULFILLED'?'U përmbush':p.status==='CANCELLED'?'Mandati ndryshoi':'Dështoi')+'</p>').join('');}}

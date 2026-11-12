@@ -106,7 +106,7 @@ function applyNegotiatedBudgetFunding(l,c){
     if(!row || !state.ministries.some(function(m){return m.id===ministry;}) || !Number.isFinite(row.budgetM))throw Error('Ndarja e ministrisë për kushtin nuk është e identifikueshme.');
     row.budgetM=fiscalRound(row.budgetM+c.costB*1000);
     if(row.budgetM>10000)throw Error('Shtesa e negociuar kalon kufirin e ndarjes së ministrisë.');
-    var interest=plan.interestB||0,total=fiscalRound(allocations.reduce(function(sum,a){return sum+a.budgetM/1000;},0)+plan.capitalB+interest+(plan.sectorQualityB||0));
+    var interest=plan.interestB||0,total=fiscalRound(plan.plannedB+c.costB);
     if(!Number.isFinite(total) || !Number.isFinite(interest) || !Number.isFinite(plan.capitalB))throw Error('Plani financiar është i pavlefshëm.');
     l.annualBudgetPlan=Object.assign({},plan,{allocations:allocations,plannedB:total});
     Object.assign(b,{allocations:allocations.map(function(a){return Object.assign({},a);}),plannedB:total,capitalB:plan.capitalB,interestB:interest,status:'DRAFT'});
@@ -229,7 +229,7 @@ function openLawNegotiations(index){
         html+='<details><summary>Prirja e deputetëve</summary>'+e.ballots.map(function(b){var m=state.mps.find(function(m){return m.seatNumber===b.seatNumber;});return '<p>'+esc(m.name || ('Deputeti '+m.seatNumber))+' · '+esc(m.party)+' · '+({pro:'Për',kunder:'Kundër',abstenim:'Abstenim',mungese:'Mungesë'})[b.vote]+'</p>';}).join('')+'</details>';
         if(!lawNegotiationAuthority(l))html+='<p>Nuk keni kompetencë për të negociuar në emër të propozuesit të këtij projektligji.</p>';
         html+='<div class="neg-parties">'+Object.values(state.parties).filter(function(p){return p.id!==state.playerParty;}).map(function(p){
-            var n=lawNegotiationRecord(l,p.id),score=n?n.initialScore:lawNegotiationScore(l,p),role=p.id===state.mandatar?'Në pushtet':state.coalitionParties.includes(p.id)?'Në koalicion':'Në opozitë',out='<article><h3>'+esc(p.name || p.short)+'</h3><p>'+esc(p.leader)+' · '+state.mps.filter(function(m){return m.party===p.id;}).length+' deputetë · '+role+'</p><p>Qëndrimi fillestar: '+(score>=60?'I hapur ndaj mbështetjes':score>=40?'Me rezerva':'Kundërshtues')+'</p>';
+            var n=lawNegotiationRecord(l,p.id),score=n?n.initialScore:lawNegotiationScore(l,p),role=p.id===state.mandatar?'Në pushtet':state.coalitionParties.includes(p.id)?'Në koalicion':'Në opozitë',out='<article data-law-party="'+esc(p.id)+'"><h3>'+esc(p.name || p.short)+'</h3><p>'+esc(p.leader)+' · '+state.mps.filter(function(m){return m.party===p.id;}).length+' deputetë · '+role+'</p><p>Qëndrimi fillestar: '+(score>=60?'I hapur ndaj mbështetjes':score>=40?'Me rezerva':'Kundërshtues')+'</p>';
             out+='<p>Interesat: '+esc(LAW_NEG_INTERESTS[p.id] || 'Përfaqësimi parlamentar dhe zbatimi i përgjegjshëm')+'</p>';
             function btn(code,label){return '<button class="action-btn" onclick="'+(code==='ACCEPT'?'acceptLawConditionAndShowSteps('+index+',\''+esc(p.id)+'\')':'lawNegotiationAction('+index+',\''+esc(p.id)+'\',\''+code+'\');openLawNegotiations('+index+')')+'">'+label+'</button>';}
             if(!n){out+=lawPoliticalOutcomeMarkup(l,n);out+='<p>'+esc(lawNegotiationRelationshipLabel(p))+'</p>';out+='<p>Interesat dhe kushtet saktësohen në hapjen e bisedimeve sipas temës dhe marrëdhënieve politike.</p>';if(lawNegotiationAuthority(l))out+='<button class="action-btn" onclick="startLawNegotiation('+index+',\''+esc(p.id)+'\');openLawNegotiations('+index+')">Hap negociatat</button>';}
@@ -243,7 +243,7 @@ function openLawNegotiations(index){
                 if(n.status==='CONSULTING')out+='<p>Hapi i ardhshëm: prisni konsultimet deri më '+esc(diplomaticDate(n.readyTurn))+'.</p>';
                 if(lawNegotiationAuthority(l) && n.initiator===state.playerParty && ['OPEN','CONDITIONAL','AGREED'].includes(n.status) && state.turnCount<=n.dueTurn){out+='<div class="candidate-actions">'+[['MEET','Planifiko takim'],['EXPLAIN','Shpjego përfitimet'],['AMEND','Ofro ndryshime'],['ASK','Kërko mbështetjen'],['DISCUSS','Diskuto kërkesat'],['COMPROMISE','Kërko kompromis'],['ACCEPT','Prano kushtin'],['PLAN','Harto dhe publiko planin'],['REFUSE','Refuzo kushtin'],['END','Ndërprit bisedimet']].filter(function(a){return !n.used.includes(a[0]) && (a[0]!=='PLAN' || n.conditions[0].kind==='REPORT' && n.conditions[0].accepted);}).map(function(a){return btn(a[0],a[1]);}).join('')+'</div>';}
                 out+='<details><summary>Historiku dhe zotimet</summary>'+n.history.map(function(h){return '<p>Java '+h.turn+': '+esc(h.text)+'</p>';}).join('')+'</details>';
-            }return out+'</article>';
+            }if(n)out+=lawNegotiationAssessmentMarkup(l,n)+'<ol>'+lawNegotiationNextSteps(l,n).map(row=>'<li>'+(row.done?'✓ ':'')+esc(row.label)+'<p>'+esc(row.detail)+'</p></li>').join('')+'</ol>';return out+'</article>';
         }).join('')+'</div>';
     }
     document.getElementById('interactiveActionModalContent').innerHTML=html+'<button class="btn-top" onclick="toggleModal(\'interactiveActionModal\',false)">Mbyll</button></div>';toggleModal('interactiveActionModal',true);
@@ -280,10 +280,10 @@ function lawNegotiationStepAction(i,p,action){
     var result=lawNegotiationAction(i,p,action);renderLawNegotiationSteps();return result;
 }
 function acceptLawConditionAndShowSteps(i,p){
-    if(!lawNegotiationAction(i,p,'ACCEPT'))return false;
-    toggleModal('interactiveActionModal',false);
-    switchMainTab('tab-dashboard');switchSubTab('dash','overview',document.querySelector('#tab-dashboard .sub-pill'));
-    renderLawNegotiationSteps();document.getElementById('lawNegotiationStepsPanel')?.scrollIntoView?.({block:'start',behavior:'smooth'});
-    if(state.laws[i]?.annualBudgetYear)showToast('Kushti u përfshi në projektbuxhet. Kërko mbështetjen e grupit; rishqyrtimi dhe votimi mbeten të nevojshëm.');
-    return true;
+    var law=state.laws[i];if(!law||!lawNegotiationAction(i,p,'ACCEPT'))return false;
+    openLawNegotiations(state.laws.findIndex(l=>l.id===law.id));
+    focusLawNegotiationParty(p);
+    showToast('Kushti u regjistrua. Vazhdo kërkesën për mbështetje në këtë dritare.');return true;
 }
+
+function focusLawNegotiationParty(p){const card=document.querySelector('[data-law-party="'+p+'"]');if(!card)return;const ask=Array.from(card.querySelectorAll('button')).find(b=>b.textContent==='Kërko mbështetjen'),target=ask||card;target.scrollIntoView?.({block:'nearest',behavior:'instant'});ask?.focus?.({preventScroll:true});}

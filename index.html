@@ -29,6 +29,8 @@
     <link rel="stylesheet" href="political-life.css?v=88">
     <link rel="stylesheet" href="societal-dynamics.css?v=84">
 <link rel="stylesheet" href="world-opportunities.css">
+<link rel="stylesheet" href="dynamic-conference.css">
+<link rel="stylesheet" href="live-speech.css">
 </head>
 <body>
 <aside id="pwaUpdateNotice" hidden role="status" style="position:fixed;bottom:12px;left:12px;right:12px;z-index:100000;padding:12px;background:#14243b;color:#fff;border:1px solid #d8b465;border-radius:12px;max-height:40dvh;overflow:auto">
@@ -61,7 +63,7 @@
         
         <div class="start-footer">
             <span class="start-tag" data-legislature-label>Legjislatura XI</span>
-            <span class="start-tag">Loja v101</span>
+            <span class="start-tag">Loja v105</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -127,7 +129,7 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
-            <p id="pwaVersion">Loja v101</p>
+            <p id="pwaVersion">Loja v105</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
@@ -332,7 +334,7 @@
                     <div class="stat-icon-wrapper red">📉</div>
                     <div class="stat-text-wrapper">
                         <span class="stat-label">Rritja / Papunësia</span>
-                        <span class="stat-val" id="statEconomy" style="color: var(--danger); text-shadow: 0 0 10px rgba(239,68,68,0.4);">+3.9% | 10.8%</span>
+                        <span class="stat-val" id="statEconomy">+3.9% | 10.8%</span>
                     </div>
                 </div>
                 <div class="stat-box" onclick="switchMainTab('tab-diplomacy')">
@@ -487,39 +489,9 @@
                 </div>
 
                 <div id="dash-press" class="sub-content" style="display:none;">
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">🎙️ Konferencë për Media</div>
-                            </div>
-                            <div style="margin-bottom:12px;">
-                                <label style="font-size:0.73rem; color:var(--text-muted); display:block; margin-bottom:4px;">Tema e Konferencës:</label>
-                                <select id="pressTopicSelect" style="width:100%; margin-bottom:8px;">
-                                    <option value="Paketa Ekonomike, Pagat dhe Inflacioni">Paketa Ekonomike dhe Buxheti</option>
-                                    <option value="Dialogu në Bruksel dhe Siguria në Veri">Dialogu dhe Siguria në Veri</option>
-                                    <option value="Stabiliteti i Koalicionit dhe Puna e Kuvendit">Stabiliteti i Koalicionit / Qeveria</option>
-                                    <option value="Sundimi i Ligjit, Vetingu dhe Drejtësia">Sundimi i Ligjit dhe Vetingu</option>
-                                    <option value="Furnizimi me Energji (KEK) dhe Projektet Kapitale">Energjia dhe Investimet Kapitale</option>
-                                </select>
-
-                                <label style="font-size:0.73rem; color:var(--text-muted); display:block; margin-bottom:4px;">Toni / Qëllimi i Komunikimit:</label>
-                                <select id="pressToneSelect" style="width:100%; margin-bottom:8px;">
-                                    <option value="INSTITUTIONAL">Institucional dhe sqarues</option>
-                                    <option value="POPULIST">Kritik ndaj opozitës dhe mobilizues</option>
-                                    <option value="COOPERATIVE">Bashkëpunues me theks te konsensusi</option>
-                                </select>
-                                
-                                <label style="font-size:0.73rem; color:var(--text-muted); display:block; margin-bottom:4px;">Përfaqësimi (Formati):</label>
-                                <select id="pressPartnerSelect" style="width:100%;">
-                                    <option value="SOLO">Paraqitje e vetme e Liderit</option>
-                                    <option value="MINISTER">Së bashku me një Ministër të Linjës</option>
-                                </select>
-                            </div>
-                            <button class="action-btn btn-gold" onclick="startPressConference()">Thirr Konferencën & Hyr në Pyetje ▶</button>
-                        </div>
-
-                        <div>
-                            <div class="card">
+ <section id="conferencePanel" class="card" aria-label="Salla e mediave"></section>
+ <details class="card"><summary>Komunikatat zyrtare dhe deklaratat e veçanta</summary>
+<div class="card">
                                 <div class="card-header">
                                     <div class="card-title">📜 Publiko Komunikatë Zyrtare</div>
                                 </div>
@@ -543,10 +515,8 @@
                                 </div>
                                 <button class="action-btn btn-outline" onclick="issuePublicStatement()">Lësho Deklaratën</button>
                             </div>
-                        </div>
-                    </div>
-                    <div id="pressLiveStage" class="card" style="display:none; border-color:var(--accent-gold); margin-top:14px;"></div>
-                </div>
+                        
+</details></div>
 
                 <div id="dash-promises" class="sub-content" style="display:none;">
                     <div class="card">
@@ -1215,6 +1185,14 @@
 <script src="personal-life-data.js" defer></script>
 <script src="personal-life.js" defer></script>
 <script src="mandate-press.js" defer></script>
+<script src="dynamic-conference-data.js" defer></script>
+<script src="dynamic-conference-sources.js" defer></script>
+<script src="dynamic-conference.js" defer></script>
+<script src="dynamic-conference-ui.js" defer></script>
+<script src="live-speech-data.js" defer></script>
+<script src="live-speech.js" defer></script>
+<script src="live-speech-ui.js" defer></script>
+<script src="governance-flow-repairs.js" defer></script>
 <script type="module">
     // Dynamic CDN imports keep guest play working even when Firebase cannot load.
     try {
@@ -1252,5 +1230,12 @@
 <dialog id="trepcaDialog" class="government-scandal-dialog" aria-labelledby="trepcaTitle"><div id="trepcaContent"></div></dialog>
 <dialog id="rtkDialog" class="government-scandal-dialog" aria-labelledby="rtkTitle"><div id="rtkContent"></div></dialog>
 <dialog id="energyInquiryDialog" class="government-scandal-dialog" aria-labelledby="energyInquiryTitle"><div id="energyInquiryContent"></div></dialog>
+<div id="dynamicConferenceModal" class="modal-overlay conference-overlay" role="dialog" aria-modal="true" aria-labelledby="dynamicConferenceTitle">
+ <section class="conference-box" tabindex="-1"><div class="conference-flash" aria-hidden="true"></div>
+  <header class="conference-room-header"><div class="conference-seal" aria-hidden="true">✦</div><div><strong id="dynamicConferenceTitle">Republika e Kosovës</strong><small>Qendra e mediave · Ambient i simuluar</small></div><button type="button" id="dynamicConferenceClose" onclick="closeDynamicConference()" aria-label="Mbyll dhe vazhdo konferencën më vonë">Më vonë ✕</button></header>
+  <div class="conference-room-light" aria-hidden="true"></div><div id="dynamicConferenceBody" class="conference-body"></div>
+ </section>
+</div>
+<div id="liveSpeechModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="liveSpeechTitle"><div class="live-speech-box"><header class="speech-header"><strong>REPUBLIKA E KOSOVËS · FOLTORE</strong><button id="liveSpeechClose" type="button" onclick="closeLiveSpeech()">Ruaj draftin · Më vonë ×</button></header><div id="liveSpeechBody" class="speech-body"></div></div></div>
 </body>
 </html>

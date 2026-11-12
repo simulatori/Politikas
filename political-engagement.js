@@ -24,22 +24,9 @@ function currentPoliticalThemes(st){
 }
 function politicalThemeLabel(key){return key==='INVESTORS'?'Investitorët e huaj dhe zbatimi':PARTY_TOPICS[key];}
 function politicalThemeContext(st,key){return ({ECONOMY:'Buxheti '+enterpriseMoney(st.budgetTotalB)+' · papunësia '+st.unemployment+'%',CORRUPTION:'Rreziku i dosjeve '+st.leakRisk+'% · Vettingu '+st.justiceReform.status,DIALOGUE:'Presioni ndërkombëtar '+st.internationalPressure+'%',UNIONS:'Arsim/Shëndetësi · '+(currentGeneralStrike(st)?.status||'Kërkesa sektoriale aktive'),LOCAL:'Strukturat dhe projektet komunale · java '+st.turnCount,INVESTORS:'Profile në proces: '+(st.foreignInvestments?.bidders||[]).filter(b=>['NEGOTIATING','SIGNED'].includes(b.status)).length})[key]||'';}
-function partyPressPreview(){const topic=document.getElementById('partyPressTopic')?.value,stance=document.getElementById('partyPressStance')?.value,h=document.getElementById('partyPressPreview');if(h)h.textContent=(politicalThemeLabel(topic)||'')+': '+({AGGRESSIVE:'Kërkojmë llogaridhënie dhe kundërshtojmë dështimet.',PEACEFUL:'Ftojmë palët në dialog dhe zgjidhje të përbashkëta.',DIPLOMATIC:'Kërkojmë koordinim institucional dhe hapa të matshëm.',POPULIST:'Prioritet i menjëhershëm për qytetarët dhe lehtësim të barrës.'})[stance]+' '+politicalThemeContext(state,topic);}
-function openStructuredPartyPress(){
-    const e=catalogEscape;document.getElementById('interactiveActionModalContent').innerHTML='<h2>Konferenca e '+e(state.parties[state.playerParty].short)+'</h2><p>Komunikim partiak · €2,000 · një konferencë në javë.</p><label>Tema<select id="partyPressTopic" onchange="partyPressPreview()">'+Object.entries(PARTY_TOPICS).map(([k,v])=>'<option value="'+k+'">'+e(v)+(currentPoliticalThemes(state).includes(k)?' · aktuale':'')+'</option>').join('')+'</select></label><label>Qëndrimi<select id="partyPressStance" onchange="partyPressPreview()">'+Object.entries(PARTY_STANCES).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></label><p id="partyPressPreview"></p><button class="action-btn" onclick="holdStructuredPartyPress(document.getElementById(\'partyPressTopic\').value,document.getElementById(\'partyPressStance\').value)">Mbaj konferencën</button><button class="btn-top" onclick="toggleModal(\'interactiveActionModal\',false)">Mbyll</button>';toggleModal('interactiveActionModal',true);partyPressPreview();
-}
-function holdStructuredPartyPress(topic,stance){
-    const ok=engagementCommit(()=>{const d=engagementData(state),owner=state.playerParty;if(!PARTY_TOPICS[topic]||!PARTY_STANCES[stance]||d.conferences.some(r=>r.owner===owner&&r.turn===state.turnCount))throw Error('Zgjidhni temën/qëndrimin; lejohet një konferencë në javë.');oppositionSpend(2000);
-        const repeat=stance==='POPULIST'&&d.conferences.filter(r=>r.owner===owner).slice(-2).some(r=>r.stance==='POPULIST'),delta=repeat?-.2:currentPoliticalThemes(state).includes(topic)?.16:.08;
-        const groups=topic==='ECONOMY'?{business:.5,youth:.3}:topic==='CORRUPTION'?{youth:.5,public:.2}:topic==='UNIONS'?{public:.6}:topic==='LOCAL'?{youth:.3,pensioners:.3}:{business:.3,public:.2};
-        if(stance==='AGGRESSIVE'){groups.youth=(groups.youth||0)+.2;groups.business=(groups.business||0)-.4;state.governance.mediaTrust=clamp(state.governance.mediaTrust-1,0,100);}if(stance==='POPULIST')groups.business=(groups.business||0)-.5;
-        if(stance==='PEACEFUL'){groups.public=(groups.public||0)+.2;groups.pensioners=(groups.pensioners||0)+.3;}
-        if(stance==='DIPLOMATIC'){groups.business=(groups.business||0)+.3;groups.youth=(groups.youth||0)-.1;}
-        if(stance==='DIPLOMATIC'&&topic==='DIALOGUE'&&agendaExecutive())state.internationalPressure=Math.max(0,state.internationalPressure-1);
-        d.conferences.push({owner,topic,stance,turn:state.turnCount,cost:2000,delta,repeat});politicalPollEffect(owner,delta,'Konferencë: '+politicalThemeLabel(topic));politicalGroupEffect(owner,'party-press:'+owner+':'+state.turnCount,groups);
-        addMediaNews('Konferencë e partisë',state.parties[owner].short+' · '+politicalThemeLabel(topic),'NEUTRAL',PARTY_STANCES[stance]+' · '+politicalThemeContext(state,topic));
-    });if(ok)toggleModal('interactiveActionModal',false);return ok;
-}
+function partyPressPreview(){}
+function openStructuredPartyPress(){return typeof openDynamicConference==='function'?openDynamicConference():false;}
+function holdStructuredPartyPress(){return openStructuredPartyPress();}
 function managedMediaLine(st,outletId){const owner=st.mediaWarfare?.market.outlets.find(o=>o.id===outletId)?.owner;return (st.mediaWarfare?.market.engagement?.actions||[]).filter(a=>a.outletId===outletId&&a.owner===owner&&a.kind==='EDITORIAL').at(-1)?.line||'BALANCED';}
 function ownedMediaDefence(st,party){return Math.max(.55,1-(st.mediaWarfare?.market.outlets||[]).filter(o=>o.owner===party&&managedMediaLine(st,o.id)==='DEFEND').length*.15);}
 function createOwnedMediaAction(owner,outletId,kind,params={}){
