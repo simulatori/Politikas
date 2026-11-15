@@ -154,7 +154,7 @@ function updateInternationalAgreements(){
             var n=internationalNegotiation(a.negotiationId),law=a.lawId && state.laws.find(function(l){return l.id===a.lawId;});
             if(a.externalReview.status==="PENDING" && state.turnCount>=a.externalReview.dueTurn){
                 var r=internationalReadiness(n),draw=electionSeed(a.id+":"+n.startedTurn+":"+a.partnerId+":"+a.topic)%100;
-                a.externalReview.status=r.relation>=40 && r.debt<80 && draw<clamp(50+Math.floor(r.reform/4)-r.failures*10,15,85)?"APPROVED":"REJECTED";
+                a.externalReview.status=r.relation>=40 && (a.terms.requestedM===0 || r.debt<80) && draw<clamp(50+Math.floor(r.reform/4)-r.failures*10,15,85)?"APPROVED":"REJECTED";
                 a.history.push({turn:state.turnCount,text:"Shqyrtimi i jashtëm i simulimit: "+INTERNATIONAL_STATUS[a.externalReview.status]+". Ky nuk është vendim real i institucionit."});
             }
             if(a.externalReview.status==="REJECTED" || law && law.status==="FAILED" || (!a.lifecycle || a.lifecycle.legacy) && state.turnCount>a.deadlineTurn){a.status="FAILED";a.history.push({turn:state.turnCount,text:"Marrëveshja dështoi: refuzim i jashtëm/parlamentar ose kushte të papërfunduara brenda afatit."});internationalAgreementImpact(a,false);}

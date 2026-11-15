@@ -2,6 +2,7 @@
 const FDI_LEGEND_CHANCE=.05,FDI_STABLE_WEEKS=4;
 function fdiExactMoney(n){return new Intl.NumberFormat('sq-AL',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2}).format(n*1e9);}
 function fdiInvestor(id){return FDI_INVESTORS.find(i=>i.id===id);}
+function fdiBidderTerms(b){const i=fdiInvestor(b.investorId),t=b.decisionNightTerms;if(!t)return i;if(!i||t.version!==1||t.scale!==.65||typeof t.storyId!=='string')throw Error('Kushtet e investimit të rishikuar janë të pavlefshme.');return {...i,capitalB:fiscalRound(i.capitalB*t.scale),cofinanceB:fiscalRound(i.cofinanceB*t.scale),jobs:Math.floor(i.jobs*t.scale),weeklyTaxB:fiscalRound(i.weeklyTaxB*t.scale),approval:+(i.approval*t.scale).toFixed(3),penalty:+(i.penalty*t.scale).toFixed(3)};}
 function fdiLegacyRevision(db){return db.campaigns.length+db.offers.filter(o=>o.status!=='OFFERED').length+db.offers.filter(o=>FDI_TYPES[o.type]?.mega).reduce((n,o)=>n+(o.infrastructureStartedTurn!==null?1:0)+(o.taxLawId!==null?1:0),0);}
 function migrateForeignInvestments(st){
     const db=st.foreignInvestments;if(!db||db.version===3)return;
@@ -48,10 +49,10 @@ function startForeignInvestmentCampaign(revision,focus){
     });
 }
 function fdiBidder(id,revision,statuses){const db=state.foreignInvestments,b=db?.bidders?.find(b=>b.id===id);return b&&db.revision===revision&&statuses.includes(b.status)?b:null;}
-function fdiAnonymousTitle(b){return 'Profili anonim #'+(Number(b.id.split(':')[1])+1)+' · '+FDI_FAMILIES[fdiInvestor(b.investorId).family].label;}
-function fdiBidderTitle(b){const i=fdiInvestor(b.investorId);return b.revealed?i.company+' · '+i.project:fdiAnonymousTitle(b);}
+function fdiAnonymousTitle(b){return 'Profili anonim #'+(Number(b.id.split(':')[1])+1)+' · '+FDI_FAMILIES[fdiBidderTerms(b).family].label;}
+function fdiBidderTitle(b){const i=fdiBidderTerms(b);return b.revealed?i.company+' · '+i.project:fdiAnonymousTitle(b);}
 function startBidderNegotiation(id,revision){
-    const b=fdiBidder(id,revision,['HIDDEN']);if(!b||state.turnCount>b.expiresTurn)return false;const i=fdiInvestor(b.investorId),check=fiscalSpendingCheck(i.cofinanceB,true),risk=fdiInitialConditions(state);
+    const b=fdiBidder(id,revision,['HIDDEN']);if(!b||state.turnCount>b.expiresTurn)return false;const i=fdiBidderTerms(b),check=fiscalSpendingCheck(i.cofinanceB,true),risk=fdiInitialConditions(state);
     if(!check.allowed||state.budgetTotalB<i.cofinanceB||risk){showToast(risk||check.message||'Arka nuk e mbulon bashkëfinancimin.');return false;}
     return fdiCommit(function(){
         if(!state.streetProtests)initializeStreetProtests(state);
@@ -59,22 +60,23 @@ function startBidderNegotiation(id,revision){
         Object.assign(b,{status:'NEGOTIATING',startTurn:state.turnCount,lastTurn:state.turnCount,deadlineTurn:state.turnCount+i.deadline,paymentId:state.publicFinance.ledger.at(-1).id,governmentKey:fdiGovernmentKey(state),protestBaseline:state.streetProtests.counter,scandalBaseline:(state.securityOps?.operations||[]).filter(o=>o.exposed).map(o=>o.id),darkExposedAtStart:state.darkPolitics?.exposedTurn??null,arrearsAtStartB:state.publicFinance.arrearsB});registerRogueTender('BIDDER|'+b.id,FDI_FAMILIES[i.family].sector,b.paymentId);state.foreignInvestments.revision++;
     });
 }
-function rejectMysteryBidder(id,revision){const b=fdiBidder(id,revision,['HIDDEN']);if(!b)return false;return fdiCommit(function(){b.status='REJECTED';b.rejectedTurn=state.turnCount;state.foreignInvestments.revision++;});}
+function fdiRejectBidderRecord(b,st=state){if(!b||b.status!=='HIDDEN')return false;b.status='REJECTED';b.rejectedTurn=st.turnCount;st.foreignInvestments.revision++;return true;}
+function rejectMysteryBidder(id,revision){const b=fdiBidder(id,revision,['HIDDEN']);if(!b)return false;return fdiCommit(function(){fdiRejectBidderRecord(b);});}
 function startBidderInfrastructure(id,revision){if(municipalCapitalBlocked(state))return false;const b=fdiBidder(id,revision,['NEGOTIATING']);if(!b||b.infrastructureStartedTurn!==null||state.turnCount>b.deadlineTurn)return false;return fdiCommit(function(){b.infrastructureStartedTurn=state.turnCount;state.foreignInvestments.revision++;});}
 function proposeBidderTaxLaw(id,revision){
-    const b=fdiBidder(id,revision,['NEGOTIATING']);if(!b||state.turnCount>b.deadlineTurn)return false;const i=fdiInvestor(b.investorId),old=state.laws.find(l=>l.id===b.taxLawId);if(!i.lawRequired||old&&!['FAILED','WITHDRAWN','ANNULLED'].includes(old.status)||!assertPoliticalParliament('Ligji i lehtësirave të investimit'))return false;
+    const b=fdiBidder(id,revision,['NEGOTIATING']);if(!b||state.turnCount>b.deadlineTurn)return false;const i=fdiBidderTerms(b),old=state.laws.find(l=>l.id===b.taxLawId);if(!i.lawRequired||old&&!['FAILED','WITHDRAWN','ANNULLED'].includes(old.status)||!assertPoliticalParliament('Ligji i lehtësirave të investimit'))return false;
     const saved=fdiCommit(function(){
         const law={id:'bidder-tax:'+(++state.billCounter),title:'Ligji i lehtësirave · '+fdiAnonymousTitle(b),desc:'Lehtësim '+Math.round(i.relief*100)+'% vetëm për kontratën e këtij profili anonim. Nuk ndryshon normat e bizneseve të tjera. Kompania dhe ndikimi i saktë zbulohen në nënshkrim; arkëtimet nisin pas realizimit.',ministry:'Ministria e Financave',sector:FDI_FAMILIES[i.family].sector,proposer:'Qeveria e Kosovës',costB:0,duration:1,approvalEffect:0,status:'DRAFT',supportParties:[state.playerParty],stageHistory:[],voteHistory:[],applied:false,legalEffectMode:'PROCEDURAL',fdiBidderId:b.id,fdiTaxRelief:i.relief};
         initializeCatalogBill(law);state.laws.unshift(law);b.taxLawIds.push(law.id);b.taxLawId=law.id;state.foreignInvestments.revision++;
     });if(saved)openBidderTaxLaw(id);return saved;
 }
 function openBidderTaxLaw(id){const b=state.foreignInvestments?.bidders?.find(b=>b.id===id),n=state.laws.findIndex(l=>l.id===b?.taxLawId);if(n>=0)catalogBillDetails(n);}
-function bidderTaxLawPassed(b,st){const i=fdiInvestor(b.investorId);return !i.lawRequired||st.laws.some(l=>l.id===b.taxLawId&&l.fdiBidderId===b.id&&l.fdiTaxRelief===i.relief&&l.status==='PASSED'&&(l.voteHistory||[]).some(v=>v.passed&&v.pro>=61));}
+function bidderTaxLawPassed(b,st){const i=fdiBidderTerms(b);return !i.lawRequired||st.laws.some(l=>l.id===b.taxLawId&&l.fdiBidderId===b.id&&l.fdiTaxRelief===i.relief&&l.status==='PASSED'&&(l.voteHistory||[]).some(v=>v.passed&&v.pro>=61));}
 function fdiBidderSectorReady(i,m){return (i.tier===4?m.sec_police>8&&m.sec_edu>8:m.sec_police>=i.security&&m.sec_edu>=i.education)&&m[FDI_FAMILIES[i.family].primary]>=i.primary;}
 function bidderSigningReason(b,st){
     if(typeof securityFDIBlocked==='function'&&securityFDIBlocked(st))return 'IHD-te jane bllokuar nga kriza nderkombetare.';
     if(typeof courtInvestmentFrozen==='function'&&courtInvestmentFrozen(b.taxLawId,st))return 'Ligji i lehtësirave është pezulluar nga Gjykata Kushtetuese.';
-    if(b.status!=='NEGOTIATING')return 'Profili nuk është në negociatë.';const i=fdiInvestor(b.investorId),metrics=fdiDevelopment(st);
+    if(b.status!=='NEGOTIATING')return 'Profili nuk është në negociatë.';const i=fdiBidderTerms(b),metrics=fdiDevelopment(st);
     if(typeof populationWorkerReason==='function'){const reason=populationWorkerReason(i.jobs,st);if(reason)return reason;}
     if(st.turnCount>b.deadlineTurn)return 'Afati i negocimit ka skaduar.';
     const breach=fdiBreachReason(b,st);if(breach)return breach;
@@ -87,10 +89,10 @@ function bidderSigningReason(b,st){
 function signMysteryBidder(id,revision){
     if(municipalCapitalBlocked(state)){showToast('Gjykata: Mega-Projektet e reja jane te bllokuara.');return false;}
     const b=fdiBidder(id,revision,['NEGOTIATING']);if(!b)return false;const reason=bidderSigningReason(b,state);if(reason){showToast(reason);return false;}
-    return fdiCommit(function(){const i=fdiInvestor(b.investorId);Object.assign(b,{status:'SIGNED',revealed:true,signedTurn:state.turnCount,signedMetrics:fdiDevelopment(state),signedStableWeeks:state.foreignInvestments.stability.weeks,executionDeadlineTurn:state.turnCount+i.executionWeeks+4});state.foreignInvestments.revision++;addMediaNews('Investimet','Zbulohet investitori: '+i.company,'POSITIVE',i.project+'. Kapital privat '+fdiMoney(i.capitalB)+'; '+i.jobs+' vende pune dhe '+fdiExactMoney(i.weeklyTaxB)+'/javë tatime neto pas realizimit.');});
+    return fdiCommit(function(){const i=fdiBidderTerms(b);Object.assign(b,{status:'SIGNED',revealed:true,signedTurn:state.turnCount,signedMetrics:fdiDevelopment(state),signedStableWeeks:state.foreignInvestments.stability.weeks,executionDeadlineTurn:state.turnCount+i.executionWeeks+4});state.foreignInvestments.revision++;addMediaNews('Investimet','Zbulohet investitori: '+i.company,'POSITIVE',i.project+'. Kapital privat '+fdiMoney(i.capitalB)+'; '+i.jobs+' vende pune dhe '+fdiExactMoney(i.weeklyTaxB)+'/javë tatime neto pas realizimit.');});
 }
 function fdiApplyBidderOutcome(b,success,reason){
-    if(b.outcomeApplied||!['NEGOTIATING','SIGNED'].includes(b.status))return;const i=fdiInvestor(b.investorId);if(success&&b.status!=='SIGNED')throw Error('Investimi nuk është nënshkruar.');
+    if(b.outcomeApplied||!['NEGOTIATING','SIGNED'].includes(b.status))return;const i=fdiBidderTerms(b);if(success&&b.status!=='SIGNED')throw Error('Investimi nuk është nënshkruar.');
     b.outcomeApplied=true;b.status=success?'COMPLETED':'FAILED';b.approvalBefore=state.approval;rtkApplyApprovalTarget(state,fdiApprovalTarget(state.approval,success,i));b.approvalAfter=state.approval;if(typeof interestPublicReaction==='function')interestPublicReaction(state,b.approvalAfter-b.approvalBefore,{sectorId:'sec_econ'});
     if(success){b.completedTurn=state.turnCount;state.unemployment=fiscalRound(Math.max(0,state.unemployment-i.jobs/Math.max(1,typeof populationWorkforce==='function'?populationWorkforce(state):FDI_LABOUR_FORCE)*100));if(!economicPilotActive(state))state.gdpGrowth=fiscalRound(state.gdpGrowth+i.capitalB/FISCAL_GDP_B*20);}
     else{b.failedTurn=state.turnCount;b.failureReason=reason;if(typeof recordCrisisPressEvent==='function')recordCrisisPressEvent('INVESTMENT','bidder:'+b.id,fdiBidderTitle(b),FDI_FAMILIES[i.family].primary);}
@@ -103,13 +105,13 @@ function processForeignInvestmentsWeek(turn){
     try{legacyProcessForeignInvestmentsWeek(turn);}finally{state.foreignInvestments=db;}
     const clean=fdiPoliticallyStable(state),key=fdiGovernmentKey(state),signature=fdiRiskSignature(state);db.stability.weeks=clean&&db.stability.riskSignature===signature?db.stability.weeks+1:0;db.stability.key=key;db.stability.riskSignature=signature;
     db.attractionCampaigns.filter(c=>c.status==='ACTIVE'&&turn>=c.dueTurn&&!(typeof securityFDIBlocked==='function'&&securityFDIBlocked(state))).forEach(c=>{
-        const i=fdiInvestor(c.investorId);if(i.tier===4&&(!fdiPoliticallyStable(state)||!fdiLegendEligible(fdiDevelopment(state),db.stability.weeks,i))){c.status='CANCELLED';addMediaNews('Investimet','Nuk u kualifikua profili anonim','NEUTRAL','Nivelet e sektorëve ose stabiliteti ranë gjatë fushatës. Fushata nuk kthehet në para.');return;}
+        const i=fdiBidderTerms(c);if(i.tier===4&&(!fdiPoliticallyStable(state)||!fdiLegendEligible(fdiDevelopment(state),db.stability.weeks,i))){c.status='CANCELLED';addMediaNews('Investimet','Nuk u kualifikua profili anonim','NEUTRAL','Nivelet e sektorëve ose stabiliteti ranë gjatë fushatës. Fushata nuk kthehet në para.');return;}
         c.status='COMPLETED';c.revealedTurn=turn;db.bidders.push({id:'mystery:'+Number(c.id.split(':')[1]),campaignId:c.id,investorId:i.id,status:'HIDDEN',revealed:false,createdTurn:turn,expiresTurn:turn+6,startTurn:null,lastTurn:turn,deadlineTurn:null,paymentId:null,infrastructureStartedTurn:null,infrastructureElapsed:0,taxLawId:null,taxLawIds:[],stableWeeks:0,signedTurn:null,signedMetrics:null,signedStableWeeks:null,executionDeadlineTurn:null,executionElapsed:0,rejectedTurn:null,completedTurn:null,failedTurn:null,failureReason:null,outcomeApplied:false,approvalBefore:null,approvalAfter:null,governmentKey:null,protestBaseline:null,scandalBaseline:[],darkExposedAtStart:null,arrearsAtStartB:null});
         addMediaNews('Investimet','Mbërrin një profil anonim','NEUTRAL',FDI_FAMILIES[i.family].anonymous+' Shqyrtoni kushtet përpara angazhimit të fondeve.');
     });
     db.bidders.forEach(b=>{
         if(b.status==='HIDDEN'){if(turn>b.expiresTurn)b.status='EXPIRED';return;}
-        if(!['NEGOTIATING','SIGNED'].includes(b.status)||b.lastTurn>=turn)return;b.lastTurn=turn;const i=fdiInvestor(b.investorId),breach=fdiBreachReason(b,state);if(breach){fdiApplyBidderOutcome(b,false,breach);return;}
+        if(!['NEGOTIATING','SIGNED'].includes(b.status)||b.lastTurn>=turn)return;b.lastTurn=turn;const i=fdiBidderTerms(b),breach=fdiBreachReason(b,state);if(breach){fdiApplyBidderOutcome(b,false,breach);return;}
         if(typeof securityFDIBlocked==='function'&&securityFDIBlocked(state)){if(b.status==='NEGOTIATING'&&turn>b.deadlineTurn||b.status==='SIGNED'&&turn>=b.executionDeadlineTurn)fdiApplyBidderOutcome(b,false,'Kriza nderkombetare tejkaloi afatin kontraktual.');return;}
         if((b.infrastructureStartedTurn!==null||b.status==='SIGNED')&&typeof localProjectBlocked==='function'&&localProjectBlocked('BIDDER|'+b.id,fdiBidderTitle(b),b.municipalityId)){if(b.status==='NEGOTIATING'&&turn>b.deadlineTurn||b.status==='SIGNED'&&turn>=b.executionDeadlineTurn)fdiApplyBidderOutcome(b,false,'Bllokada lokale tejkaloi afatin kontraktual.');return;}
         if(typeof courtInvestmentFrozen==='function'&&courtInvestmentFrozen(b.taxLawId,state)){
@@ -126,10 +128,10 @@ function processForeignInvestmentsWeek(turn){
         }
     });db.lastTurn=turn;validateForeignInvestments(state);return true;
 }
-function fdiMegaTotals(st){if(typeof internationalIsolation==='function'&&internationalIsolation(st))return {capitalB:0,jobs:0};const totals=legacyFdiMegaTotals(st);(st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED').forEach(b=>{const i=fdiInvestor(b.investorId);totals.capitalB+=i.capitalB;totals.jobs+=i.jobs;});return totals;}
+function fdiMegaTotals(st){if(typeof internationalIsolation==='function'&&internationalIsolation(st))return {capitalB:0,jobs:0};const totals=legacyFdiMegaTotals(st);(st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED').forEach(b=>{const i=fdiBidderTerms(b);totals.capitalB+=i.capitalB;totals.jobs+=i.jobs;});return totals;}
 function foreignInvestmentEmploymentBoost(st){return Math.min(100,fdiMegaTotals(st).jobs/Math.max(1,typeof populationWorkforce==='function'?populationWorkforce(st):FDI_LABOUR_FORCE)*100);}
 function foreignInvestmentCapacityBoost(st){return fdiMegaTotals(st).capitalB/FISCAL_GDP_B*100;}
-function foreignInvestmentAnnualTax(st){if(typeof internationalIsolation==='function'&&internationalIsolation(st))return 0;return Math.max(0,strategicZoneAnnualAdjustment(st)+legacyForeignInvestmentAnnualTax(st)+(st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED').reduce((sum,b)=>sum+fdiInvestor(b.investorId).weeklyTaxB*FISCAL_WEEKS,0));}
+function foreignInvestmentAnnualTax(st){if(typeof internationalIsolation==='function'&&internationalIsolation(st))return 0;return Math.max(0,strategicZoneAnnualAdjustment(st)+legacyForeignInvestmentAnnualTax(st)+(st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED').reduce((sum,b)=>sum+fdiBidderTerms(b).weeklyTaxB*FISCAL_WEEKS,0));}
 // Entry points retained for old saved contracts and their existing controls.
 function decideForeignInvestment(...args){return legacyDecideForeignInvestment(...args);}
 function startForeignInvestmentInfrastructure(...args){return legacyStartForeignInvestmentInfrastructure(...args);}
@@ -148,10 +150,10 @@ function validateForeignInvestments(st){
     db.attractionCampaigns.forEach((c,n)=>{
         const d=c.draw;if(c.id!=='attract-campaign:'+n||!integer(c.startTurn,0,st.turnCount)||c.dueTurn!==c.startTurn+3||!['ACTIVE','COMPLETED','CANCELLED'].includes(c.status)||!d||!(d.focus==='AUTO'||Object.hasOwn(FDI_FAMILIES,d.focus))||!integer(d.stableWeeks,0,c.startTurn)||!Array.isArray(d.excluded)||new Set(d.excluded).size!==d.excluded.length||d.excluded.some(id=>!fdiInvestor(id))||![d.legendRoll,d.sampleRoll].every(v=>Number.isFinite(v)&&v>=0&&v<1))fail();metrics(d.metrics);
         if(!fdiPools(d.focus,d.metrics,d.stableWeeks,d.excluded).normal.length||fdiDrawInvestor(d)?.id!==c.investorId)fail();payment(c.paymentId,.0005,c.startTurn,'EXPENSE');actions++;
-        if(c.revealedTurn!==undefined&&(c.status!=='COMPLETED'||!integer(c.revealedTurn,c.dueTurn,st.turnCount)||c.revealedTurn>c.dueTurn&&!(typeof securityFDIDelayCovered==='function'&&securityFDIDelayCovered(st,c.dueTurn,c.revealedTurn))))fail();const count=db.bidders.filter(b=>b.campaignId===c.id).length;if(c.status==='COMPLETED'?count!==1||st.turnCount<c.dueTurn:count!==0)fail();if(c.status==='CANCELLED'&&!(typeof validIsolationCancellation==='function'&&validIsolationCancellation(st,c))&&(fdiInvestor(c.investorId).tier!==4||st.turnCount<c.dueTurn))fail();
+        if(c.revealedTurn!==undefined&&(c.status!=='COMPLETED'||!integer(c.revealedTurn,c.dueTurn,st.turnCount)||c.revealedTurn>c.dueTurn&&!(typeof securityFDIDelayCovered==='function'&&securityFDIDelayCovered(st,c.dueTurn,c.revealedTurn))))fail();const count=db.bidders.filter(b=>b.campaignId===c.id).length;if(c.status==='COMPLETED'?count!==1||st.turnCount<c.dueTurn:count!==0)fail();if(c.status==='CANCELLED'&&!(typeof validIsolationCancellation==='function'&&validIsolationCancellation(st,c))&&(fdiBidderTerms(c).tier!==4||st.turnCount<c.dueTurn))fail();
     });
     db.bidders.forEach(b=>{
-        const c=db.attractionCampaigns.find(c=>c.id===b.campaignId),i=fdiInvestor(b.investorId),started=b.startTurn!==null,signed=b.signedTurn!==null;
+        const c=db.attractionCampaigns.find(c=>c.id===b.campaignId),i=fdiBidderTerms(b),started=b.startTurn!==null,signed=b.signedTurn!==null;
         if(!c||c.status!=='COMPLETED'||b.id!=='mystery:'+Number(c.id.split(':')[1])||ids.has(b.id)||!i||i.id!==c.investorId||b.createdTurn!==(c.revealedTurn??c.dueTurn)||b.expiresTurn!==b.createdTurn+6||!['HIDDEN','NEGOTIATING','SIGNED','COMPLETED','FAILED','REJECTED','EXPIRED'].includes(b.status)||b.revealed!==signed||!integer(b.lastTurn,b.createdTurn,st.turnCount)||!integer(b.infrastructureElapsed,0,i.publicWeeks)||!integer(b.stableWeeks,0,i.stableWeeks)||!integer(b.executionElapsed,0,i.executionWeeks)||!Array.isArray(b.taxLawIds)||new Set(b.taxLawIds).size!==b.taxLawIds.length)fail();ids.add(b.id);
         if(!['FAILED','REJECTED','EXPIRED'].includes(b.status)){if(reserved.has(i.id))fail();reserved.add(i.id);}
         if(started){if(!['NEGOTIATING','SIGNED','COMPLETED','FAILED'].includes(b.status)||!integer(b.startTurn,b.createdTurn,b.expiresTurn)||b.startTurn>st.turnCount||b.deadlineTurn!==b.startTurn+i.deadline||!integer(b.protestBaseline,0,st.streetProtests?.counter??-1)||typeof b.governmentKey!=='string'||!Array.isArray(b.scandalBaseline)||b.scandalBaseline.some(id=>typeof id!=='string')||!Number.isFinite(b.arrearsAtStartB)||b.arrearsAtStartB<0)fail();payment(b.paymentId,i.cofinanceB,b.startTurn,'CAPITAL_PAYMENT');actions++;}
@@ -170,7 +172,7 @@ function validateForeignInvestments(st){
 }
 
 function fdiBidderCard(b,db){
-    const i=fdiInvestor(b.investorId),f=FDI_FAMILIES[i.family],e=catalogEscape,metrics=fdiDevelopment(state),negotiating=b.status==='NEGOTIATING',hidden=b.status==='HIDDEN',law=state.laws.find(l=>l.id===b.taxLawId),reason=negotiating?bidderSigningReason(b,state):'';
+    const i=fdiBidderTerms(b),f=FDI_FAMILIES[i.family],e=catalogEscape,metrics=fdiDevelopment(state),negotiating=b.status==='NEGOTIATING',hidden=b.status==='HIDDEN',law=state.laws.find(l=>l.id===b.taxLawId),reason=negotiating?bidderSigningReason(b,state):'';
     const minimum=n=>n>8&&n<8.1?'mbi 8':n;
     let html='<article class="card fdi-mega-card fdi-status-'+b.status.toLowerCase()+'" data-bidder="'+b.id+'"><div class="fdi-company-heading"><span class="fdi-company-icon" aria-hidden="true">'+(b.revealed?f.icon:'❓')+'</span><div><span class="fdi-eyebrow">'+(b.revealed?'Tier '+i.tier+' · '+e(i.country):'Identitet i pazbuluar')+'</span><h3>'+e(fdiBidderTitle(b))+'</h3></div><span class="tag">'+({HIDDEN:'Profil anonim',NEGOTIATING:'Negociatë',SIGNED:'Nënshkruar',COMPLETED:'Realizuar',FAILED:'Dështuar',REJECTED:'Refuzuar',EXPIRED:'Skaduar'})[b.status]+'</span></div>';
     if(!b.revealed)html+='<p>'+e(f.anonymous)+'</p><p>Emri, projekti i saktë dhe përfitimet zbulohen vetëm pasi të plotësoni kushtet dhe të nënshkruani marrëveshjen.</p>';

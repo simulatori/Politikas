@@ -200,7 +200,7 @@ function advanceElectionDayProcess() {
         catch(error){state=JSON.parse(beforeState);stopElectionDayAnimation();showToast(error.message);return false;}
     }
     if(!saveGameAuto()){state=JSON.parse(beforeState);stopElectionDayAnimation();return false;}
-    if(cycle.status==="RESULTS"){
+    if(cycle.status==="RESULTS"&&!(typeof electionNightDefersPublication==='function'&&electionNightDefersPublication(cycle))){
         var composition=getAssemblyComposition(),ready=composition?.status==='PUBLISHED';renderAssemblyComposition();renderPostElectionInvitation();if(ready)openConstituentSessionPanel();
         showMajorAnnouncement({badge:'ZGJEDHJET PËRFUNDUAN',title:ready?'Fillon konstituimi i Kuvendit':'Përbërja e Kuvendit kërkon plotësim',reason:ready?'U publikuan 120 mandate. Çdo grup parlamentar, përfshirë opozitën, mund të marrë pjesë në konstituim.':'Numërimi përfundoi, por ende nuk janë përcaktuar 120 mandate të vlefshme. Hapni përbërjen për të parë të dhënat që mungojnë.',immediateImpact:'Qeveria e mëparshme mbetet në detyrë me kompetenca të kufizuara. Kuvendi i ri nuk konstituohet automatikisht.',statsHtml:ready?'<button class="action-btn" onclick="openPostElectionTalks()">Hap ftesën për qeverisje</button><button class="action-btn" onclick="openConstituentSessionPanel()">Konstituimi i Kuvendit</button>':'<button class="action-btn" onclick="openElectionAssemblyResults()">Shqyrto përbërjen dhe të dhënat që mungojnë</button>'});
     }

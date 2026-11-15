@@ -157,6 +157,7 @@ function processLawNegotiations(){
         if(l.status==='WITHDRAWN')n.status='ENDED';
     });
 }
+function endLawNegotiationRecord(n){n.status='ENDED';return 'Bisedimet u ndërprenë pa marrëveshje.';}
 function lawNegotiationAction(i,p,action){
     var l=state.laws[i],n=l && lawNegotiationRecord(l,p);if(!n || !lawNegotiationAuthority(l) || n.initiator!==state.playerParty || state.turnCount>n.dueTurn || ['FAILED','ENDED','WITHDRAWN','EXPIRED'].includes(n.status) && !(action==='RECONSIDER' && lawNegotiationAssessment(l,n).canReconsider))return false;
     if(n.status==='CONSULTING')return false;
@@ -176,7 +177,7 @@ function lawNegotiationAction(i,p,action){
         else if(action==='DISCUSS'){n.status='CONSULTING';n.readyTurn=state.turnCount+1;text='Kërkoj një javë për konsultime me grupin parlamentar.';}
         else if(action==='COMPROMISE'){n.score+=4;text='Ka hapësirë për kompromis, nëse kushti ynë përfshihet realisht.';}
         else if(action==='REFUSE'){n.score-=8;n.status='FAILED';text='Pa këtë garanci nuk kemi marrëveshje. Procedura mund të vazhdojë pa votat tona.';}
-        else if(action==='END'){n.status='ENDED';text='Bisedimet u ndërprenë pa marrëveshje.';}
+        else if(action==='END'){text=endLawNegotiationRecord(n);}
         else if(action==='ACCEPT'){
             if(l.annualBudgetYear && c.kind==='FUNDING')applyNegotiatedBudgetFunding(l,c);
             if(!l.annualBudgetYear && c.kind==='FUNDING' && (!agendaExecutive() || state.budgetTotalB<(l.costB||0)+c.costB))throw Error('Kushti kërkon kompetencë ekzekutive dhe buxhet për të gjithë projektligjin.');

@@ -31,8 +31,21 @@
 <link rel="stylesheet" href="world-opportunities.css">
 <link rel="stylesheet" href="dynamic-conference.css">
 <link rel="stylesheet" href="live-speech.css">
+<link rel="stylesheet" href="budget-meetings.css">
+<link rel="stylesheet" href="election-night.css">
+<link rel="stylesheet" href="cooperation.css">
+<link rel="stylesheet" href="navigation-laptop.css">
+<link rel="stylesheet" href="citizen-voices.css">
+<link rel="stylesheet" href="decision-night.css">
+<link rel="stylesheet" href="release-notes.css">
+<script src="release-notes.js" defer></script>
 </head>
 <body>
+<dialog id="releaseNotesDialog" aria-labelledby="releaseNotesTitle" aria-describedby="releaseNotesDescription">
+ <header class="release-notes-header"><p class="release-notes-kicker">Përditësimet e fundit · 15 nëntor 2026</p><h1 id="releaseNotesTitle">Çka ka të re në Republikë?</h1><p id="releaseNotesDescription">Më shumë përballje, vendime dhe pasoja që lidhen me mënyrën si e udhëheq vendin.</p><button type="button" class="release-notes-close" data-release-notes-dismiss aria-label="E pashë njoftimin, mbylle">×</button></header>
+ <div class="release-notes-body"><p class="release-notes-hint">Ngjarjet të dalin gjatë lojës kur krijohen kushtet përkatëse. Hap kartelat për t’i parë të gjitha të rejat.</p><div id="releaseNotesGroups"></div></div>
+ <footer class="release-notes-footer"><p>Ky njoftim shfaqet vetëm një herë në këtë shfletues.</p><button type="button" id="releaseNotesContinue" data-release-notes-dismiss>E pashë · Vazhdo</button></footer>
+</dialog>
 <aside id="pwaUpdateNotice" hidden role="status" style="position:fixed;bottom:12px;left:12px;right:12px;z-index:100000;padding:12px;background:#14243b;color:#fff;border:1px solid #d8b465;border-radius:12px;max-height:40dvh;overflow:auto">
 <p id="pwaUpdateNoticeText"></p><button type="button" class="action-btn" style="min-height:44px;white-space:normal" onclick="window.republikaPWA?.apply()">Ruaj dhe aktivizo përditësimin</button>
 </aside>
@@ -63,7 +76,7 @@
         
         <div class="start-footer">
             <span class="start-tag" data-legislature-label>Legjislatura XI</span>
-            <span class="start-tag">Loja v105</span>
+            <span class="start-tag">Loja v118</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -129,7 +142,7 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
-            <p id="pwaVersion">Loja v105</p>
+            <p id="pwaVersion">Loja v118</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
@@ -213,6 +226,10 @@
 <!-- ============================================================
      APP LAYOUT DHE SIDEBAR / DOCK
      ============================================================ -->
+<div id="electionNightModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="electionNightHeading">
+    <div class="modal-box night-shell" id="electionNightContent"></div>
+</div>
+
 <div class="app-layout">
     
     <!-- SIDEBAR PËR DESKTOP (Kthehet në Dock lundrues në Mobile) -->
@@ -247,7 +264,7 @@
         </button>
         <button class="nav-item" onclick="switchMainTab('tab-elections', this)">
             <span class="nav-icon">📍</span>
-            <span class="nav-label-wide">38 Komunat</span><span class="nav-label-compact">Komunat</span>
+            <span class="nav-label-wide">Komunat</span><span class="nav-label-compact">Komunat</span>
         </button>
         <button class="nav-item" onclick="switchMainTab('tab-diplomacy', this)">
             <span class="nav-icon">🌍</span>
@@ -632,7 +649,7 @@
             <!-- TAB 3: KUVENDI I KOSOVËS -->
             <section id="tab-assembly" class="tab-view">
                 <div id="assemblyCampaignBanner" class="political-outcome political-outcome--pending" hidden></div>
-                <div id="constituentEntryCard" class="card">
+                <div id="constituentEntryCard" class="card" hidden>
                     <div class="card-title">Konstituimi i Kuvendit dhe zgjedhja e Kryetarit</div>
                     <p>Hap seancën për verifikimin e mandateve, betimin dhe votimin e Kryesisë së Kuvendit.</p>
                     <button id="constituentEntryBtn" class="action-btn btn-gold" onclick="openConstituentSessionPanel()">Hap seancën konstituive</button>
@@ -1193,6 +1210,26 @@
 <script src="live-speech.js" defer></script>
 <script src="live-speech-ui.js" defer></script>
 <script src="governance-flow-repairs.js" defer></script>
+<script src="annual-budget-workflow.js" defer></script>
+<script src="ministry-envelopes.js" defer></script>
+<script src="contextual-meetings.js" defer></script>
+<script src="conference-language.js" defer></script>
+<script src="regular-cabinet.js" defer></script>
+<script src="cooperation-data.js" defer></script>
+<script src="cooperation.js" defer></script>
+<script src="cooperation-ui.js" defer></script>
+<script src="citizen-voices-data.js" defer></script>
+<script src="citizen-voices.js" defer></script>
+<script src="citizen-voices-ui.js" defer></script>
+<script src="decision-night-data.js" defer></script>
+<script src="decision-night.js" defer></script>
+<script src="decision-night-ui.js" defer></script>
+<script src="premier-episodes.js" defer></script>
+<script src="premier-episodes-extra.js" defer></script>
+<script src="election-night.js" defer></script>
+<script src="premier-consequences.js" defer></script>
+<script src="mandate-dilemmas.js" defer></script>
+<script src="mandate-aftershocks.js" defer></script>
 <script type="module">
     // Dynamic CDN imports keep guest play working even when Firebase cannot load.
     try {
@@ -1237,5 +1274,11 @@
  </section>
 </div>
 <div id="liveSpeechModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="liveSpeechTitle"><div class="live-speech-box"><header class="speech-header"><strong>REPUBLIKA E KOSOVËS · FOLTORE</strong><button id="liveSpeechClose" type="button" onclick="closeLiveSpeech()">Ruaj draftin · Më vonë ×</button></header><div id="liveSpeechBody" class="speech-body"></div></div></div>
+<div id="annualBudgetReminderModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Buxheti i vitit të ardhshëm"><div class="budget-notice-box" id="annualBudgetReminderBody"></div></div>
+<div id="ministryBudgetConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Burimi i pagesës"><div class="budget-notice-box" id="ministryBudgetConfirmBody"></div></div>
+<div id="regularCabinetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="regularCabinetTitle"><section class="regular-cabinet-box" id="regularCabinetBody"></section></div>
+<button id="regularCabinetLauncher" class="btn-top regular-cabinet-launcher" type="button" onclick="openRegularCabinet()" hidden>Mbledhja e Qeverisë</button>
+<div id="cooperationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cooperationTitle"><section class="cooperation-box" id="cooperationBody"></section></div>
+<div id="decisionNightModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="decisionNightTitle"><section id="decisionNightBody" class="decision-night-box"></section></div>
 </body>
 </html>

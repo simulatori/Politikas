@@ -2,7 +2,7 @@
 function economyRows(st,kind){return worldRows(st,kind);}
 function economyMeta(st=state){return worldDB(st)?.economy;}
 function economyBidder(st,id){return st.foreignInvestments?.bidders.find(b=>b.id===id);}
-function economyCompanies(st,families){return (st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED'&&!socioAnchorClosed(st,b.id)&&(!families||families.includes(fdiInvestor(b.investorId)?.family)));}
+function economyCompanies(st,families){return (st.foreignInvestments?.bidders||[]).filter(b=>b.status==='COMPLETED'&&!socioAnchorClosed(st,b.id)&&(!families||families.includes(fdiBidderTerms(b)?.family)));}
 function economyFacility(st,source){const key=source.split('|HOST|')[0];return commissioningProjects(st).find(p=>p.key===key&&p.kind==='BUILD');}
 function economyEnvironmentalSites(st,landfill=false){return commissioningProjects(st).filter(p=>p.kind==='BUILD'&&p.sector==='sec_env'&&(landfill?p.p.categoryId==='hydro_permits':['recycling','illegal_dumps','hydro_permits'].includes(p.p.categoryId))&&commissionRecord(st,p.key)?.status==='OPERATIONAL'&&commissionOpen(st,p.key));}
 function economyPaidSubsidies(st){return (st.productionResources?.history||[]).flatMap(h=>Object.entries(h.sectors).filter(([,s])=>s.subsidyPaidB>0&&s.subsidyReceipt).map(([sector,s])=>({id:s.subsidyReceipt,sector,turn:h.turn,amountB:s.subsidyPaidB,workers:s.workers||0})));}
@@ -15,7 +15,7 @@ worldSources=function(kind,st=state){
  if(kind==='UNIVERSITY')return [{id:'sec_edu',label:'Arsimi i lartë · dosje e operatorit privat të simuluar'}];
  if(kind==='DEEPFAKE')return st.laws.filter(l=>['DRAFT','SCHEDULED','DEBATE','REVIEW'].includes(l.status)).map(l=>({id:l.id,label:l.title}));
  if(kind==='SUBSIDY_FRAUD')return economyPaidSubsidies(st).map(p=>({id:p.id,label:PRODUCTION_SECTORS[p.sector].name+' · '+enterpriseMoney(p.amountB)+' · java '+p.turn}));
- if(kind==='SUCCESSION')return economyCompanies(st).filter(b=>fdiInvestor(b.investorId).tier<=2).map(b=>({id:b.id,label:fdiBidderTitle(b)}));
+ if(kind==='SUCCESSION')return economyCompanies(st).filter(b=>fdiBidderTerms(b).tier<=2).map(b=>({id:b.id,label:fdiBidderTitle(b)}));
  if(kind==='LANDFILL')return economyEnvironmentalSites(st,true).flatMap(p=>st.municipalities.map(m=>({id:p.key+'|HOST|'+m.id,label:p.p.title+' · pritëse '+m.name})));
  if(kind==='RETAIL_PAY')return economyCompanies(st,['AGRIFOOD']).map(b=>({id:b.id,label:fdiBidderTitle(b)+' · faturat e rrjetit blerës'}));
  if(kind==='SEASONAL')return st.productionResources.assets.some(a=>a.sector==='tourism'&&a.level>0)?st.municipalities.map(m=>({id:m.id,label:m.name})):[];
@@ -44,7 +44,7 @@ worldNewCase=function(kind,source,event=false){
   const p=economyPaidSubsidies(state).find(p=>p.id===source);e.grantSector=p.sector;e.grantTurn=p.turn;e.grantB=p.amountB;e.suspectedB=fiscalRound(p.amountB*.25);e.actualJobs=p.workers;e.declaredJobs=p.workers+Math.ceil(p.workers*.2);e.verifiedJobs=null;
   e.auditFees={FREEZE:Math.max(.000001,fiscalRound(Math.min(.001,p.amountB*.1))),TARGET:Math.max(.000001,fiscalRound(Math.min(.002,p.amountB*.15))),CORRECT:Math.max(.000001,fiscalRound(Math.min(.002,p.amountB*.1)))};
  }
- if(['DATACENTER','SUCCESSION','RETAIL_PAY'].includes(kind)){const b=economyBidder(state,source),i=fdiInvestor(b.investorId);e.investorId=i.id;e.companyJobs=i.jobs;e.companyCapitalB=i.capitalB;}
+ if(['DATACENTER','SUCCESSION','RETAIL_PAY'].includes(kind)){const b=economyBidder(state,source),i=fdiBidderTerms(b);e.investorId=i.id;e.companyJobs=i.jobs;e.companyCapitalB=i.capitalB;}
  if(kind==='DATACENTER')e.loadMW=0;
  if(kind==='LANDFILL'){r.city=source.split('|HOST|')[1];e.partnerCities=state.municipalities.filter(m=>m.id!==r.city).slice(0,2).map(m=>m.id);e.blocked=false;}
  if(kind==='RETAIL_PAY'){e.privateInvoiceB=fiscalRound(Math.min(.005,e.companyCapitalB*.02));e.privateSettledB=0;}
@@ -57,7 +57,7 @@ chooseWorldCase=function(id,choice){
  return lifeCommit(()=>{
   const r=worldRecord(id),opt=worldChoices(r)[choice],e=r.economy;if(r.status!=='OPEN'||!opt)throw Error('Dosja nuk pret këtë vendim.');
   if(r.kind==='SUCCESSION'&&choice==='MERGE'){
-   const original=economyBidder(state,r.source),partner=economyCompanies(state,[fdiInvestor(original.investorId).family]).find(b=>b.id!==r.source);
+   const original=economyBidder(state,r.source),partner=economyCompanies(state,[fdiBidderTerms(original).family]).find(b=>b.id!==r.source);
    if(!partner)throw Error('Kërkohet një kompani tjetër reale, aktive, nga e njëjta fushë.');e.partnerId=partner.id;
   }
   if(r.kind==='SEASONAL'&&choice==='COMMUTE'&&worldPaidBuses(state)<5)throw Error('Kërkohen të paktën pesë autobusë me operim të paguar këtë javë.');
@@ -253,8 +253,8 @@ function validateEconomyCases(st){
  const subjects=new Set(),grants=new Set(),activeGrantPrograms=new Set();for(const r of worldDB(st).cases.filter(r=>ECONOMY_CASE_DEFS[r.kind])){
   const e=r.economy;if(!e||e.version!==1||!Number.isInteger(e.fundedWeeks)||e.fundedWeeks<0||!Array.isArray(e.followups)||!Array.isArray(e.operatingPayments)||!Number.isFinite(e.recoveredB)||e.recoveredB<0)bad();
   const subject=r.kind+':'+(r.kind==='LANDFILL'?r.source.split('|HOST|')[0]:r.source);if(['DATACENTER','UNIVERSITY','SUCCESSION','SUBSIDY_FRAUD','LANDFILL'].includes(r.kind)){if(subjects.has(subject))bad();subjects.add(subject);}
-  if(['DATACENTER','SUCCESSION','RETAIL_PAY'].includes(r.kind)){const b=economyBidder(st,r.source),i=b&&fdiInvestor(b.investorId);if(!b||!i||b.status!=='COMPLETED'||e.investorId!==i.id||e.companyJobs!==i.jobs||e.companyCapitalB!==i.capitalB)bad();}
-  if(r.kind==='DATACENTER'&&(!['TECH'].includes(fdiInvestor(e.investorId).family)||![0,25,60].includes(e.loadMW)||r.qualified&&e.loadMW!==(r.choice==='LIMIT'?25:60)))bad();
+  if(['DATACENTER','SUCCESSION','RETAIL_PAY'].includes(r.kind)){const b=economyBidder(st,r.source),i=b&&fdiBidderTerms(b);if(!b||!i||b.status!=='COMPLETED'||e.investorId!==i.id||e.companyJobs!==i.jobs||e.companyCapitalB!==i.capitalB)bad();}
+  if(r.kind==='DATACENTER'&&(!['TECH'].includes(fdiBidderTerms(e).family)||![0,25,60].includes(e.loadMW)||r.qualified&&e.loadMW!==(r.choice==='LIMIT'?25:60)))bad();
   if(['WASTE_IMPORT','LANDFILL'].includes(r.kind)){const site=economyFacility(st,r.source);if(!site||site.sector!=='sec_env'||r.kind==='WASTE_IMPORT'&&r.source!==site.key||r.kind==='LANDFILL'&&(site.p.categoryId!=='hydro_permits'||r.source!==site.key+'|HOST|'+r.city))bad();}
   if(r.kind==='LANDFILL'&&(!worldCity(st,r.city)||!Array.isArray(e.partnerCities)||e.partnerCities.length!==2||new Set(e.partnerCities).size!==2||e.partnerCities.some(id=>id===r.city||!worldCity(st,id))||typeof e.blocked!=='boolean'))bad();
   if(r.kind==='UNIVERSITY'&&(r.source!=='sec_edu'||e.students!==600||!Number.isInteger(e.transferred)||e.transferred<0||e.transferred>600||!Number.isInteger(e.remaining)||e.remaining<0||e.remaining>600||r.choice==='TRANSFER'&&e.transferred+e.remaining!==600||r.choice==='TRANSFER'&&r.qualified&&e.remaining!==0))bad();
@@ -266,7 +266,7 @@ function validateEconomyCases(st){
    if(worldLive(r)){if(activeGrantPrograms.has(e.grantSector))bad();activeGrantPrograms.add(e.grantSector);}
   }
   if(r.kind==='SUCCESSION'&&r.closedTurn&&(!turn(r.closedTurn)||e.closedJobsApplied!==e.companyJobs))bad();
-  if(r.kind==='SUCCESSION'&&r.choice==='MERGE'){const partner=economyBidder(st,e.partnerId);if(!partner||partner.id===r.source||partner.status!=='COMPLETED'||fdiInvestor(partner.investorId).family!==fdiInvestor(e.investorId).family)bad();}
+  if(r.kind==='SUCCESSION'&&r.choice==='MERGE'){const partner=economyBidder(st,e.partnerId);if(!partner||partner.id===r.source||partner.status!=='COMPLETED'||fdiBidderTerms(partner).family!==fdiBidderTerms(e).family)bad();}
   if(r.kind==='RETAIL_PAY'&&(!Number.isFinite(e.privateInvoiceB)||e.privateInvoiceB!==fiscalRound(Math.min(.005,e.companyCapitalB*.02))||!Number.isFinite(e.privateSettledB)||e.privateSettledB<0||e.privateSettledB>e.privateInvoiceB||r.revenues.length))bad();
   if(r.kind==='SEASONAL'&&!worldCity(st,r.source))bad();
   if(r.kind!=='SUBSIDY_FRAUD'&&e.recoveredB!==0)bad();

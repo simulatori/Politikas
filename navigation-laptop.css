@@ -1,0 +1,31 @@
+#constituentEntryCard[hidden]{display:none!important}
+#dip-overview>.card:empty{display:none}
+#tab-diplomacy>.sub-nav{min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#7ca8ff80 transparent;cursor:grab;touch-action:auto}
+#tab-diplomacy>.sub-nav::-webkit-scrollbar{height:7px}
+#tab-diplomacy>.sub-nav::-webkit-scrollbar-thumb{background:#7ca8ff80;border-radius:8px}
+#tab-diplomacy>.sub-nav>.sub-pill{flex:0 0 auto;white-space:nowrap}
+#tab-diplomacy>.sub-nav.is-dragging{cursor:grabbing;user-select:none}
+.diplomacy-nav-controls{display:flex;justify-content:flex-end;gap:8px;margin:0 0 8px}
+.diplomacy-nav-controls button{min-width:44px;min-height:44px;border:1px solid var(--glass-border);border-radius:10px;background:#17263d;color:var(--text-main);cursor:pointer}
+.diplomacy-nav-controls button:disabled{opacity:.35;cursor:default}
+.diplomacy-nav-controls[hidden],.government-nav-controls[hidden]{display:none!important}
+@media(min-width:1025px) and (max-width:1536px){
+ .app-layout{padding-left:232px}
+ .app-main-view{padding:16px;min-width:0}
+ .bottom-nav{left:12px;top:12px;bottom:12px;width:208px;padding:16px 10px}
+ .bottom-nav .nav-item{min-height:44px;padding:10px 12px;margin-bottom:4px;gap:10px;line-height:1.35;font-size:.8rem}
+ .bottom-nav .sidebar-logo{gap:9px;margin-bottom:14px;padding-bottom:12px}
+ .header-top{gap:10px;align-items:flex-start}
+ .header-top>*{min-width:0;max-width:100%}
+ .header-controls{gap:8px;max-width:100%;flex-wrap:wrap}
+ .header-controls .profile-menu{max-width:260px}
+ .stats-grid{gap:10px}
+ .stat-box{min-width:0;padding:12px;gap:10px}
+ .stat-icon-wrapper{width:34px;height:34px;flex:0 0 34px}
+ .stat-text-wrapper{min-width:0}
+ .stat-val{font-size:1.1rem;overflow-wrap:anywhere}
+ .card{padding:20px}
+ .grid-2,.grid-3,.sub-content,.tab-view{min-width:0}
+}
+@media(min-width:1025px) and (max-width:1280px){.cooperation-profile-grid,.cooperation-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1280px) and (max-width:1536px){.stats-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.stat-box{padding:10px;gap:8px}.stat-icon-wrapper{width:30px;height:30px;flex-basis:30px}.stat-val{font-size:1rem}}

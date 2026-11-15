@@ -101,7 +101,7 @@ function resetGovernmentNotifications(){
 function governmentInvestmentSnapshot(st){
     const result={},db=st?.foreignInvestments;if(!db)return result;
     (db.bidders||[]).forEach(b=>{
-        const i=fdiInvestor(b.investorId),revealed=b.revealed;
+        const i=fdiBidderTerms(b),revealed=b.revealed;
         result['bidder:'+b.id]={status:b.status,title:fdiBidderTitle(b),delta:Number.isFinite(b.approvalAfter)&&Number.isFinite(b.approvalBefore)?b.approvalAfter-b.approvalBefore:null,turn:b.completedTurn??b.failedTurn??b.signedTurn??b.startTurn,cost:i.cofinanceB,reason:b.failureReason||'',revealed,jobs:revealed?i.jobs:null,tax:revealed?i.weeklyTaxB:null};
     });
     (db.offers||[]).forEach(o=>{const t=FDI_TYPES[o.type];result['legacy:'+o.id]={status:o.status,title:t.title,delta:Number.isFinite(o.approvalAfter)&&Number.isFinite(o.approvalBefore)?o.approvalAfter-o.approvalBefore:null,turn:o.completedTurn??o.failedTurn??o.startTurn,cost:t.costB,reason:o.failureReason||'',revealed:true,jobs:t.jobs||null,tax:t.taxB*(t.mega?1-t.relief:1)/FISCAL_WEEKS};});return result;

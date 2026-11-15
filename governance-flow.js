@@ -3,6 +3,7 @@ const GOVERNMENT_VOTE_COMMIT=Object.freeze({});
 function callGameRenderer(name){const fn=globalThis[name];if(typeof fn==='function')fn();}
 function renderVisibleWorkspace(){
     const view=document.querySelector('.tab-view.active');if(!view)return;
+    if(view.id==='tab-assembly')renderConstituentEntry();
     const panel=Array.from(view.querySelectorAll('.sub-content')).find(el=>el.style.display!=='none'),key=panel?.id||'';
     const renderer={
         'tab-dashboard':{base:'renderDashboard','dash-calendar':'renderStateCalendar','dash-inbox':'renderWeeklyAgenda','dash-promises':'renderMandateExperience'},
@@ -47,7 +48,7 @@ function renderPendingGovernmentDialogs(){
     if(state.governance?.pendingScandal||document.getElementById('governmentScandalDialog')?.open)callGameRenderer('renderGovernmentCrisisUI');
 }
 function refreshVisibleGameUI(){
-    if(!state)return;fiscalSyncBudgetStatuses();updateTopBar();renderVisibleWorkspace();
+    if(!state)return;fiscalSyncBudgetStatuses();updateTopBar();renderConstituentEntry();renderVisibleWorkspace();
     renderPoliticalRoleUI({light:true});renderPostElectionInvitation();reconcileGovernmentNotificationAudience();renderUrgentSituations();renderGovernmentDecisionStatus();
     if(!weeklyProcessing)reconcileWeeklyTransition();renderPendingGovernmentDialogs();
     const view=document.querySelector('.tab-view.active');if(view)uiEnhanceDetails(view);
@@ -83,15 +84,25 @@ function renderExecutiveAccess(){
     if(gov){let gate=document.getElementById('governmentRoleGate');if(!gate&&document.createElement){gate=document.createElement('section');gate.id='governmentRoleGate';gate.className='card';gov.prepend(gate);}if(gate){gate.hidden=executive;gate.innerHTML='<h2>'+(state.governmentFormed?'Qeveria aktuale':'Në pritje të Qeverisë')+'</h2><p>'+electoralEscape(state.primeMinister)+' · '+getCoalitionSeats()+' / 120 mandate.</p><p>Menaxhimi ekzekutiv hapet vetëm pas miratimit të Qeverisë suaj në Kuvend. Ju veproni përmes partisë dhe grupit parlamentar.</p><button class="action-btn" onclick="openPostElectionTalks()">Negociatat e qeverisjes</button><button class="action-btn" onclick="switchMainTab(\'tab-party\')">Shtabi i Partisë</button>';}}
 }
 function initializeGovernmentNavigation(){
-    const strip=document.querySelector('#tab-government > .sub-nav');if(!strip||strip.dataset.horizontalReady)return;strip.dataset.horizontalReady='true';
-    const controls=document.createElement('div');controls.className='government-nav-controls';controls.innerHTML='<button type="button" aria-label="Seksionet majtas">←</button><button type="button" aria-label="Seksionet djathtas">→</button>';strip.before(controls);
-    controls.children[0].onclick=()=>strip.scrollBy({left:-Math.max(240,strip.clientWidth*.7),behavior:'auto'});controls.children[1].onclick=()=>strip.scrollBy({left:Math.max(240,strip.clientWidth*.7),behavior:'auto'});
-    strip.addEventListener('wheel',e=>{if(strip.scrollWidth<=strip.clientWidth)return;const amount=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;const before=strip.scrollLeft;strip.scrollLeft+=amount;if(before!==strip.scrollLeft)e.preventDefault();},{passive:false});
+    initializeHorizontalNavigation(document.querySelector('#tab-government > .sub-nav'),'government-nav-controls','Seksionet');
+}
+function initializeDiplomacyNavigation(){
+    initializeHorizontalNavigation(document.querySelector('#tab-diplomacy > .sub-nav'),'diplomacy-nav-controls','Skedat e diplomacisë');
+}
+function initializeHorizontalNavigation(strip,controlsClass,label){
+    if(!strip||strip.dataset.horizontalReady)return;strip.dataset.horizontalReady='true';
+    const controls=document.createElement('div');controls.className=controlsClass;controls.innerHTML='<button type="button" aria-label="'+label+' majtas">←</button><button type="button" aria-label="'+label+' djathtas">→</button>';strip.before(controls);
+    const update=()=>{const max=strip.scrollWidth-strip.clientWidth;controls.hidden=max<=1;controls.children[0].disabled=strip.scrollLeft<=1;controls.children[1].disabled=strip.scrollLeft>=max-1;};
+    controls.children[0].onclick=()=>{strip.scrollBy({left:-Math.max(240,strip.clientWidth*.7),behavior:'auto'});update();};controls.children[1].onclick=()=>{strip.scrollBy({left:Math.max(240,strip.clientWidth*.7),behavior:'auto'});update();};
+    strip.addEventListener('scroll',update,{passive:true});
+    if(typeof ResizeObserver==='function')new ResizeObserver(update).observe(strip);else window.addEventListener('resize',update);
+    strip.addEventListener('wheel',e=>{if(strip.scrollWidth<=strip.clientWidth)return;const unit=e.deltaMode===1?28:e.deltaMode===2?strip.clientWidth:1,amount=(Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY)*unit;const before=strip.scrollLeft;strip.scrollLeft+=amount;if(before!==strip.scrollLeft)e.preventDefault();},{passive:false});
     let drag=null,moved=false;
     strip.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,left:strip.scrollLeft};moved=false;});
     strip.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>5){moved=true;strip.setPointerCapture(e.pointerId);strip.classList.add('is-dragging');strip.scrollLeft=drag.left-dx;e.preventDefault();}});
     function end(){drag=null;strip.classList.remove('is-dragging');}strip.addEventListener('pointerup',end);strip.addEventListener('pointercancel',end);
-    strip.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopImmediatePropagation();moved=false;}},true);
+    strip.addEventListener('click',e=>{if(moved&&e.detail!==0){e.preventDefault();e.stopImmediatePropagation();}moved=false;},true);
+    update();
 }
 function currentFormationTalk(st){const t=st.governmentFormationTalk;return t&&t.cycleId===constituentCycle(st)?.id&&t.player===st.playerParty&&(!st.mandatar||t.leader===st.mandatar)?t:null;}
 function formationPoliticalCommit(change){
@@ -154,3 +165,4 @@ function validateGovernmentFormationTalk(st){
     if(!Number.isInteger(t.fairMinistries)||t.fairMinistries<1||t.fairMinistries>st.ministries.length||![null,'MINISTRIES','PROGRAMME','PM'].includes(t.counter)||typeof t.reply!=='string'||t.reply.length>2000||t.votes!==null&&(!Number.isInteger(t.votes.pro)||!Number.isInteger(t.votes.kunder)||t.votes.pro<0||t.votes.kunder<0||t.votes.pro+t.votes.kunder!==120)||['APPROVED','FAILED'].includes(t.status)&&(!t.votes||(t.status==='APPROVED')!==(t.votes.pro>=61)))throw Error('Oferta ose votat e kabinetit janë të pavlefshme.');
 }
 document.addEventListener('DOMContentLoaded',initializeGovernmentNavigation);
+document.addEventListener('DOMContentLoaded',initializeDiplomacyNavigation);
