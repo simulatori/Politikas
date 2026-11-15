@@ -20,8 +20,8 @@ function proposeStrategicLaw(kind,amountB=.3){
     });
 }
 function strategicBondAllowed(st,amount){return fiscalBorrowingAllowed(st,amount)&&fiscalAnnualInterestB(st)+amount*.05<=st.taxRevenueB*FISCAL_BORROWING_RULES.interestRevenueShare+1e-9;}
-function strategicZoneCandidates(st){return (st.foreignInvestments?.bidders||[]).filter(b=>b.revealed&&['SIGNED','COMPLETED'].includes(b.status)&&fdiInvestor(b.investorId)?.capitalB>=.1);}
-function strategicLicencePrice(b){return fiscalRound(Math.min(.15,Math.max(.025,fdiInvestor(b.investorId).capitalB*.2)));}
+function strategicZoneCandidates(st){return (st.foreignInvestments?.bidders||[]).filter(b=>b.revealed&&['SIGNED','COMPLETED'].includes(b.status)&&fdiBidderTerms(b)?.capitalB>=.1);}
+function strategicLicencePrice(b){return fiscalRound(Math.min(.15,Math.max(.025,fdiBidderTerms(b).capitalB*.2)));}
 function activateStrategicLaw(l){
     const r=l?.strategicFinance;if(!r||r.receiptId||l.status!=='PASSED'||!l.applied||courtLawFrozen(l,state))return false;
     if(r.kind==='CONFISCATION'){r.status='RECOVERY_PENDING';return false;}
@@ -76,7 +76,7 @@ function processStrategicEconomyWeek(turn){
 function strategicZoneAnnualAdjustment(st){
     return strategicLaws(st).filter(l=>l.strategicFinance.kind==='ZONE'&&l.status==='PASSED'&&!courtLawFrozen(l,st)).reduce((sum,l)=>{
         const r=l.strategicFinance,b=(st.foreignInvestments?.bidders||[]).find(b=>b.id===r.bidderId);if(!r.receiptId||!b||b.status!=='COMPLETED'||r.status==='REVOKED')return sum;
-        const exemption=st.turnCount<r.taxHolidayUntil?fdiInvestor(b.investorId).weeklyTaxB*FISCAL_WEEKS:0,spillover=st.turnCount-r.activatedTurn>=12?.001*FISCAL_WEEKS:0;
+        const exemption=st.turnCount<r.taxHolidayUntil?fdiBidderTerms(b).weeklyTaxB*FISCAL_WEEKS:0,spillover=st.turnCount-r.activatedTurn>=12?.001*FISCAL_WEEKS:0;
         return sum-exemption+spillover;
     },0);
 }
@@ -105,7 +105,7 @@ function renderStrategicEconomy(){
             html+='<p><strong>'+e(l.status)+' · '+e(r.status)+'</strong></p>'+(courtLawFrozen(l,state)?'<p class="crisis-warning">I pezulluar nga Gjykata. Arkëtimi pret vendimin dhe hyrjen në fuqi.</p>':'')+'<button class="action-btn" onclick="openStrategicLegislation()">Hap procedurën në Kuvend</button>';
             if(l.status==='PASSED'&&!r.receiptId&&!courtLawFrozen(l,state)){
                 if(kind==='BOND')html+='<button class="action-btn" '+(!allowed?'disabled':'')+' onclick="realizeStrategicLaw(\''+e(l.id)+'\')">Emeto huanë · kontrollo kapacitetin</button>';
-                if(kind==='ZONE'){const rows=strategicZoneCandidates(state);html+='<select id="'+id+'"><option value="">Zgjidh investitorin e zbuluar</option>'+rows.map(b=>'<option value="'+e(b.id)+'">'+e(fdiInvestor(b.investorId).company)+' · '+enterpriseMoney(strategicLicencePrice(b))+'</option>').join('')+'</select><button class="action-btn" '+(!allowed||!rows.length?'disabled':'')+' onclick="realizeStrategicLaw(\''+e(l.id)+'\',document.getElementById(\''+id+'\').value)">Nënshkruaj licencën</button><p>Kërkohet IHD e nënshkruar ose e realizuar. Gjigantët ruajnë kushtet dhe rrallësinë e sistemit ekzistues.</p>';}
+                if(kind==='ZONE'){const rows=strategicZoneCandidates(state);html+='<select id="'+id+'"><option value="">Zgjidh investitorin e zbuluar</option>'+rows.map(b=>'<option value="'+e(b.id)+'">'+e(fdiBidderTerms(b).company)+' · '+enterpriseMoney(strategicLicencePrice(b))+'</option>').join('')+'</select><button class="action-btn" '+(!allowed||!rows.length?'disabled':'')+' onclick="realizeStrategicLaw(\''+e(l.id)+'\',document.getElementById(\''+id+'\').value)">Nënshkruaj licencën</button><p>Kërkohet IHD e nënshkruar ose e realizuar. Gjigantët ruajnë kushtet dhe rrallësinë e sistemit ekzistues.</p>';}
                 if(kind==='CONFISCATION')html+='<p>Vettingu: '+e(state.justiceReform.status)+' · drejtori dhe zbatimi ndiqen te Zbatimi i Ligjeve.</p>';
             }
             if(r.receiptId)html+='<p>Arkëtuar: '+enterpriseMoney(r.amountB)+(r.kind==='BOND'?' · borxh i regjistruar, jo grant':'')+'</p>';

@@ -2,10 +2,38 @@
    Keep CORE_ASSETS aligned with local script dependencies in index.html.
    Cache only this game's static shell. Never cache Auth, Firestore or user saves.
    The next version activates after all windows using the previous version close. */
-const CACHE_VERSION='v105';
+const CACHE_VERSION='v118';
 const CACHE_PREFIX='republika-shell:'+self.registration.scope+':';
 const CACHE_NAME=CACHE_PREFIX+CACHE_VERSION;
 const CORE_ASSETS=[
+    "./release-notes.js",
+    "./release-notes.css",
+    "./annual-budget-workflow.js",
+    "./ministry-envelopes.js",
+    "./contextual-meetings.js",
+    "./conference-language.js",
+    "./regular-cabinet.js",
+    "./cooperation-data.js",
+    "./cooperation.js",
+    "./cooperation-ui.js",
+    "./cooperation.css",
+    "./navigation-laptop.css",
+    "./citizen-voices-data.js",
+    "./citizen-voices.js",
+    "./citizen-voices-ui.js",
+    "./citizen-voices.css",
+    "./decision-night-data.js",
+    "./decision-night.js",
+    "./decision-night-ui.js",
+    "./decision-night.css",
+    "./premier-episodes.js",
+    "./premier-episodes-extra.js",
+    "./election-night.js",
+    "./premier-consequences.js",
+    "./mandate-dilemmas.js",
+    "./mandate-aftershocks.js",
+    "./election-night.css",
+    "./budget-meetings.css",
     "./governance-flow-repairs.js",
     "./live-speech-data.js",
     "./live-speech.js",

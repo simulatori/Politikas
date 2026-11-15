@@ -7,7 +7,7 @@ function populationTaxAnnual(base,st){return Math.max(0,base)*populationFactor(s
 function populationUnemployed(st){st=st||state;return Math.floor(populationWorkforce(st)*clamp(st.unemployment,0,100)/100);}
 function populationReservedJobs(st){
     st=st||state;var db=st.foreignInvestments;if(!db)return productionReservedWorkers(st);
-    var jobs=(db.bidders||[]).filter(b=>b.status==='SIGNED').reduce((sum,b)=>sum+(fdiInvestor(b.investorId)?.jobs||0),0);
+    var jobs=(db.bidders||[]).filter(b=>b.status==='SIGNED').reduce((sum,b)=>sum+(fdiBidderTerms(b)?.jobs||0),0);
     return jobs+productionReservedWorkers(st)+(db.offers||[]).filter(o=>o.status==='ACTIVE'&&FDI_TYPES[o.type]?.mega).reduce((sum,o)=>sum+(FDI_TYPES[o.type].jobs||0),0);
 }
 function populationAvailableWorkers(st){st=st||state;return Math.max(0,populationUnemployed(st)-populationReservedJobs(st));}

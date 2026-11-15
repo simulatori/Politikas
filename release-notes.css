@@ -1,0 +1,36 @@
+:root{--release-bg:#0d1729;--release-panel:#15223a;--release-line:#30415d;--release-gold:#e7bf65;--release-text:#f0f4fb;--release-muted:#b4c3d8}
+body.release-notes-open{overflow:hidden}
+#releaseNotesDialog{box-sizing:border-box;width:min(920px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 40px);padding:0;margin:auto;border:1px solid var(--release-line);border-radius:24px;color:var(--release-text);background:var(--release-bg);box-shadow:0 28px 100px #0009;font-family:inherit;text-align:left;overflow:hidden}
+#releaseNotesDialog[open]{display:flex;flex-direction:column;animation:release-notes-enter .25s ease-out}
+#releaseNotesDialog::backdrop{background:rgba(2,7,17,.82);backdrop-filter:blur(14px)}
+#releaseNotesDialog *{box-sizing:border-box}
+#releaseNotesDialog .release-notes-header{padding:26px 30px 22px;border-bottom:1px solid var(--release-line);background:linear-gradient(120deg,#1d304b,#101b2e);flex-shrink:0;position:relative}
+#releaseNotesDialog .release-notes-kicker{margin:0 44px 10px 0;color:var(--release-gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+#releaseNotesTitle{margin:0 36px 10px 0;font-size:clamp(23px,4vw,32px);line-height:1.2;color:var(--release-text)}
+#releaseNotesDescription{margin:0;max-width:680px;color:var(--release-muted);font-size:14px;line-height:1.6}
+#releaseNotesDialog .release-notes-close{position:absolute;right:20px;top:20px;border:1px solid var(--release-line);background:#ffffff08;color:var(--release-text);border-radius:12px;width:44px;height:44px;padding:0;font:inherit;font-size:24px;cursor:pointer}
+#releaseNotesDialog .release-notes-body{padding:22px 30px;overflow-y:auto;overscroll-behavior:contain;min-height:0;scrollbar-gutter:stable}
+#releaseNotesDialog .release-notes-hint{margin:0 0 18px;color:var(--release-muted);font-size:13px;line-height:1.6}
+#releaseNotesGroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+#releaseNotesDialog .release-notes-group{min-width:0;background:linear-gradient(140deg,#1a2a43,#121e32);border:1px solid var(--release-line);border-radius:15px;overflow:hidden}
+#releaseNotesDialog .release-notes-group summary{cursor:pointer;padding:18px 18px 16px;list-style:none;position:relative;padding-right:38px}
+#releaseNotesDialog .release-notes-group summary::-webkit-details-marker{display:none}
+#releaseNotesDialog .release-notes-group summary::after{content:'+';position:absolute;right:17px;top:15px;color:var(--release-gold);font-size:24px;line-height:1}
+#releaseNotesDialog .release-notes-group[open] summary::after{content:'−'}
+#releaseNotesDialog .release-notes-group-title{display:block;color:var(--release-text);font-size:15px;font-weight:800;line-height:1.4;margin-bottom:8px;overflow-wrap:anywhere}
+#releaseNotesDialog .release-notes-group-intro{display:block;color:var(--release-muted);font-size:13px;line-height:1.6}
+#releaseNotesDialog .release-notes-group ul{margin:0;padding:0 18px 4px 34px;border-top:1px solid var(--release-line)}
+#releaseNotesDialog .release-notes-group li{padding:13px 0;border-bottom:1px solid #ffffff0b;color:var(--release-gold)}
+#releaseNotesDialog .release-notes-group li:last-child{border-bottom:0}
+#releaseNotesDialog .release-notes-group strong{color:var(--release-text);font-size:13px;line-height:1.5}
+#releaseNotesDialog .release-notes-group li p{color:var(--release-muted);font-size:13px;line-height:1.6;margin:5px 0 0}
+#releaseNotesDialog .release-notes-footer{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 30px;border-top:1px solid var(--release-line);background:#101b2e}
+#releaseNotesDialog .release-notes-footer p{margin:0;color:var(--release-muted);font-size:12px;line-height:1.5}
+#releaseNotesContinue{flex-shrink:0;min-height:46px;min-width:190px;padding:12px 20px;border:1px solid var(--release-gold);border-radius:12px;background:linear-gradient(120deg,#f1c96d,#dca93d);color:#141b27;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+#releaseNotesDialog button:hover{filter:brightness(1.08)}
+#releaseNotesDialog :is(button,summary):focus-visible{outline:3px solid #8fc9ff;outline-offset:3px}
+@keyframes release-notes-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){#releaseNotesDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:18px}#releaseNotesDialog .release-notes-header{padding:22px 18px 18px}#releaseNotesDialog .release-notes-close{right:12px;top:12px}#releaseNotesDialog .release-notes-kicker{font-size:10px}#releaseNotesDialog .release-notes-body{padding:18px 16px}#releaseNotesGroups{grid-template-columns:1fr}#releaseNotesDialog .release-notes-footer{padding:14px 18px;gap:10px;flex-direction:column;align-items:stretch}#releaseNotesContinue{width:100%;min-width:0}#releaseNotesDialog .release-notes-footer p{font-size:11px}}
+@media(prefers-reduced-motion:reduce){#releaseNotesDialog[open]{animation:none}}
+
+#releaseNotesDialog>.workspace-back{display:none!important}

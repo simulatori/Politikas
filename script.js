@@ -5339,6 +5339,7 @@ function calculateLawVote(law, forecast) {
         ballot=vitalCommunityBallot(law,mp,ballot);
         ballot=veteransBudgetBallot(law,mp,ballot);
         ballot=coalitionBlackmailBallot(law,mp,ballot);
+        if(typeof mandatePilotBallot==='function')ballot=mandatePilotBallot(law,mp,ballot);
         result[ballot]++;
         if (ballot === "pro" && (mp.party === "MIN_MULTI" || mp.party === "SL")) result.minorityYes++;
         result.ballots.push({ seatNumber: mp.seatNumber, vote: ballot,
@@ -5376,6 +5377,7 @@ function finalizeLawVote(law, result, sessionId) {
     law.voteHistory.push({ week: state.turnCount, pro: result.pro, kunder: result.kunder,
         abstenim: result.abstenim, mungese: result.mungese, minorityYes: result.minorityYes, passed: result.passed });
     law.status = result.passed ? "PASSED" : "FAILED";
+    if(typeof recordMandateVote==='function')recordMandateVote(law,result);
     if(result.passed&&typeof considerAICourtReferral==='function')considerAICourtReferral(law);
     if(typeof interestLawResult==='function'&&!law.brusselsSpecial&&!courtMajorPending(law,state))interestLawResult(law,result);
     if(!result.passed&&typeof recordCrisisPressEvent==='function')recordCrisisPressEvent('LAW','law:'+law.id,law.title,law.sector);
@@ -5404,10 +5406,10 @@ function beginLawVote(law, continuation) {
     if(typeof legislativeCampaignClosed==='function'&&legislativeCampaignClosed()){showToast('Kuvendi nuk voton ligje të reja gjatë fushatës.');return false;}
     if(!continuation&&law){var agendaSession=(state.parliamentarySessions||[]).find(s=>s.status!=='COMPLETED'&&s.billIds?.includes(law.id));if(agendaSession){continuation={sessionId:agendaSession.id};state.activeSessionId=agendaSession.id;}}
     if(bureauVoteBlocked(law)){showToast("Procesi i Byrose eshte ne pritje te vendimit ose te Venecias.");return false;}
-    if(law?.annualBudgetYear&&agendaExecutive(state)&&state.veteransBudget?.openedTurn===null){governmentCrisisCommit(()=>openVeteransBudget(law.annualBudgetYear));renderVeteransBudget();return false;}
+    // The annual budget never opens or requires another policy bill.
     if(law?.associationUltimatumId){showToast('Drafti i ultimatumit trajtohet vetem nga rasti kushtetues i regjistruar.');return false;}
     if(typeof legislativeCampaignClosed==='function'&&legislativeCampaignClosed()){showToast('Kuvendi nuk voton ligje të reja gjatë fushatës.');return false;}
-    if(typeof governmentCrisisPending==='function'&&governmentCrisisPending()){showToast('Zgjidhni vendimin urgjent përpara votimit.');return false;}
+    if(typeof governmentCrisisPending==='function'&&governmentCrisisPending()&&!(law?.annualBudgetYear&&pendingGovernmentDecisions(state).every(r=>r.renderer==='renderVeteransBudget'))){showToast('Zgjidhni vendimin urgjent përpara votimit.');return false;}
     if(typeof constitutionalBlockReason==='function' && constitutionalBlockReason(law,state)){showToast(constitutionalBlockReason(law,state));return false;}
     if(law && !law.oppositionBill && !law.annualBudgetYear && !law.internationalAgreementId && law.costB>0){var authorization=fiscalSpendingCheck(law.costB,false);if(!authorization.allowed){showToast(authorization.message);return false;}}
     if(law?.annualBudgetYear && state.publicFinance.budgets[law.annualBudgetYear]?.lawId!==law.id){showToast('Kjo nuk është paraqitja aktive e projektbuxhetit.');return false;}
@@ -8162,11 +8164,12 @@ function switchSubTab(prefix, subKey, pillBtn) {
         parentSection.querySelectorAll("[data-assembly-tab]").forEach(function(button){
             var selected=button===pillBtn;button.setAttribute("aria-selected",String(selected));button.tabIndex=selected?0:-1;
         });
-        revealAssemblyTab(pillBtn);
     }
 
     renderVisibleWorkspace();stopConstituentAnimation();
     revealWorkspaceTarget(target);
+    // Rendering a longer panel can introduce the page scrollbar and narrow the rail.
+    if(prefix==='ass')revealAssemblyTab(pillBtn);
 }
 
 window.addEventListener("DOMContentLoaded", initApp);

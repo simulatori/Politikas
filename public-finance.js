@@ -226,7 +226,7 @@ function processFiscalWeek(turn){
     operating=fiscalRound(Math.max(0,operating-rtkOperatingSavings(turn,operating)-sectorExpansionSavings(state,Math.max(0,operating-rtkAnnualSavings(state)/FISCAL_WEEKS))));
     var available=Math.min(Math.max(0,state.budgetTotalB),room),paidInterest=Math.min(available,interest);available-=paidInterest;
     if(paidInterest)fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-paidInterest),'Interesi i borxhit publik','INTEREST');
-    var paidOperating=Math.min(available,operating);if(paidOperating)fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-paidOperating),'Shpenzimet operative të ministrive','EXPENSE');
+    var paidOperating=Math.min(available,operating);if(typeof ministryOperatingAllowance==='function')paidOperating=ministryOperatingAllowance(paidOperating,state);if(paidOperating)fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-paidOperating),'Shpenzimet operative të ministrive','EXPENSE');
     if(typeof recordUnionOperatingFunding==='function')recordUnionOperatingFunding(turn,operating,paidOperating);
     var sectorQuality=typeof processSectorQualityFunding==='function'?processSectorQualityFunding(turn):{paidB:0,unpaidB:0};
     var transport=processTransportFiscal(turn);var enterprises=typeof processStateEnterprisesFiscal==='function'?processStateEnterprisesFiscal(turn):{paidB:0,revenueB:0};
@@ -274,6 +274,7 @@ function fiscalPreview(kind,data){
     document.getElementById('interactiveActionModalContent').innerHTML='<div class="fiscal11"><h2>'+e(title)+'</h2><p>Kosto / transferim nga arka: '+money(cost)+'. Afati: '+(weeks?weeks+' javë':'Në konfirmim')+'.</p>'+rates+(annualRevenueDelta?'<p>Ndryshimi i pritshëm i të hyrave vjetore pas zbatimit: '+money(annualRevenueDelta)+'. Nuk është arkëtim i menjëhershëm.</p>':'')+(saving?'<p>Kursimi ul planin operativ vjetor pas auditimit, deri '+money(saving)+'. Nuk krijon para nga asgjëja.</p>':'')+(kind==='BORROW'?'<p>Huamarrje: '+money(data.amountB)+'; interesi vjetor i tanishëm '+state.debtInterestRate+'%. Kryegjëja mbetet detyrim. Marrja e huasë nuk është investim i përfunduar.</p>':'')+(kind==='REPAY'?'<p>Shlyerje nga rezerva: '+money(data.amountB)+'. Kryegjëja dhe rezerva ulen me të njëjtën shumë.</p>':'')+'<button class="action-btn btn-gold" onclick="confirmFiscalDecision(\''+pending.id+'\')">Konfirmo vendimin</button><button class="btn-top" onclick="toggleModal(\'interactiveActionModal\',false)">Kthehu</button></div>';toggleModal('interactiveActionModal',true);
     if(!saveGameAuto()){f.pending=previousPending;toggleModal('interactiveActionModal',false);return false;}return true;
 }
+function fiscalApplyDomesticRepayment(amountB){if(!Number.isFinite(amountB)||amountB<=0||amountB>.150000001||state.fiscalReserve+1e-9<amountB||fiscalDomesticDebt()+1e-9<amountB)throw Error('Rezerva ose borxhi nuk e mbulon shlyerjen.');fiscalAllocatePrincipal(state,amountB);state.publicDebtPct=fiscalRound(Math.max(0,state.publicDebtPct-amountB/FISCAL_GDP_B*100));fiscalSetBalance(state,'fiscalReserve',fiscalRound(state.fiscalReserve-amountB),'Shlyerja e kryegjësë','DEBT_REPAYMENT');}
 function confirmFiscalDecision(id){
     if(!assertGovernmentAuthority('Konfirmimi financiar') || state.pendingVote || weeklyProcessing)return false;
     var f=state.publicFinance,p=f.pending;
@@ -290,7 +291,7 @@ function confirmFiscalDecision(id){
             state.publicDebtPct=fiscalRound(state.publicDebtPct+p.data.amountB/FISCAL_GDP_B*100);
             fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB+p.data.amountB),'Obligacioni qeveritar','BORROWING');
             if(reserve){fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-reserve),'Ndarja e huasë në rezervë','TRANSFER');fiscalSetBalance(state,'fiscalReserve',fiscalRound(state.fiscalReserve+reserve),'Ndarja e huasë në rezervë','TRANSFER');}
-        }else if(p.kind==='REPAY'){fiscalAllocatePrincipal(state,p.data.amountB);state.publicDebtPct=fiscalRound(Math.max(0,state.publicDebtPct-p.data.amountB/FISCAL_GDP_B*100));fiscalSetBalance(state,'fiscalReserve',fiscalRound(state.fiscalReserve-p.data.amountB),'Shlyerja e kryegjësë','DEBT_REPAYMENT');}
+        }else if(p.kind==='REPAY'){fiscalApplyDomesticRepayment(p.data.amountB);}
         else if(p.kind==='RESERVE'){fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-p.costB),'Transferimi në rezervë','TRANSFER');fiscalSetBalance(state,'fiscalReserve',fiscalRound(state.fiscalReserve+p.costB),'Transferimi në rezervë','TRANSFER');}
         else if(p.costB){var interestPart=p.kind==='ARREARS'?fiscalAllocateInterestArrears(state,p.costB):0;if(interestPart)fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-interestPart),p.title,'INTEREST');if(p.costB>interestPart)fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB-(p.costB-interestPart)),p.title,'EXPENSE');if(p.kind==='ARREARS')f.arrearsB=fiscalRound(Math.max(0,f.arrearsB-p.costB));}
         if(p.kind==='TAX'){if(typeof interestTaxDecision==='function')interestTaxDecision(d,{...state.taxPolicy});if(economicPilotActive(state))d.pilotStartRates=Object.assign({},state.economicPilot.effectiveRates);Object.assign(state.taxPolicy,p.data);var shift=p.data.vat-(p.oldVat??18);if(shift>0)adjustPublicSupport(-shift*.2,{source:'applyTaxPolicyChange'});}
@@ -350,7 +351,7 @@ function prepareAnnualBudget(year,allocations,capitalB,revisionId){
     if(state.laws.some(function(l){return l.annualBudgetYear===year && !['FAILED','WITHDRAWN'].includes(l.status);})){showToast('Ky vit ka tashmë një projektbuxhet aktiv ose të miratuar.');return false;}
     var savedId=null;
     var saved=fiscalCommit(function(){
-        openVeteransBudget(year);
+        // Annual appropriations are independent of the veterans policy scenario.
         var sectorQualityB=typeof sectorManagementAnnualPublicCost==='function'?sectorManagementAnnualPublicCost(state):0;
         var transportB=transportAnnualOperating(state);var expansionB=sectorExpansionWeeklyCost(state)*FISCAL_WEEKS,expansionSavingsB=sectorExpansionSavings(state,Math.max(0,allocations.reduce((sum,a)=>sum+a.budgetM/1000,0)/FISCAL_WEEKS-rtkAnnualSavings(state)/FISCAL_WEEKS))*FISCAL_WEEKS;
         var rtkSavingsB=rtkAnnualSavings(state),akpB=sovereignWeeklyCost(state)*FISCAL_WEEKS,highwayB=highwayWeeklyCost(state)*FISCAL_WEEKS,laborB=laborSubsidyWeekly(state)*FISCAL_WEEKS,generalStrikeB=generalStrikeAnnualCost(state),northB=northAnnualCost(state),veteransB=veteransAnnualCost(state),interestB=fiscalAnnualInterestB(state),total=fiscalRound(allocations.reduce(function(sum,a){return sum+a.budgetM/1000;},0)+capitalB+interestB+sectorQualityB+veteransB+northB+generalStrikeB+laborB+highwayB+akpB-rtkSavingsB+expansionB-expansionSavingsB+transportB),id='annual-budget:'+year+':'+(++state.billCounter);
