@@ -1,11 +1,16 @@
 {
-  "generated": "2026-11-12",
-  "cacheVersion": "v105",
+  "generated": "2026-11-15",
+  "cacheVersion": "v118",
   "files": [
     {
       "file": "agreement-documents.js",
       "bytes": 42408,
       "sha256": "0bb92053c28f08a2d8af63a84899a8ea6a869d0efec43dfcf197a2ab5354a59d"
+    },
+    {
+      "file": "annual-budget-workflow.js",
+      "bytes": 13810,
+      "sha256": "a59a32b64602bc3ada71d4261d911ee715d24e28a5c3688c23046d5bff4232d3"
     },
     {
       "file": "assembly-allocation.js",
@@ -58,9 +63,14 @@
       "sha256": "cb5379ef73842f7cf4a9ca96796f018713ad418da6832e0ebd2970a59e6d8b85"
     },
     {
+      "file": "budget-meetings.css",
+      "bytes": 4379,
+      "sha256": "85ff5f32da2384e2827940957d7d5c71b47b232922eef02ec18b6ccc28497119"
+    },
+    {
       "file": "cabinet-management.js",
-      "bytes": 5473,
-      "sha256": "bfc3ebbb04f59e608c2058961afaaccc9d7403488a0d7ed0bbcd2991844f90f5"
+      "bytes": 5483,
+      "sha256": "e75fa6493a8a0d3284ec4552f6b1d789822bd5168b651edb390d029b210591fa"
     },
     {
       "file": "campaign.js",
@@ -89,13 +99,33 @@
     },
     {
       "file": "cinematic-stories.js",
-      "bytes": 28825,
-      "sha256": "44f7c9071288f697b784c79f3fbb1933966f103d547f0abbacfdcea68fe006d5"
+      "bytes": 29022,
+      "sha256": "ab9206d1d57a531dd35e81a8882352ad045df3251e672bf2b6637b72b937edea"
+    },
+    {
+      "file": "citizen-voices-data.js",
+      "bytes": 5243,
+      "sha256": "3e106abafd1c01fd51b814909edb34d5202cc231081fe83221daff373b6867bd"
+    },
+    {
+      "file": "citizen-voices-ui.js",
+      "bytes": 11201,
+      "sha256": "763ca9ef6b440f21a13b0d92b329b4c0c2994fb57b448f67bc3153abab8e453d"
+    },
+    {
+      "file": "citizen-voices.css",
+      "bytes": 2720,
+      "sha256": "c06f0125aa00e39199bf4535b1d0443ea3585dc0109e7b49f14cea99ca5f9115"
+    },
+    {
+      "file": "citizen-voices.js",
+      "bytes": 17893,
+      "sha256": "dffa00de0c9ba1c50ac2605b473cce388ed4671380a20cd0ca0ccbf30375243d"
     },
     {
       "file": "civic-innovation.js",
-      "bytes": 46294,
-      "sha256": "011a0ead063bd36dcf2d22bdbccd6a8428d4ac7997afb287e6f391fe9a047ce4"
+      "bytes": 46300,
+      "sha256": "be55ba83430e0143e64ae5f38725fb7af9641cbccdb0aad312ae7b5e0d38b719"
     },
     {
       "file": "civil-registry.js",
@@ -118,9 +148,14 @@
       "sha256": "1862e9ecf3d0ca5c384d5ba9d65212691050e7948129f3dc4db57682a29d3e9f"
     },
     {
+      "file": "conference-language.js",
+      "bytes": 5044,
+      "sha256": "b8c703e97d2f9caa5efebd7e0be504dfc49c200310d0bfdb2a83bf55a84635bb"
+    },
+    {
       "file": "constituent-session.js",
-      "bytes": 41020,
-      "sha256": "cf0ceca1fe3515b1501ab5f6be71cfe23357a1c8cf067f7292a08886fefc65bd"
+      "bytes": 41419,
+      "sha256": "3eb79fbd18c95e2b080962bc93e7d716dfdad315bb7e0e9d047b5109ac6467a9"
     },
     {
       "file": "constitution-dark-politics.js",
@@ -131,6 +166,31 @@
       "file": "constitutional-court.js",
       "bytes": 11625,
       "sha256": "ed0b3a9f0f717c1484bab3446206479d2a75b26bf76b371ad2595d68502b2bb6"
+    },
+    {
+      "file": "contextual-meetings.js",
+      "bytes": 13515,
+      "sha256": "a8331fbeb3e4847bf9b549139ffb01b9a45ab4149ddeee5eb6c7e5bdd2010082"
+    },
+    {
+      "file": "cooperation-data.js",
+      "bytes": 6766,
+      "sha256": "75ecf9994f1edaf3e78fd293c71c09d41bf4d4a37e1c595cad0c42a7446a3379"
+    },
+    {
+      "file": "cooperation-ui.js",
+      "bytes": 18410,
+      "sha256": "0a5c1f054dfa60edd1c1f7ed8c5cfcbfff006d6ed7643c9134555b1b2ee1de9d"
+    },
+    {
+      "file": "cooperation.css",
+      "bytes": 4142,
+      "sha256": "71abb16bda5853410bfc58cbe79b284fafe918168a7ba1be707c8e9af201aea4"
+    },
+    {
+      "file": "cooperation.js",
+      "bytes": 14377,
+      "sha256": "a89520ccca00274c70e71276fdf2957a5c610a5c8798d9c08fc93f9fe2af4f2b"
     },
     {
       "file": "council-europe.js",
@@ -288,14 +348,34 @@
       "sha256": "a5414c00d611b7264360965ed2f9da16384cb33aa6d0ff709a8f74b8987e86a8"
     },
     {
+      "file": "decision-night-data.js",
+      "bytes": 3088,
+      "sha256": "8e1852ae713dd42689e136a3c0f71e1fb139db048be68d92d64fe271dfe347e8"
+    },
+    {
+      "file": "decision-night-ui.js",
+      "bytes": 6882,
+      "sha256": "9c330167fc0185cd48df385843ca7206b4f9482812f57dd6cf936dd60fa087df"
+    },
+    {
+      "file": "decision-night.css",
+      "bytes": 2370,
+      "sha256": "d5664de5575ba3d9262cd9861b39861ddf1a9cb973aa37b3c2bdef7905ceef60"
+    },
+    {
+      "file": "decision-night.js",
+      "bytes": 18051,
+      "sha256": "b90492d07a7df2d5909b4f58e80f5aa5a5353ba717f44f596c4233c895cbb6a7"
+    },
+    {
       "file": "deputy-mandates.js",
       "bytes": 24040,
       "sha256": "9c30088b9755c229a3a96a1cbc823a784bf0bb5c2eb7ffad296a00d70d297fc3"
     },
     {
       "file": "development-events.js",
-      "bytes": 22739,
-      "sha256": "698c123be44d8b47dfec0b059bbce6ca93a939aa71b1a2fa10595d4c2fe65878"
+      "bytes": 22731,
+      "sha256": "8807e47120a5a32faef0bc758ba44fd4dfb63ad8353bee0a9bd0da32c0425fe8"
     },
     {
       "file": "diaspora-mobilization.js",
@@ -334,8 +414,8 @@
     },
     {
       "file": "dynamic-conference-ui.js",
-      "bytes": 9653,
-      "sha256": "97b74d8135780687e8cd9a57760a9afc17bd08d425b44a64f679e220397ec8fe"
+      "bytes": 9732,
+      "sha256": "62f15bf40f678075186d7ecd143c52be660b3867c5a87661711cfaa721c9e1fd"
     },
     {
       "file": "dynamic-conference.css",
@@ -344,8 +424,8 @@
     },
     {
       "file": "dynamic-conference.js",
-      "bytes": 25247,
-      "sha256": "99a0bd8a32dc04473e00db9192a2c02f4a0c366262cad57b73f42e2363a3e20a"
+      "bytes": 25393,
+      "sha256": "5a494b09d01fe3eb54b3554364b0d2485911b6037197e51e4231fa7eb6a51fe5"
     },
     {
       "file": "economic-forecast.js",
@@ -379,8 +459,8 @@
     },
     {
       "file": "economy-cases.js",
-      "bytes": 33628,
-      "sha256": "388b029704090a1f5f03b8d1228ab8b6fe9bfa9635e9aac61e987ba85c26560a"
+      "bytes": 33564,
+      "sha256": "024af3c93ce74b640cc60add07cc2560b83a7198ce760f5b9ad6f79d85a308dd"
     },
     {
       "file": "election-access.js",
@@ -394,8 +474,18 @@
     },
     {
       "file": "election-day.js",
-      "bytes": 30290,
-      "sha256": "e0828657832ec04da1ab01ea6614cac7b79cf97ea6f1e02bf97dedc0e4a4934a"
+      "bytes": 30384,
+      "sha256": "dc8d3f8e3f8f174838bb0f3d5e1cfd7ccd780ff5894929f4f9566842b7e71674"
+    },
+    {
+      "file": "election-night.css",
+      "bytes": 3681,
+      "sha256": "ad3cc99385664526f12263c13a462a07efa9ad5a6bafc68a6c28ca0c6ab2022d"
+    },
+    {
+      "file": "election-night.js",
+      "bytes": 33978,
+      "sha256": "a4315a4cb186ee151626747644c3e7654a6ac4b5a89153e31973374a179a9125"
     },
     {
       "file": "election-preparation.js",
@@ -454,8 +544,8 @@
     },
     {
       "file": "foreign-investments.js",
-      "bytes": 37080,
-      "sha256": "d5d06009619ea8cf154df1df14d083c7785dd92312aab9d7dc0fe96dc9867aec"
+      "bytes": 37573,
+      "sha256": "aebbea8f7ca77e906fbc2941d126ed90f2f3d58393b29a666534afd02fb4cc72"
     },
     {
       "file": "future-opportunities.js",
@@ -479,8 +569,8 @@
     },
     {
       "file": "governance-flow.js",
-      "bytes": 20718,
-      "sha256": "5df6b9b749a15d9f40e66ec08b0857d9a87b97d3afb680f08cb99c6c5b72bbc5"
+      "bytes": 21689,
+      "sha256": "ed38517ee2121759ebcb771d008daa720052d2b8b120e447e760f41e9de5a30d"
     },
     {
       "file": "governing-challenges-ui.js",
@@ -499,8 +589,8 @@
     },
     {
       "file": "government-notifications.js",
-      "bytes": 15129,
-      "sha256": "8b1e16fa0fb6ae6d519de642bb159813bb26d550758fe1b0d312c078e7ec9978"
+      "bytes": 15121,
+      "sha256": "140c641f042f3df1ea3e5def736d58230a76a68731abdfeb54a41be3f6568554"
     },
     {
       "file": "highway-project.js",
@@ -544,8 +634,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 95614,
-      "sha256": "2542c4e4296a0d0ea3fb139776a4e46da6971c012ac786328648d1e00fc22368"
+      "bytes": 99423,
+      "sha256": "92c1c6de6a34a24e6547ee1342d99f4122c80ac2f21c8d1df1ab209e91a7ab7a"
     },
     {
       "file": "influence-network.js",
@@ -589,8 +679,8 @@
     },
     {
       "file": "international-diplomacy.js",
-      "bytes": 52366,
-      "sha256": "18a0acafc09f9e5239c5f035dce1304445f6261dd6610b86aacb4dcbb59a109b"
+      "bytes": 52394,
+      "sha256": "664bc9e715f2aa35f5fb72e9c7af9770e24c99227a75b3d481f64ac42ffec936"
     },
     {
       "file": "investor-database.js",
@@ -619,8 +709,8 @@
     },
     {
       "file": "law-negotiations.js",
-      "bytes": 38899,
-      "sha256": "e894095176d449188ccf8173266a915a71b47c2cd8cfb384230e21ffdd52e3ce"
+      "bytes": 38971,
+      "sha256": "3cc977cd9a6be7b8347449a76349b5abd9562e92c1af0fd81226b4e0658ab77d"
     },
     {
       "file": "legislature-sequence.js",
@@ -634,8 +724,8 @@
     },
     {
       "file": "live-speech-ui.js",
-      "bytes": 8939,
-      "sha256": "71a180ef1785109b456bc97d52433bb10581738ce11194654eb2ac70db3b1230"
+      "bytes": 9172,
+      "sha256": "fd5ba272f28dc583ae1cbd6d01bdededca94916c670b1f64fa1a351767e39299"
     },
     {
       "file": "live-speech.css",
@@ -676,6 +766,16 @@
       "file": "logo.png",
       "bytes": 10852,
       "sha256": "8b452b84c3f4f1ad376ea1fd5cab4a9b2b2100dc4c2c6266718e095970c897e0"
+    },
+    {
+      "file": "mandate-aftershocks.js",
+      "bytes": 24172,
+      "sha256": "99772097ab76f30b777b11c2b579889d745f5bbd539c4ff1dd0350e628ceb0ce"
+    },
+    {
+      "file": "mandate-dilemmas.js",
+      "bytes": 40966,
+      "sha256": "3f8f891b9152fdf07067d2c22a5788fb3367cd8b292805de65b93409ab68b324"
     },
     {
       "file": "mandate-experience.js",
@@ -719,13 +819,18 @@
     },
     {
       "file": "meeting-visuals.js",
-      "bytes": 13816,
-      "sha256": "a6d356fa41e2014c0787b51da6fe7b892f76ae7cb532e52ffc5a8c7b6c113ea3"
+      "bytes": 13820,
+      "sha256": "0a5207ffcb25c328ad78ed3b09ca084493f3e2f22918dfe94a06c690a0dd30c3"
     },
     {
       "file": "minister-performance.js",
       "bytes": 21278,
       "sha256": "0c39e3da6adf89e4ef110ecec80d37a654db885d7945b54ff5cba69ceabba5de"
+    },
+    {
+      "file": "ministry-envelopes.js",
+      "bytes": 17142,
+      "sha256": "50da5317d92b0baf5033549b466c690b76dc6f7d0ac24883cd74c9077d82d8cd"
     },
     {
       "file": "municipal-development.js",
@@ -741,6 +846,11 @@
       "file": "national-emergencies.js",
       "bytes": 8587,
       "sha256": "65318923251bceb6c079c6178c4ae95655e7805f58085332d16b9e3eb00b27d8"
+    },
+    {
+      "file": "navigation-laptop.css",
+      "bytes": 2261,
+      "sha256": "eabb981cc1bb9336ac65331d6f5fd24d001c1057798eaea1e2cfe7a911dd96f3"
     },
     {
       "file": "north-crisis.js",
@@ -779,8 +889,8 @@
     },
     {
       "file": "political-accountability.js",
-      "bytes": 9946,
-      "sha256": "f9198986f1ecdb07f7cd44b204c4af6190f01d0affaf35b65f5f7bcff101f009"
+      "bytes": 9938,
+      "sha256": "e2833f2f500e9ad347476f3317d2a309c5ba553549d6e974e7fc5f69beca2ea0"
     },
     {
       "file": "political-engagement.js",
@@ -789,8 +899,8 @@
     },
     {
       "file": "political-life-ui.js",
-      "bytes": 20879,
-      "sha256": "744d2094e08cc6f69fbe0ebd9e95c076b3080e643f2e26c49fe55321e6df98fb"
+      "bytes": 20957,
+      "sha256": "c8429826fe0a9a76558038cca9193bb552a2f244ff54d448daf8224ea90035db"
     },
     {
       "file": "political-life.css",
@@ -799,8 +909,8 @@
     },
     {
       "file": "political-life.js",
-      "bytes": 45465,
-      "sha256": "a3e788f8d68327c0e6b51816bb90de02c77408009e67bc00a7274ccd50dae104"
+      "bytes": 45759,
+      "sha256": "b806187540eeb65119778f7a396f1741b7b237d6aa02e595d71fb2ea03639c76"
     },
     {
       "file": "political-roles.js",
@@ -814,13 +924,28 @@
     },
     {
       "file": "population.js",
-      "bytes": 6027,
-      "sha256": "509afb8a2822133287aecb4d4a57a9f00a4db820c698bf16094f86ea863d0c41"
+      "bytes": 6019,
+      "sha256": "f9b2f8fce7893ef0b75e4710dd113132b5cb3774cddeabf518c40d39b511d9fd"
     },
     {
       "file": "post-election-flow.js",
       "bytes": 5391,
       "sha256": "7fac621471f2cf873fec8de6eb15b1b79b1e660d322028a272d526edaf7b292a"
+    },
+    {
+      "file": "premier-consequences.js",
+      "bytes": 22982,
+      "sha256": "0610ac1046e0bb59ec39b5def77ab1a4290ec77c3a3ba5b009ba56070d4ba550"
+    },
+    {
+      "file": "premier-episodes-extra.js",
+      "bytes": 31541,
+      "sha256": "6a0b4b27f764cae1abaf08afb78140a9a568d3b0fae30c3bfaf13c01276f31fd"
+    },
+    {
+      "file": "premier-episodes.js",
+      "bytes": 42353,
+      "sha256": "46ecb98b053fab116e22a07460011ff4ac2c686b2aa3ada064feea114ee4a67a"
     },
     {
       "file": "presidency.js",
@@ -849,8 +974,8 @@
     },
     {
       "file": "public-finance.js",
-      "bytes": 65039,
-      "sha256": "5bf44cc14fa44fe286e137aa12bc549646e23b8b49998c0386d2132c29877820"
+      "bytes": 65460,
+      "sha256": "0a407ed7bbd243a465f398fb0d13cd667a562559fddd532116c3f10ae246f43e"
     },
     {
       "file": "public-support.js",
@@ -865,7 +990,22 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "1aff7eb9873b98291ac264fdff55bf113b15c152223957adc6ceddb357c843a7"
+      "sha256": "aed4ba1d55062c31f0ff4b4abf11dffbbad5750f81f7094b1325eb0aedbb3a91"
+    },
+    {
+      "file": "regular-cabinet.js",
+      "bytes": 12813,
+      "sha256": "c2ed0e219df6f7ec5f235196fe80623515f1f2e569af51dd750e431c2bdde547"
+    },
+    {
+      "file": "release-notes.css",
+      "bytes": 5064,
+      "sha256": "6634bfd995136de2999172723378825cca06758ccec305b80cb49c342d00b812"
+    },
+    {
+      "file": "release-notes.js",
+      "bytes": 7240,
+      "sha256": "da6a35a192b15188ff0419932cd5bde75a03071b1d36776fff04209a20a7abb7"
     },
     {
       "file": "responsive-ui.js",
@@ -884,8 +1024,8 @@
     },
     {
       "file": "script.js",
-      "bytes": 557184,
-      "sha256": "c8e7874de00a22234fe76922239701969f5bfcddbcdc1c77f208e40d52227ad5"
+      "bytes": 557427,
+      "sha256": "283f3764befb4389533baefffc34c96481cdc4bdacecad28688f87c3197abad7"
     },
     {
       "file": "sector-expansion-data.js",
@@ -919,8 +1059,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 8515,
-      "sha256": "04e514f73c6f2899e3317c300540f121ff7ccf9b06d7f1d61cb84f5f68b039df"
+      "bytes": 9338,
+      "sha256": "182ee35b972375d758ac6d293b5d5260112db3f537c5763956ab2bef6b63f0dc"
     },
     {
       "file": "shadow-cabinet.js",
@@ -949,8 +1089,8 @@
     },
     {
       "file": "societal-dynamics.js",
-      "bytes": 40734,
-      "sha256": "920cb35779c42a57bfba17ef1d75048dad77a4f652715556bc2b216a2dd99f41"
+      "bytes": 40749,
+      "sha256": "f8653dac1c01944f1f708a01036def54b5b084d1ea9ec9e334bda9d69eb971f1"
     },
     {
       "file": "sovereign-fund.js",
@@ -959,8 +1099,8 @@
     },
     {
       "file": "state-calendar.js",
-      "bytes": 33098,
-      "sha256": "6aa7501ef973dfe1041949facdf55dd8442b67ef727bd822439335561ab87477"
+      "bytes": 33090,
+      "sha256": "8245bdce31669aea369a4e9ad3a12db22aa70673c5e67c26f0b3ff339f50bffe"
     },
     {
       "file": "state-development.js",
@@ -979,8 +1119,8 @@
     },
     {
       "file": "strategic-economy.js",
-      "bytes": 14774,
-      "sha256": "b5ae14c2f3a3c893d5f05696768ee162286e6a3e2f9023ea599f33f82861013a"
+      "bytes": 14742,
+      "sha256": "1d0b397ad36684544959ac55594f1dbdbc8fbb28767a3ab920fc4cdbe2f4bcef"
     },
     {
       "file": "strategic-reserves.js",

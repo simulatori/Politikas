@@ -314,10 +314,20 @@ function openConstituentSessionPanel() {
     switchMainTab("tab-assembly");switchSubTab("ass","constituent",document.getElementById("constituentTabBtn"));return true;
 }
 function stopConstituentAnimation() {if(constituentTimer!==null)clearInterval(constituentTimer);constituentTimer=null;}
+function constituentEntryRequired(st=state){
+    const cycle=constituentCycle(st),session=currentConstituentSession(st);
+    if(!cycle||session?.status==='COMPLETED')return false;
+    if(st.assemblyConstituted&&st.assemblyCycleId===cycle.id)return false;
+    return !constituentPrerequisite(st);
+}
+function renderConstituentEntry(){
+    const entry=document.getElementById('constituentEntryCard');if(!entry||!state)return;
+    const required=constituentEntryRequired(state);entry.hidden=!required;entry.style.display=required?'block':'none';
+}
 function renderConstituentSession() {
     var host=document.getElementById("constituentPanel");if(!host)return;
     var s=currentConstituentSession(),c=constituentComposition(state),problem=constituentPrerequisite(state),esc=electoralEscape;
-    var entry=document.getElementById("constituentEntryCard");if(entry)entry.style.display=(c && (!s || s.status!=="COMPLETED") || !state.assemblyConstituted)?"block":"none";
+    renderConstituentEntry();
     var html='<div class="card"><h3>Seanca konstituive e Kuvendit</h3><p>Kuvendi ka 120 deputetë. Kryetari dhe secili nënkryetar zgjidhen me të paktën 61 vota pro. Votat kundër, abstenimet dhe mungesat nuk llogariten si mbështetje.</p><p>Çdo subjekt paraqet kandidatin për postin që i takon. Ju propozoni kandidatët e partisë suaj dhe zgjidhni nëse do t’i mbështesni kandidatët e të tjerëve. Pas zgjedhjes së Kryetarit dhe pesë nënkryetarëve, seanca përfundon.</p>';
     if(problem)html+='<p role="alert">'+esc(problem)+'</p>';
     else {
