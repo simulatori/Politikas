@@ -216,6 +216,7 @@ function migrateCandidateRegistry(gameState) {
             used.add(record.id); return record;
         });
     });
+    Object.entries(gameState.parties).filter(([id,p])=>p.customFounded).forEach(([id,p])=>{registry[id]=[{id:'career-founder',name:p.leader,partyId:id,listNumber:1,source:p.founderActorId?'CAREER_PUBLIC':'MANUAL_SIMULATED',gender:null,genderStatus:'UNCONFIRMED'}];});
     gameState.candidateRegistry = registry;
     gameState.candidateRegistryVersion = 1;
     if (typeof gameState.manualCandidateCounter === "undefined") gameState.manualCandidateCounter = 0;
@@ -229,7 +230,7 @@ function validateCandidateRegistry(gameState) {
     var registry=gameState.candidateRegistry,ids=new Set();
     if (!registry || typeof registry!=="object" || Array.isArray(registry) || gameState.candidateRegistryVersion!==1 ||
         !Number.isInteger(gameState.manualCandidateCounter) || gameState.manualCandidateCounter<0) throw Error("Regjistri i kandidatëve është i pavlefshëm");
-    if(Object.keys(registry).some(function(partyId){return !Object.hasOwn(PROVIDED_CANDIDATE_LISTS,partyId) && !Object.hasOwn(BROCHURE_SUBJECTS,partyId);})){throw Error("Parti e panjohur në regjistrin e kandidatëve");}
+    if(Object.keys(registry).some(function(partyId){return !Object.hasOwn(PROVIDED_CANDIDATE_LISTS,partyId) && !Object.hasOwn(BROCHURE_SUBJECTS,partyId) && !gameState.parties[partyId]?.customFounded;})){throw Error("Parti e panjohur në regjistrin e kandidatëve");}
     Object.keys(PROVIDED_CANDIDATE_LISTS).forEach(function(partyId){if (!Array.isArray(registry[partyId])) throw Error("Mungon lista e kandidatëve për "+partyId);});
     Object.keys(registry).forEach(function(partyId) {
         if (!Array.isArray(registry[partyId])) throw Error("Mungon lista e kandidatëve për "+partyId);
@@ -267,6 +268,7 @@ function getCandidateCatalogue(gameState) {
 }
 
 function addManualElectoralCandidate(name) {
+    if(state.parties[state.playerParty]?.customFounded){showToast('Rekruto personazhe reale te organizimi i subjektit.');return false;}
     var list=getCurrentElectoralList(), partyId=state.playerParty;
     if (!list || list.status!=="DRAFT" || !state.candidateRegistry[partyId]) {showToast("Shtimi manual lejohet vetëm në draftin e partisë suaj.");return false;}
     if(!electoralListEditable(state,list))return false;
@@ -558,7 +560,7 @@ function renderElectoralList() {
         return !candidateBelongsToParty(catalogue.find(function(person) { return person.id === id; }), list.partyId);
     });
     var save = document.getElementById("saveElectoralListBtn"); if (save) save.disabled = locked;
-    var manual=document.getElementById("manualCandidateForm");if(manual)manual.hidden=locked||!records;
+    var manual=document.getElementById("manualCandidateForm");if(manual)manual.hidden=locked||!records||!!state.parties[state.playerParty]?.customFounded;
     var submit = document.getElementById("submitElectoralListBtn");
     if (submit) { submit.hidden = state.electionPhase !== "CAMPAIGN"; submit.disabled = locked; }
     var feedback = document.getElementById("electoralListValidation"); if (feedback) feedback.textContent = ELECTORAL_LIST_RULES.explanation;
