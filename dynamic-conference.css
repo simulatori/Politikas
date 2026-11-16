@@ -13,3 +13,9 @@
 @media(prefers-reduced-motion:reduce){.conference-box,.conference-option,.conference-flash{animation:none!important;transition:none!important}.conference-option:hover{transform:none}.conference-flash{display:none}}
 
 #dynamicConferenceModal > .workspace-back{display:none}
+
+/* Contextual evidence remains optional to expand, inside the same room. */
+.conference-dossier{margin:16px 0;border:1px solid #91b4d344;border-radius:12px;background:#08152566;padding:12px 15px;color:#bfd0e0;line-height:1.65;font-size:13px}.conference-dossier summary{cursor:pointer;min-height:32px;color:#e4c47f;font-weight:700}.conference-dossier p{margin:10px 0 0;overflow-wrap:anywhere}
+
+#deepOtherOffers{grid-column:1/-1}#deepOtherOffers>button{display:block;width:100%;margin-top:10px;white-space:normal;text-align:left}
+#meetingSceneModalContent .scene-dialogue:has(.conference-question){max-height:none;overflow:visible}
