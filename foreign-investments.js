@@ -9,7 +9,8 @@ function migrateForeignInvestments(st){
     if(![1,2].includes(db.version))throw Error('Version i panjohur i investimeve.');
     db.version=3;db.attractionCampaigns=[];db.bidders=[];db.stability={weeks:0,key:fdiGovernmentKey(st),riskSignature:fdiRiskSignature(st)};
 }
-function enableForeignInvestments(){if(state.foreignInvestments)return false;return fiscalCommit(function(){state.foreignInvestments={version:3,lastTurn:state.turnCount,revision:0,campaigns:[],offers:[],attractionCampaigns:[],bidders:[],stability:{weeks:0,key:fdiGovernmentKey(state),riskSignature:fdiRiskSignature(state)}};});}
+function foreignInvestmentInitialState(st){return {version:3,lastTurn:st.turnCount,revision:0,campaigns:[],offers:[],attractionCampaigns:[],bidders:[],stability:{weeks:0,key:fdiGovernmentKey(st),riskSignature:fdiRiskSignature(st)}};}
+function enableForeignInvestments(){if(state.foreignInvestments)return false;return fiscalCommit(function(){state.foreignInvestments=foreignInvestmentInitialState(state);});}
 function fdiCommit(change){if(typeof securityFDIBlocked==='function'&&securityFDIBlocked(state)){showToast('IHD-te jane bllokuar nga kriza nderkombetare.');return false;}const ticker=document.getElementById('mediaTickerText'),before=ticker?.textContent,notices=typeof governmentInvestmentSnapshot==='function'?governmentInvestmentSnapshot(state):null;const saved=fiscalCommit(function(){migrateForeignInvestments(state);change();validateForeignInvestments(state);});if(!saved&&ticker)ticker.textContent=before;if(saved&&notices&&typeof notifyGovernmentInvestmentChanges==='function')notifyGovernmentInvestmentChanges(notices,state);return saved;}
 function fdiDevelopment(st){const result={};['sec_edu','sec_police','sec_tech','sec_roads','sec_energy','sec_agri','sec_health'].forEach(id=>result[id]=typeof sectorManagementAverage==='function'?sectorManagementAverage(st,id):3);return result;}
 function fdiPoliticallyStable(st){return !!st.governmentFormed&&st.governmentStatus==='IN_OFFICE'&&!fdiInitialConditions(st)&&st.publicFinance.arrearsB<=1e-8&&!(st.darkPolitics?.exposedTurn===st.turnCount)&&(st.securityOps?.operations||[]).every(o=>!o.exposed||o.resolvedTurn!==st.turnCount);}
@@ -27,7 +28,7 @@ function fdiExcluded(st){
     (st.foreignInvestments?.offers||[]).filter(o=>['OFFERED','ACTIVE','COMPLETED'].includes(o.status)).forEach(o=>{if(mapping[o.type])ids.push(mapping[o.type]);});return [...new Set(ids)];
 }
 function fdiPools(focus,metrics,weeks,excluded){
-    const available=FDI_INVESTORS.filter(i=>(focus==='AUTO'||i.family===focus)&&!excluded.includes(i.id)&&fdiAttractionEligible(i,metrics,weeks));
+    const available=FDI_INVESTORS.filter(i=>!i.inboundOnly&&(focus==='AUTO'||i.family===focus)&&!excluded.includes(i.id)&&fdiAttractionEligible(i,metrics,weeks));
     return {normal:available.filter(i=>i.tier<4),legendary:available.filter(i=>i.tier===4)};
 }
 function fdiDrawInvestor(draw){
@@ -149,7 +150,7 @@ function validateForeignInvestments(st){
     function metrics(m){if(!m||Object.keys(m).length!==7||['sec_edu','sec_police','sec_tech','sec_roads','sec_energy','sec_agri','sec_health'].some(k=>!Number.isFinite(m[k])||m[k]<1||m[k]>10))fail();}
     db.attractionCampaigns.forEach((c,n)=>{
         const d=c.draw;if(c.id!=='attract-campaign:'+n||!integer(c.startTurn,0,st.turnCount)||c.dueTurn!==c.startTurn+3||!['ACTIVE','COMPLETED','CANCELLED'].includes(c.status)||!d||!(d.focus==='AUTO'||Object.hasOwn(FDI_FAMILIES,d.focus))||!integer(d.stableWeeks,0,c.startTurn)||!Array.isArray(d.excluded)||new Set(d.excluded).size!==d.excluded.length||d.excluded.some(id=>!fdiInvestor(id))||![d.legendRoll,d.sampleRoll].every(v=>Number.isFinite(v)&&v>=0&&v<1))fail();metrics(d.metrics);
-        if(!fdiPools(d.focus,d.metrics,d.stableWeeks,d.excluded).normal.length||fdiDrawInvestor(d)?.id!==c.investorId)fail();payment(c.paymentId,.0005,c.startTurn,'EXPENSE');actions++;
+        if(c.inboundOfferId){if(typeof inboundNativeCampaignValid!=='function'||!inboundNativeCampaignValid(st,c))fail();}else{if(!fdiPools(d.focus,d.metrics,d.stableWeeks,d.excluded).normal.length||fdiDrawInvestor(d)?.id!==c.investorId)fail();payment(c.paymentId,.0005,c.startTurn,'EXPENSE');}actions++;
         if(c.revealedTurn!==undefined&&(c.status!=='COMPLETED'||!integer(c.revealedTurn,c.dueTurn,st.turnCount)||c.revealedTurn>c.dueTurn&&!(typeof securityFDIDelayCovered==='function'&&securityFDIDelayCovered(st,c.dueTurn,c.revealedTurn))))fail();const count=db.bidders.filter(b=>b.campaignId===c.id).length;if(c.status==='COMPLETED'?count!==1||st.turnCount<c.dueTurn:count!==0)fail();if(c.status==='CANCELLED'&&!(typeof validIsolationCancellation==='function'&&validIsolationCancellation(st,c))&&(fdiBidderTerms(c).tier!==4||st.turnCount<c.dueTurn))fail();
     });
     db.bidders.forEach(b=>{

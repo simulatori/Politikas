@@ -76,7 +76,7 @@
         
         <div class="start-footer">
             <span class="start-tag" data-legislature-label>Legjislatura XI</span>
-            <span class="start-tag">Loja v120</span>
+            <span class="start-tag">Loja v121</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -142,7 +142,7 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
-            <p id="pwaVersion">Loja v120</p>
+            <p id="pwaVersion">Loja v121</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
@@ -979,7 +979,7 @@
                     <button class="sub-pill" id="diplomaticReportTab" onclick="openDiplomaticReport()">📊 Raporti Diplomatik</button>
                 </div>
 
-                <div id="dip-overview" class="sub-content"><section class="card" id="dinarCrisisPanel"></section><section class="card" id="councilEuropePanel"></section><section id="euAccessionPanel" class="card"></section><div id="diplomacyDashboard" class="diplomacy-dashboard"></div></div>
+                <div id="dip-overview" class="sub-content"><section class="card" id="dinarCrisisPanel"></section><section class="card" id="councilEuropePanel"></section><section id="foreignInvitationsPanel" class="card" hidden></section><section id="euAccessionPanel" class="card"></section><div id="diplomacyDashboard" class="diplomacy-dashboard"></div></div>
                 <div id="dip-dialogue" class="sub-content" style="display:none;">
                     <div id="dialogueBrusselsContainer"></div>
                 </div>
@@ -1241,6 +1241,7 @@
 <script src="party-career.js" defer></script>
 <script src="career-debates.js" defer></script>
 <script src="speech-editorial.js" defer></script>
+<script src="foreign-invitations.js" defer></script>
 <script type="module">
     // Dynamic CDN imports keep guest play working even when Firebase cannot load.
     try {
@@ -1293,5 +1294,7 @@
 <div id="decisionNightModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="decisionNightTitle"><section id="decisionNightBody" class="decision-night-box"></section></div>
 <div id="euAccessionModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Rruga evropiane"><section class="budget-notice-box" id="euAccessionNotice"></section></div>
 <div id="careerDebateModal" class="modal-overlay conference-overlay" role="dialog" aria-modal="true" aria-labelledby="careerDebateTitle"><section class="conference-box"><header class="conference-room-header"><strong id="careerDebateTitle">Studioja e debatit</strong><button class="btn-top" onclick="toggleModal('careerDebateModal',false)">Ruaj dhe dil</button></header><div class="conference-body" id="careerDebateBody"></div></section></div>
+<div id="foreignInvitationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="foreignInvitationTitle"><section class="foreign-invitation-box" id="foreignInvitationBody"></section></div>
+<button id="foreignInvitationReturn" class="btn-top foreign-invitation-return" hidden onclick="returnToForeignInvitation()">← Kthehu te oferta</button>
 </body>
 </html>
