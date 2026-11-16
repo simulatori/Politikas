@@ -103,7 +103,7 @@ function processGovernmentCrisesWeek(turn){
     }
     d.promises.filter(p=>p.status==='OPEN').forEach(function(p){
         if(p.governmentKey && p.governmentKey!==crisisGovernmentKey(state)){p.status='CANCELLED';return;}
-        if(crisisSectorMetric(state,p.sector)>p.baseline+.01){p.status='FULFILLED';d.credibility=clamp(d.credibility+5,0,100);}
+        if((typeof deepGovernancePromiseMetric==='function'?deepGovernancePromiseMetric(state,p):crisisSectorMetric(state,p.sector))>p.baseline+.01){p.status='FULFILLED';d.credibility=clamp(d.credibility+5,0,100);}
         else if(turn>=p.dueTurn){p.status='FAILED';crisisApproval(-4);d.credibility=clamp(d.credibility-8,0,100);state.historyLog.unshift('Premtimi 3-javor dështoi: ndëshkim i dyfishtë në mbështetje (-4 pikë).');}
     });
     if(!randomMinisterScandalAllowed(state))return;

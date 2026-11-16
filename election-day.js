@@ -164,7 +164,7 @@ function hasOpenElectionProcess() {
 function syncElectionDayAnimation() {
     var cycle=getElectionDayCycle(state);
     var running=cycle&&(cycle.status==="COUNTING" || cycle.status==="VOTING"&&cycle.votingProgress<100);
-    if(!running){stopElectionDayAnimation();return;}
+    if(!running||electionDayProgressError?.cycleId===cycle.id){stopElectionDayAnimation();return;}
     if(electionDayTimer===null)electionDayTimer=setInterval(function(){advanceElectionDayProcess();},500);
 }
 
@@ -184,22 +184,38 @@ function openElectionVoting() {
     try{cycle.results=generateElectionDayResults(cycle);}catch(error){showToast('Votimi nuk u hap: '+error.message);return false;}
     cycle.status="VOTING";cycle.openedAt=electionDayStamp();
     if(!saveGameAuto()){Object.assign(cycle,previous);return false;}
-    toggleModal("majorEventModal",false);openElectionDayPanel();renderElectionDayPanel();
+    electionDayProgressError=null;toggleModal("majorEventModal",false);openElectionDayPanel();renderElectionDayPanel();
     showToast("Vendvotimet u hapën në simulim. Votat janë regjistruar vetëm një herë për këtë cikël.");return true;
+}
+
+var electionDayProgressError=null;
+function electionCountRecoveryMarkup(cycle){if(!cycle||electionDayProgressError?.cycleId!==cycle.id)return "";return '<section class="card election-count-recovery" role="alert"><h3>Numërimi pret konfirmimin e hapit të radhës</h3><p>Votat e regjistruara janë ruajtur. Hapi i fundit nuk u konfirmua; rezultati nuk do të rigjenerohet.</p><p>'+catalogEscape(electionDayProgressError.message)+'</p><button class="action-btn" onclick="retryElectionDayCount()">Provo sërish hapin e numërimit</button><button class="action-btn" onclick="window.republikaCloudGame?.exportJSON()">Shkarko kopjen e lojës</button></section>';}
+function retryElectionDayCount(){electionDayProgressError=null;return advanceElectionDayProcess();}
+function completeElectionCounting(){
+    var advanced=false;
+    for(var step=0;step<16;step++){
+        var cycle=getElectionDayCycle(state);
+        if(!cycle||cycle.status!=="COUNTING"||electionDayProgressError?.cycleId===cycle.id)break;
+        if(typeof nightPending==='function'&&nightPending(cycle)){if(typeof openElectionNight==='function')openElectionNight();break;}
+        if(!advanceElectionDayProcess())break;
+        advanced=true;
+    }
+    return advanced;
 }
 
 function advanceElectionDayProcess() {
     var cycle=getElectionDayCycle(state);
     if(!cycle||!hasOpenElectionProcess())return false;
     var beforeState=JSON.stringify(state);
-    var previous={status:cycle.status,votingProgress:cycle.votingProgress,countingProgress:cycle.countingProgress,completedAt:cycle.completedAt};
+    try{
     if(cycle.status==="VOTING")cycle.votingProgress=Math.min(100,cycle.votingProgress+10);
     else {var domesticAlreadyComplete=cycle.countingProgress===100;cycle.countingProgress=Math.min(100,cycle.countingProgress+10);if(cycle.countingProgress===100 && (typeof advanceDiasporaCount!=='function'||advanceDiasporaCount(cycle,domesticAlreadyComplete))){cycle.status="RESULTS";cycle.completedAt=electionDayStamp();}}
     if(cycle.status==="RESULTS"){
-        try{reconcilePostElection(state);migrateAssemblyState(state);if(!storeAssemblyReport(cycle,assemblyMetadata(state,cycle),{deferCommit:true}))throw Error("Mandatet nuk u regjistruan.");}
-        catch(error){state=JSON.parse(beforeState);stopElectionDayAnimation();showToast(error.message);return false;}
+        reconcilePostElection(state);migrateAssemblyState(state);if(!storeAssemblyReport(cycle,assemblyMetadata(state,cycle),{deferCommit:true}))throw Error("Mandatet nuk u regjistruan.");
     }
-    if(!saveGameAuto()){state=JSON.parse(beforeState);stopElectionDayAnimation();return false;}
+    if(!saveGameAuto())throw Error("Hapi nuk u ruajt. Kontrollo hapësirën e pajisjes ose shkarko kopjen e lojës para se të provosh sërish.");
+    electionDayProgressError=null;
+    }catch(error){state=JSON.parse(beforeState);electionDayProgressError={cycleId:cycle.id,message:error.message||"Numërimi kërkon një provë tjetër."};stopElectionDayAnimation();showToast(electionDayProgressError.message);renderElectionDayPanel();if(typeof renderElectionNight==='function')renderElectionNight();return false;}
     if(cycle.status==="RESULTS"&&!(typeof electionNightDefersPublication==='function'&&electionNightDefersPublication(cycle))){
         var composition=getAssemblyComposition(),ready=composition?.status==='PUBLISHED';renderAssemblyComposition();renderPostElectionInvitation();if(ready)openConstituentSessionPanel();
         showMajorAnnouncement({badge:'ZGJEDHJET PËRFUNDUAN',title:ready?'Fillon konstituimi i Kuvendit':'Përbërja e Kuvendit kërkon plotësim',reason:ready?'U publikuan 120 mandate. Çdo grup parlamentar, përfshirë opozitën, mund të marrë pjesë në konstituim.':'Numërimi përfundoi, por ende nuk janë përcaktuar 120 mandate të vlefshme. Hapni përbërjen për të parë të dhënat që mungojnë.',immediateImpact:'Qeveria e mëparshme mbetet në detyrë me kompetenca të kufizuara. Kuvendi i ri nuk konstituohet automatikisht.',statsHtml:ready?'<button class="action-btn" onclick="openPostElectionTalks()">Hap ftesën për qeverisje</button><button class="action-btn" onclick="openConstituentSessionPanel()">Konstituimi i Kuvendit</button>':'<button class="action-btn" onclick="openElectionAssemblyResults()">Shqyrto përbërjen dhe të dhënat që mungojnë</button>'});
@@ -247,6 +263,7 @@ function renderElectionDayPanel() {
     if(cycle.manifest.diasporaPolicy && cycle.countingProgress===100)html+='<div class="card" id="diasporaCountStage"><h3>Numërimi i votave nga jashtë</h3><progress max="100" value="'+(cycle.diasporaCount?.progress||0)+'"></progress><p>'+(cycle.diasporaCount?.counted?'Numërimi përfundoi. Bonusi i simuluar i mandateve: '+cycle.manifest.diasporaPolicy.bonus:'Numërimi vazhdon…')+'</p></div>';
     if(cycle.status==='RESULTS' && cycle.manifest.modelVersion===2)html+=countingReportHtml(cycle);
     if(cycle.status==="RESULTS") html+='<button id="viewAssemblyCompositionBtn" class="action-btn btn-gold" onclick="openAssemblyComposition()">Përbërja e Kuvendit — kontrollo mandatet</button>';
+    html+=electionCountRecoveryMarkup(cycle);
     host.innerHTML=html;
     if(host.querySelectorAll)host.querySelectorAll("details[data-election-details]").forEach(function(detail){if(opened.includes(detail.getAttribute("data-election-details")))detail.open=true;});
     syncElectionDayAnimation();

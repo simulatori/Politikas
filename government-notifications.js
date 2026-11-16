@@ -50,10 +50,9 @@ function governmentNoticeCanPresent(n){
     const start=document.getElementById('startScreen');if(start&&!start.classList.contains('hidden'))return false;
     const weekly=document.getElementById('weekTransitionOverlay');if(weekly&&weekly.style.display&&weekly.style.display!=='none')return false;
     if(document.querySelector('dialog[open]:not(#governmentNotificationDialog)'))return false;
-    if(document.querySelector('.modal-overlay.show:not(#votingModal)'))return false;
-    if(document.getElementById('votingModal')?.classList.contains('show')){
-        if(n.kind!=='VOTE'||state.pendingVote?.governmentNotice?.id!==n.id||!currentVotingData||currentVotingData.totalCounted<120)return false;
-    }
+    // A top-layer notice must not cover the vote's finish/continue controls.
+    // The existing retry queue presents it after the voting room closes.
+    if(document.querySelector('.modal-overlay.show'))return false;
     return true;
 }
 function governmentNoticeElement(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;}

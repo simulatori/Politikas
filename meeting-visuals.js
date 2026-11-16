@@ -38,6 +38,7 @@ function openScheduledVisualMeeting(index){
     var before=JSON.stringify(state),c=scheduledVisualContext(m),key='visual:scheduled:'+m.id;
     if(!state.meetingScenes[key])politicalSceneJournal('scheduled:'+m.id,c.kind,'U hap takimi për '+m.topic+'. Nuk është arritur marrëveshje.','OPEN');
     if(strategyMeetingSupported(m))strategyFlow(m);
+    if(typeof prepareDeepMeeting==='function')prepareDeepMeeting(m);
     if(!saveGameAuto()){state=JSON.parse(before);return false;}
     politicalSceneReturnFocus=document.activeElement;renderScheduledVisualMeeting(index);toggleModal('interactiveActionModal',false);toggleModal('meetingSceneModal',true);return true;
 }
