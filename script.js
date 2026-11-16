@@ -5608,8 +5608,14 @@ function animateVoteStep() {
     }
 }
 
+function ensureVotingPresentation(){
+    if(state.pendingVote?.finalized&&(!currentVotingData||currentVotingData.completed))presentPendingVote();
+    if(!state.pendingVote&&!currentVotingData){toggleModal("votingModal",false);return false;}
+    return !!currentVotingData&&!currentVotingData.completed;
+}
+
 function skipVotingAnimation() {
-    if (!currentVotingData || currentVotingData.completed) return;
+    if (!ensureVotingPresentation()) return;
     clearInterval(votingAnimInterval);
     var v = currentVotingData;
     v.currentPro = v.targetPro;
@@ -5642,10 +5648,11 @@ function showVotingResult() {
     var resEl = document.getElementById("votingModalResult");
     if (resEl) resEl.innerHTML = currentVotingData.finalResultHtml;
     if(state.pendingVote?.governmentNotice && typeof showGovernmentNotification==='function')showGovernmentNotification(state.pendingVote.governmentNotice);
+    if(document.getElementById('votingModal')?.classList.contains('show')){proceedBtn?.scrollIntoView?.({block:'nearest',behavior:'instant'});proceedBtn?.focus?.({preventScroll:true});}
 }
 
 function finishVotingProcess() {
-    if (!currentVotingData || currentVotingData.completed) return;
+    if (!ensureVotingPresentation()) return;
     var pending = state.pendingVote;
     if (!pending || !pending.finalized) return;
     currentVotingData.completed = true;
