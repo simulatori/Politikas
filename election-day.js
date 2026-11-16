@@ -241,7 +241,7 @@ function announceElectionDay() {
 
 function renderElectionDayPanel() {
     var host=document.getElementById("electionDayPanel"),cycle=getElectionDayCycle(state),eligible=electionDayEligible(state);
-    var pill=document.getElementById("electionDayTabBtn");if(pill)pill.disabled=!eligible;
+    var pill=document.getElementById("electionDayTabBtn");if(pill)pill.disabled=!eligible&&!cycle;
     if(!host)return;
     if(!eligible){host.innerHTML='<p>Dita e zgjedhjeve aktivizohet pas përfundimit dhe mbylljes së fushatës trejavore.</p>';stopElectionDayAnimation();return;}
     if(!cycle){host.innerHTML='<div class="card"><h3>Kontrolloni listat zgjedhore</h3><p>'+electoralEscape(state.electionDayPreparationError||"Korrigjoni listën dhe provoni sërish.")+'</p><button class="action-btn" onclick="openElectionVoting()">Hape procesin e votimit</button></div>';return;}

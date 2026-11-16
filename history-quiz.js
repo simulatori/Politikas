@@ -42,22 +42,22 @@ function historyShuffle(items){const a=items.slice();for(let i=a.length-1;i>0;i-
 function drawHistoryQuestions(st){const ids=historyShuffle(HISTORY_QUESTIONS.map(q=>q.id)).slice(0,5),previous=st.historyQuiz.attempts.at(-1)?.questionIds;if(previous&&ids.every(id=>previous.includes(id)))ids[4]=HISTORY_QUESTIONS.find(q=>!ids.includes(q.id)).id;return ids;}
 function historyQuestion(id){return HISTORY_QUESTIONS.find(q=>q.id===id);}
 function historyQuizScore(r){return r.answers.filter(a=>a.correct).length;}
-function historyQuizReward(r){return r.kind==='EMERGENCY'?r.perCorrectB:(r.rewardB??.5);}
-function historyQuizBonus(r){return r.kind==='EMERGENCY'?0:(r.rewardB===undefined?.5:.005);}
+function historyQuizReward(r){return r.kind==='PARTY'?.0000025:r.kind==='EMERGENCY'?r.perCorrectB:(r.rewardB??.5);}
+function historyQuizBonus(r){return r.kind==='PARTY'?.0000025:r.kind==='EMERGENCY'?0:(r.rewardB===undefined?.5:.005);}
 function historyQuizRef(r){return r.kind==='EMERGENCY'?r.id:r.year;}
 function historyQuizRefArg(r){return r.kind==='EMERGENCY'?"'"+r.id+"'":String(r.year);}
 function historyQuizAttempt(ref){return state.historyQuiz?.attempts.find(r=>typeof ref==='string'?r.id===ref:r.year===ref&&r.kind!=='EMERGENCY');}
-function historyQuizPrefix(r){return r.kind==='EMERGENCY'?'Fondi Historik Emergjent: '+r.id:(r.rewardB===undefined?'Fondi Patriotik: ':'Fondi i Historisë: ')+r.year;}
+function historyQuizPrefix(r){return r.kind==='PARTY'?'Kuizi i partisë: '+r.ownerParty+':'+r.year:r.kind==='EMERGENCY'?'Fondi Historik Emergjent: '+r.id:(r.rewardB===undefined?'Fondi Patriotik: ':'Fondi i Historisë: ')+r.year;}
 function historyQuizEarned(r){return fiscalRound(historyQuizScore(r)*historyQuizReward(r)+(r.bonusId?historyQuizBonus(r):0));}
 function historyQuizPending(st){return st.historyQuiz?.attempts.find(r=>r.answers.length<5||r.feedbackIndex!==null);}
-function historyQuizMoney(b){return b>=1?'€'+b.toLocaleString('sq-AL')+' Miliardë':'€'+(b*1000)+' Milion';}
-function historyQuizCommit(change){return governmentCrisisCommit(()=>{migrateHistoryQuiz(state);change();});}
+function historyQuizMoney(b){if(b<.001)return '€'+Math.round(b*1e9).toLocaleString('sq-AL');return b>=1?'€'+b.toLocaleString('sq-AL')+' Miliardë':'€'+(b*1000)+' Milion';}
+function historyQuizCommit(change){if(!agendaExecutive()&&typeof careerEligible==='function'&&careerEligible())return lifeCommit(()=>{migrateHistoryQuiz(state);change();},false);return governmentCrisisCommit(()=>{migrateHistoryQuiz(state);change();});}
 function openHistoryQuiz(){
-    if(!agendaExecutive()){showToast('Fondi shtetëror menaxhohet nga Kryeministri.');return false;}
+    if(!agendaExecutive()&&!(typeof careerEligible==='function'&&careerEligible())){showToast('Kuizi kërkon rol politik aktiv.');return false;}
     let r=historyQuizPending(state)||state.historyQuiz?.attempts.find(r=>r.year===state.year&&r.kind!=='EMERGENCY');
     if(!r){const ok=historyQuizCommit(()=>{
         if(historyQuizPending(state)||state.historyQuiz.attempts.some(r=>r.year===state.year&&r.kind!=='EMERGENCY'))throw Error('Kuizi i këtij viti është nisur tashmë.');
-        state.historyQuiz.attempts.push({year:state.year,rewardB:.005,startTurn:state.turnCount,questionIds:drawHistoryQuestions(state),orders:Array.from({length:5},()=>historyShuffle([0,1,2,3])),answers:[],feedbackIndex:null,bonusId:null});
+        state.historyQuiz.attempts.push({year:state.year,kind:agendaExecutive()?'ANNUAL':'PARTY',ownerParty:agendaExecutive()?undefined:state.playerParty,rewardB:agendaExecutive()?.005:.0000025,startTurn:state.turnCount,questionIds:drawHistoryQuestions(state),orders:Array.from({length:5},()=>historyShuffle([0,1,2,3])),answers:[],feedbackIndex:null,bonusId:null});
     });if(!ok)return false;r=state.historyQuiz.attempts.at(-1);}
     renderHistoryQuiz(historyQuizRef(r));toggleModal('interactiveActionModal',true);return true;
 }
@@ -66,14 +66,14 @@ function answerHistoryQuiz(year,questionId,option){
         const r=historyQuizAttempt(year),q=historyQuestion(questionId);
         if(!r||!q||r.answers.length>=5||r.feedbackIndex!==null||r.questionIds[r.answers.length]!==questionId||!Number.isInteger(option)||option<0||option>3)throw Error('Kjo pyetje është përgjigjur ose zgjedhja nuk është e vlefshme.');
         const correct=option===q.correct;let receiptId=null;
-        if(correct){fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB+historyQuizReward(r)),historyQuizPrefix(r)+':'+questionId,'REVENUE');receiptId=state.publicFinance.ledger.at(-1).id;}
+        if(correct){receiptId=historyQuizAward(r,historyQuizPrefix(r)+':'+questionId,historyQuizReward(r));}
         r.answers.push({questionId,option,correct,turn:state.turnCount,receiptId});r.feedbackIndex=r.answers.length-1;
-        if(r.kind!=='EMERGENCY'&&r.answers.length===5&&historyQuizScore(r)===5){fiscalSetBalance(state,'budgetTotalB',fiscalRound(state.budgetTotalB+historyQuizBonus(r)),historyQuizPrefix(r)+':BONUS','REVENUE');r.bonusId=state.publicFinance.ledger.at(-1).id;}
+        if(r.kind!=='EMERGENCY'&&r.answers.length===5&&historyQuizScore(r)===5){r.bonusId=historyQuizAward(r,historyQuizPrefix(r)+':BONUS',historyQuizBonus(r));}
     });if(ok)renderHistoryQuiz(year);return ok;
 }
 function continueHistoryQuiz(year,index){const ok=historyQuizCommit(()=>{const r=historyQuizAttempt(year);if(!r||r.feedbackIndex!==index||index!==r.answers.length-1)throw Error('Ky hap është përfunduar.');r.feedbackIndex=null;});if(ok)renderHistoryQuiz(year);return ok;}
 function historyQuizPanelMarkup(){
-    const pending=historyQuizPending(state),used=state.historyQuiz?.attempts.find(r=>r.year===state.year&&r.kind!=='EMERGENCY'),r=pending||used;
+    if(typeof careerEligible==='function'&&careerEligible())return '<h3>Kuizi historik · fondi i partisë</h3><p>5 pyetje për Kosovën · €2,500 për përgjigje të saktë; deri €15,000 me bonusin. Një mundësi në vit, e përbashkët me kuizin qeveritar. Nuk preket arka shtetërore.</p><button class="action-btn" onclick="openHistoryQuiz()">Hap kuizin historik</button>';const pending=historyQuizPending(state),used=state.historyQuiz?.attempts.find(r=>r.year===state.year&&r.kind!=='EMERGENCY'),r=pending||used;
     return '<h3>🏛️ Fondi Patriotik · Kuizi Historik</h3><p>5 pyetje · €5 Milion për përgjigje të saktë · €30 Milion gjithsej me 5/5. Një mundësi për çdo vit të lojës.</p>'+(used&&used.answers.length===5?'<p>Fondi '+used.year+': '+historyQuizScore(used)+'/5 · '+historyQuizMoney(historyQuizEarned(used))+' të arkëtuara. Mundësia e re hapet në '+(state.year+1)+'.</p>':'')+'<button class="action-btn btn-gold" data-history-quiz-open '+(!agendaExecutive()?'disabled':'')+' onclick="openHistoryQuiz()">'+(r&&r.answers.length<5?'Vazhdo Kuizin Historik':used?'Shiko rezultatin':'Kuizi Historik Vjetor')+'</button>'+(!agendaExecutive()?'<p>Kërkon mandatin e Kryeministrit.</p>':'');
 }
 function renderHistoryQuizPanel(){const host=document.getElementById('historyQuizPanel');if(host)host.innerHTML=historyQuizPanelMarkup();}
@@ -81,7 +81,7 @@ renderDashboard=function(){historyDashboardBase();renderHistoryQuizPanel();};
 renderPublicFinance=function(){historyFiscalBase();const host=document.getElementById('fiscalPanelContainer');if(host&&typeof host.insertAdjacentHTML==='function')host.insertAdjacentHTML('beforeend','<section class="card">'+historyQuizPanelMarkup()+'</section>');};
 function renderHistoryQuiz(year){
     const r=historyQuizAttempt(year),host=document.getElementById('interactiveActionModalContent');if(!r||!host)return;
-    let html='<section class="history-quiz"><p class="history-quiz-kicker">Fondi Patriotik · '+r.year+'</p><h2>Kuizi i Historisë Kombëtare</h2><p>'+r.answers.length+'/5 përgjigje · '+historyQuizScore(r)+' të sakta · <strong>'+historyQuizMoney(historyQuizEarned(r))+' të arkëtuara</strong></p><progress max="5" value="'+r.answers.length+'" aria-label="Progresi i kuizit"></progress>';
+    let html='<section class="history-quiz"><p class="history-quiz-kicker">'+(r.kind==='PARTY'?'Fondi i partisë':'Fondi Patriotik')+' · '+r.year+'</p><h2>Kuizi i Historisë Kombëtare</h2><p>'+r.answers.length+'/5 përgjigje · '+historyQuizScore(r)+' të sakta · <strong>'+historyQuizMoney(historyQuizEarned(r))+' të arkëtuara</strong></p><progress max="5" value="'+r.answers.length+'" aria-label="Progresi i kuizit"></progress>';
     if(r.feedbackIndex!==null){
         const a=r.answers[r.feedbackIndex],q=historyQuestion(a.questionId),source=HISTORY_QUIZ_SOURCES[q.source];
         html+='<div class="history-quiz-feedback '+(a.correct?'is-correct':'is-wrong')+'" role="status"><h3>'+(a.correct?'✓ Saktë! +'+historyQuizMoney(historyQuizReward(r)):'Përgjigjja nuk ishte e saktë')+'</h3><p><strong>'+catalogEscape(q.options[q.correct])+'</strong></p><p>'+catalogEscape(q.explanation)+'</p><a href="'+catalogEscape(source.url)+'" target="_blank" rel="noopener noreferrer">Burimi: '+catalogEscape(source.title)+'</a></div>'+(r.bonusId?'<p class="history-quiz-grand">🏆 5/5! Bonusi është regjistruar.</p>':'')+'<button class="action-btn btn-gold" onclick="continueHistoryQuiz('+historyQuizRefArg(r)+','+r.feedbackIndex+')">'+(r.answers.length===5?'Shiko përmbledhjen':'Pyetja tjetër')+'</button>';
