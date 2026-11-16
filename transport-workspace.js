@@ -122,7 +122,7 @@ function renderTransportFleets(){
 
 function workspaceSnapshot(){const tab=document.querySelector('.tab-view.active');if(!tab)return null;const sub=Array.from(tab.querySelectorAll('.sub-content')).find(el=>el.style.display!=='none');return {tab:tab.id,sub:sub?.id||null};}
 function workspaceRemember(){if(workspaceReplaying)return;const next=workspaceSnapshot();if(next&&JSON.stringify(next)!==JSON.stringify(workspaceHistory.at(-1))){workspaceHistory.push(next);if(workspaceHistory.length>40)workspaceHistory.shift();}}
-function workspaceSyncNav(tab){document.querySelectorAll('.bottom-nav .nav-item').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes("'"+tab+"'")));}
+function workspaceSyncNav(tab){document.querySelectorAll('.bottom-nav .nav-item').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===tab||b.getAttribute('onclick')?.includes("'"+tab+"'")));}
 switchMainTab=function(tab,button){
     const aliases={'tab-production':'renderProductionResources','tab-sectors':'renderStateSectorsGrid','tab-transport':'renderTransportFleets'};
     if(aliases[tab]&&!agendaExecutive()){showToast('Këto asete menaxhohen nga qeveria në detyrë.');return false;}
@@ -148,7 +148,7 @@ function workspaceEnhanceBack(){
 }
 function installWorkspaceNavigation(){
     const nav=document.querySelector('.bottom-nav'),gov=document.getElementById('tab-government');if(!nav||!gov||document.getElementById('tab-production'))return;
-    const before=Array.from(nav.querySelectorAll('.nav-item')).find(b=>b.getAttribute('onclick')?.includes('tab-elections'));
+    const before=Array.from(nav.querySelectorAll('.nav-item')).find(b=>b.dataset.mainTab==='tab-elections'||b.getAttribute('onclick')?.includes('tab-elections'));
     for(const [key,label,icon,panel] of [['production','Prodhimi','🏭','gov-production'],['sectors','Reformat','⭐','gov-sectors'],['transport','Transporti','🚌',null]]){
         const full={production:'Prodhimi dhe Resurset',sectors:'Reformat Sektoriale',transport:'Transporti dhe Flotat'}[key];
         const button=document.createElement('button');button.className='nav-item';button.id=key==='production'?'productionTab':'workspaceNav-'+key;button.title=full;button.setAttribute('onclick',"switchMainTab('tab-"+key+"',this)");button.innerHTML='<span class="nav-icon">'+icon+'</span><span class="nav-label-wide">'+full+'</span><span class="nav-label-compact">'+label+'</span>';nav.insertBefore(button,before);

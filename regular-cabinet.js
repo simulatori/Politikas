@@ -14,7 +14,7 @@ function openRegularCabinet(){
     if(!regularCabinetDue()||urgentInterfaceBusy())return false;
     let s=regularCabinetDB().session;
     if(!s||s.status!=='ACTIVE'){
-        if(!lifeCommit(()=>{const d=regularCabinetSync(),previous=d.session,number=previous?.number||++d.counter;d.session={id:'cabinet-session:'+number,number,status:'ACTIVE',startedTurn:previous?.startedTurn??state.turnCount,postponed:!!previous?.postponed,items:state.cabinetAgenda.filter(a=>regularCabinetEligible(a)).map(a=>a.id),decisions:[]};}))return false;
+        if(!lifeCommit(()=>{if(typeof prepareMinisterCabinetAgenda==='function')prepareMinisterCabinetAgenda();const d=regularCabinetSync(),previous=d.session,number=previous?.number||++d.counter;d.session={id:'cabinet-session:'+number,number,status:'ACTIVE',startedTurn:previous?.startedTurn??state.turnCount,postponed:!!previous?.postponed,items:state.cabinetAgenda.filter(a=>regularCabinetEligible(a)).map(a=>a.id),decisions:[]};}))return false;
     }
     renderRegularCabinet();toggleModal('regularCabinetModal',true);document.querySelector('#regularCabinetBody button')?.focus?.({preventScroll:true});return true;
 }
@@ -49,7 +49,7 @@ resolveCabinetDecision=function(index,mode){
     const before=JSON.stringify(state),id=state.cabinetAgenda[index]?.id,result=regularCabinetResolveBase(index,mode);
     if(id&&state.cabinetAgenda.find(a=>a.id===id)?.done&&['FULL_APPROVE','MODIFIED_BUDGET'].includes(mode)){
         const s=regularCabinetDB()?.session;
-        if(s?.status==='ACTIVE'&&s.items.includes(id)&&!s.decisions.some(r=>r.itemId===id))try{recordRegularCabinetDecision(id,mode);validateLoadedState(state);if(!saveGameAuto())throw Error('Procesverbali nuk u ruajt; vendimi u anulua.');}catch(error){state=JSON.parse(before);showToast(error.message);refreshAllUI();return false;}
+        if(s?.status==='ACTIVE'&&s.items.includes(id)&&!s.decisions.some(r=>r.itemId===id)||state.cabinetAgenda.find(a=>a.id===id)?.aiProposal)try{recordRegularCabinetDecision(id,mode);if(typeof recordCabinetIntelligenceDecision==='function')recordCabinetIntelligenceDecision(id,mode);validateLoadedState(state);if(!saveGameAuto())throw Error('Procesverbali nuk u ruajt; vendimi u anulua.');}catch(error){state=JSON.parse(before);showToast(error.message);refreshAllUI();return false;}
     }
     return result;
 };

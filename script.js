@@ -928,11 +928,11 @@ function createFreshState(mode = "REALITY_OCT2026", chosenParty = "LVV", customI
     });
 
     if (customInfo) {
-        partiesClone[chosenParty].name = customInfo.partyName;
-        partiesClone[chosenParty].short = customInfo.partyName.substring(0, 14);
-        partiesClone[chosenParty].leader = customInfo.leaderName;
-        partiesClone[chosenParty].candidates[0].name = customInfo.leaderName;
-        partiesClone[chosenParty].candidates[0].simulated = true;
+        chosenParty = 'CIVIC_NEW'; mode = 'REALITY_OCT2026';
+        const safe = v => String(v||'').replace(/[<>\"&]/g,'').trim().slice(0,100);
+        const name=safe(customInfo.partyName)||'Alternativa e Re', leader=safe(customInfo.leaderName)||'Lider i Ri';
+        partiesClone[chosenParty]={id:chosenParty,name,short:name.slice(0,18),leader,deputyLeaders:[],ideology:customInfo.movement?'Lëvizje qytetare':'Parti e re',color:'#55bca4',tagClass:'tag-min',seats:0,poll:.1,partyFunds:0,internalCohesion:70,relations:{},customFounded:true,founderActorId:customInfo.actorId||null,candidates:[{id:'career-founder',name:leader,gender:null,region:'PRISHTINA',pop:0,loyalty:80,role:'Themelues në skenarin e lojës',simulated:!customInfo.actorId}],reserves:[]};
+        Object.keys(partiesClone).forEach(k=>{if(k!==chosenParty){partiesClone[k].poll*=.999;partiesClone[k].relations[chosenParty]=50;partiesClone[chosenParty].relations[k]=50;}});
     }
 
     const isPostElectionAlt = (mode === "ALT_POST_ELECTION");
@@ -6653,7 +6653,6 @@ function levelColor(level) {
 
 function renderElectionsSection() {
     renderParliamentaryElectionAccess();
-    renderMunicipalities();
     renderCampaignPanel();
     renderElectionDayPanel();
 }
@@ -8101,10 +8100,10 @@ function switchMainTab(tabId, navBtn) {
         document.querySelectorAll(".bottom-nav .nav-item").forEach(function(b) { b.classList.remove("active"); });
         navBtn.classList.add("active");
     } else {
-        var mapIdx = { "tab-dashboard": 0, "tab-party": 1, "tab-assembly": 2, "tab-government": 3, "tab-elections": 4, "tab-diplomacy": 5, "tab-development": 6, "tab-catalog": 7 };
+        var mapIdx = {};
         var btns = document.querySelectorAll(".bottom-nav .nav-item");
         btns.forEach(function(b) { b.classList.remove("active"); });
-        if (btns[mapIdx[tabId]]) btns[mapIdx[tabId]].classList.add("active");
+        var matched = Array.from(btns).find(b=>b.dataset.mainTab===tabId||(b.getAttribute("onclick")||"").includes("'"+tabId+"'"));if(matched)matched.classList.add("active");
     }
     renderVisibleWorkspace();
     if(window.matchMedia && window.matchMedia('(max-width: 1024px)').matches){
@@ -8145,6 +8144,7 @@ function initializeAssemblyTabs() {
     });
 }
 function switchSubTab(prefix, subKey, pillBtn) {
+    if(prefix==='elec'&&subKey==='municipalities'){switchMainTab('tab-municipalities');return;}
     if(prefix==='dash' && subKey==='development'){openStateDevelopment();return;} // Compatibility for old links.
     if(prefix==='gov' && subKey==='meeting' && !assertGovernmentAuthority('Mbledhja e Qeverisë'))return false;
     if(prefix === "ass"){
@@ -8152,7 +8152,7 @@ function switchSubTab(prefix, subKey, pillBtn) {
         pillBtn=document.querySelector('[data-assembly-tab="'+subKey+'"]');
         if(!pillBtn || !document.getElementById("ass-"+subKey))return;
     }
-    if (prefix === "elec" && subKey === "voting" && !electionDayEligible(state)) {
+    if (prefix === "elec" && subKey === "voting" && !electionDayEligible(state) && !getElectionDayCycle(state)) {
         showToast("Përfundoni dhe mbyllni fillimisht fushatën trejavore."); return;
     }
     if (prefix === "elec" && subKey === "campaignplay" && (!state.electionCampaign || state.electionCampaign.moduleVersion !== 3 || !["CAMPAIGN","CAMPAIGN_CLOSED"].includes(state.electionPhase))) {
