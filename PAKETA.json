@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-16",
-  "cacheVersion": "v120",
+  "cacheVersion": "v121",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -174,8 +174,8 @@
     },
     {
       "file": "constitutional-court.js",
-      "bytes": 11625,
-      "sha256": "ed0b3a9f0f717c1484bab3446206479d2a75b26bf76b371ad2595d68502b2bb6"
+      "bytes": 11664,
+      "sha256": "d16792e1702093451d1e43538f61a4c62b6c12408b6b7ed1e45175a656823d29"
     },
     {
       "file": "contextual-meetings.js",
@@ -194,8 +194,8 @@
     },
     {
       "file": "cooperation.css",
-      "bytes": 4142,
-      "sha256": "71abb16bda5853410bfc58cbe79b284fafe918168a7ba1be707c8e9af201aea4"
+      "bytes": 6103,
+      "sha256": "7311915f20a9c481964179235471863482f53d24f08a6e40be83fc5a6f3d8d68"
     },
     {
       "file": "cooperation.js",
@@ -574,8 +574,13 @@
     },
     {
       "file": "foreign-investments.js",
-      "bytes": 37573,
-      "sha256": "aebbea8f7ca77e906fbc2941d126ed90f2f3d58393b29a666534afd02fb4cc72"
+      "bytes": 37789,
+      "sha256": "f858c3f9ec2edf0c14fb747ccf062659e11ed678176f09d6adab86477a5dc77f"
+    },
+    {
+      "file": "foreign-invitations.js",
+      "bytes": 30205,
+      "sha256": "3aaff41700761d94e433204689501fa392a00cf1bca2d1f0a2f0937191a2f700"
     },
     {
       "file": "future-opportunities.js",
@@ -664,8 +669,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 101266,
-      "sha256": "f8475a7a8bd6b6fc3b754dcfa63487fc8cca094ad993177d80fe696ca5ce7d21"
+      "bytes": 101766,
+      "sha256": "122933cde036e34f783ed366083448ae4b06d957f89ee61d7cbd60499ca98e8e"
     },
     {
       "file": "influence-network.js",
@@ -789,8 +794,8 @@
     },
     {
       "file": "local-obstructions.js",
-      "bytes": 6239,
-      "sha256": "f1872413217b06020b0089c389dfb07a764b064326f5ec8a4f7351147878fae2"
+      "bytes": 6323,
+      "sha256": "219d2e441ab302a8f4a1ab961b1a9d35c4f5744002047877c7a8b18d43e98589"
     },
     {
       "file": "logo.png",
@@ -1025,7 +1030,7 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "fc06a77d33a315dd2c35c59c61597e839fb90d666ddc48841b0fb24348bc60a4"
+      "sha256": "28de92cd18e7881390c0d60d67e6b6d998b0bbde4cb4b0e1ce51dca273a37e5a"
     },
     {
       "file": "regular-cabinet.js",
@@ -1094,8 +1099,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 9543,
-      "sha256": "c936af8f5865b25ce350bc385240428f6119d54b6612f4689ccc9a5dc472faf5"
+      "bytes": 9571,
+      "sha256": "ef8839f98ba7694bd139031eaaa0ac1fa4326a60bd657e9550ecd6b9ea7e8571"
     },
     {
       "file": "shadow-cabinet.js",
