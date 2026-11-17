@@ -3184,7 +3184,7 @@ function voteNoConfidenceMotion(motionId) {
     var myPartyIsOpposition = !state.coalitionParties.includes(state.playerParty);
 
     state.mps.forEach(function(mp) {
-        if(motion.partyAI){if(specialBlockedSeats(state).has(mp.seatNumber)){mungese++;return;}if(!state.coalitionParties.includes(mp.party)||state.approval<=30&&mp.rebelRisk&&(mp.loyalty||50)<60)pro++;else kunder++;return;}
+        if(motion.partyAI){if(specialBlockedSeats(state).has(mp.seatNumber)){mungese++;return;}if(oppositionPledges().some(p=>p.seat===mp.seatNumber)||!state.coalitionParties.includes(mp.party)||state.approval<=30&&mp.rebelRisk&&(mp.loyalty||50)<60)pro++;else kunder++;return;}
         if(motion.lifeNetwork){if(lifeNoConfidenceVote(mp,state))pro++;else kunder++;return;}
         if(motion.coalitionBlackmailId){if(coalitionBlackmailMotionVote(motion,mp))pro++;else kunder++;return;}
         if(motion.veteransBudgetMotion){if(!state.coalitionParties.includes(mp.party)||specialBlockedSeats(state).has(mp.seatNumber))pro++;else kunder++;return;}
@@ -5916,7 +5916,7 @@ function openMotionModal() {
             '<select id="motionType" style="width:100%;">' +
                 '<option value="DEBATE">Mocion për Debat Parlamentar</option>' +
                 '<option value="INQUIRY">Interpelancë</option>' +
-                '<option value="NO_CONFIDENCE">Mocion Mosbesimi ndaj Qeverisë</option>' +
+                '<option value="NO_CONFIDENCE">Mocion Mosbesimi ndaj Qeverisë · €120,000</option>' +
             '</select>' +
         '</div>' +
         '<div style="margin-bottom:10px;">' +
@@ -5945,6 +5945,8 @@ function proposeMotion() {
         showToast("Titulli i mocionit duhet të jetë të paktën 5 karaktere!");
         return;
     }
+
+    if(type==='NO_CONFIDENCE'&&!agendaExecutive()){const ok=callOppositionMotion();if(ok)toggleModal('interactiveActionModal',false);return ok;}
 
     var dup = state.motions.find(function(m) {
         return m.status === "PENDING" && m.title.toLowerCase() === title.toLowerCase();
