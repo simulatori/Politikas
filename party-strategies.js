@@ -38,10 +38,11 @@ function processPartyStrategiesWeek(turn){
   else if(role==='OPPOSITION'&&!partyAISilenced(state,party)&&scandal&&!d.actions.some(a=>a.party===party&&a.context===scandal.id)&&partyAIApproach(party)==='PRAGMATIC'){action.strategy='NEGOTIATE';action.context=scandal.id;action.text='Shfrytëzon dobësimin e qeverisë për të kërkuar garanci programore. Mbështetja duhet të negociohet ende në procedurën e ligjit.';}
   else if(role==='OPPOSITION'&&!partyAISilenced(state,party)&&scandal&&!d.actions.some(a=>a.party===party&&a.context===scandal.id)&&partyAIApproach(party)==='MOBILIZE'&&pay(15000)){action.strategy='MOBILIZE';action.context=scandal.id;action.poll=partyAIPollTransfer(party,state.mandatar,.15);action.text='Organizoi tubim pas skandalit, me pagesë nga fondet e partisë.';}
   else if(role==='OPPOSITION'&&!partyAISilenced(state,party)&&scandal&&!d.actions.some(a=>a.party===party&&a.context===scandal.id)&&state.mps.some(m=>m.party===party)&&pay(10000)){action.strategy='INVESTIGATE';action.context=scandal.id;action.motion=partyAIMotion(party,'INQUIRY',scandal.id);action.poll=partyAIPollTransfer(party,state.mandatar,.2);action.text='Kërkoi interpelancë pas skandalit; financoi ekspertizën nga partia.';}
-  else if(role==='OPPOSITION'&&!partyAISilenced(state,party)&&state.approval<45&&turn%4===electionSeed(party)%4&&pay(15000)){action.strategy='MOBILIZE';action.poll=partyAIPollTransfer(party,state.mandatar,.25);action.text='Zhvilloi tubim për pakënaqësinë qytetare; fondet u paguan nga partia.';const seats=state.mps.filter(m=>!state.coalitionParties.includes(m.party)&&m.party!==state.playerParty&&!specialBlockedSeats(state).has(m.seatNumber)).length;if(state.approval<=35&&seats>=61)action.motion=partyAIMotion(party,'NO_CONFIDENCE',deputyCycleId(state));}
+  else if(role==='OPPOSITION'&&!partyAISilenced(state,party)&&state.approval<45&&turn%4===electionSeed(party)%4&&pay(15000)){action.strategy='MOBILIZE';action.poll=partyAIPollTransfer(party,state.mandatar,.25);action.text='Zhvilloi tubim për pakënaqësinë qytetare; fondet u paguan nga partia.';action.motion=partyAICheckConfidence(party,turn);}
   else if(role==='COALITION'){action.strategy='NEGOTIATE';action.text='Kërkon përputhje me programin në negociatat për ligje; marrëveshjet ekzistuese mbeten në fuqi.';}
   else if(role==='PAUSED'){action.strategy='PAUSED';action.text='Pret formimin e qeverisë; nuk ndërmerr veprime ekzekutive.';}
   else if(pay(3000)){action.strategy='ORGANIZE';action.text='Organizon degët dhe ruan fondet për fushatën.';}
+  if(!action.motion&&role==='OPPOSITION')action.motion=partyAICheckConfidence(party,turn);
   action.afterFunds=p.partyFunds;d.actions.push(action);d.parties[party]={turn,strategy:action.strategy,role,actionId:action.id};
  }
  syncElectoralMemory(state);return true;
@@ -70,6 +71,21 @@ function validatePartyStrategies(st){
  for(const c of st.localElections?.cycles||[]){if(c.rivalFundingModel===undefined)continue;if(c.rivalFundingModel!=='PARTY_FUNDS_V1'||!Array.isArray(c.rivalSpending))bad();const ids=new Set();for(const x of c.rivalSpending){const a=d.actions.find(a=>a.id===x.actionId),city=c.municipalities.find(m=>m.id===x.city);if(ids.has(x.actionId)||!a||a.strategy!=='LOCAL'||a.localCycle!==c.id||a.party!==x.party||x.party===c.owner||a.city!==x.city||a.round!==x.round||a.turn!==x.turn||a.cost!==x.amount||!city||![1,2].includes(x.round)||!Number.isSafeInteger(x.amount)||x.amount<1000||partyAILocalSpent(c,x.party,x.city,x.round)>city.voters*2)bad();ids.add(x.actionId);}
   for(const city of c.municipalities)for(const result of [city.first,city.runoff].filter(Boolean))if(JSON.stringify(result.inputs.rivalFunding)!==JSON.stringify(partyAILocalFunding(st,c,city,result.round,result.inputs.turn)))bad();
  }
- for(const m of st.motions.filter(m=>m.partyAI)){if(!st.parties[m.partyAI.party]||typeof m.partyAI.context!=='string'||typeof m.partyAI.cycle!=='string'||!['INQUIRY','NO_CONFIDENCE'].includes(m.type))bad();}
+ for(const m of st.motions.filter(m=>m.partyAI)){if(m.partyAI.dueTurn!==undefined&&(!Number.isInteger(m.partyAI.dueTurn)||m.partyAI.dueTurn!==m.week+1||!Array.isArray(m.partyAI.signatures)||m.partyAI.signatures.length<40||new Set(m.partyAI.signatures).size!==m.partyAI.signatures.length||m.partyAI.signatures.some(n=>!Number.isInteger(n)||n<1||n>120)))bad();if(!st.parties[m.partyAI.party]||typeof m.partyAI.context!=='string'||typeof m.partyAI.cycle!=='string'||!['INQUIRY','NO_CONFIDENCE'].includes(m.type))bad();}
 }
 validateLoadedState=function(st){aiValidate(st);validatePartyStrategies(st);return st;};
+
+/* Parliamentary opponents initiate scrutiny even when the player has no seat. */
+function partyAICheckConfidence(party,turn){
+ if(!partyAIGovernmentActive(state)||partyAISilenced(state,party)||!state.assemblyConstituted||!state.speakerElected||!state.mps.some(m=>m.party===party))return null;
+ const blocked=specialBlockedSeats(state),signers=state.mps.filter(m=>!state.coalitionParties.includes(m.party)&&!blocked.has(m.seatNumber));
+ if(signers.length<40||state.approval>50||state.approval>45&&turn-(state.governance?.partyCareer?.startTurn??1)<12)return null;
+ const recent=state.motions.some(m=>m.type==='NO_CONFIDENCE'&&(m.status==='PENDING'&&(!m.partyAI||m.partyAI.cycle===deputyCycleId(state))||turn-(m.week??turn)<12));if(recent)return null;
+ const id=partyAIMotion(party,'NO_CONFIDENCE',deputyCycleId(state)+':review:'+Math.floor(turn/12));if(id){const m=state.motions.find(m=>m.id===id);m.partyAI.signatures=signers.map(m=>m.seatNumber);m.partyAI.dueTurn=turn+1;m.desc='Opozita ka mbledhur '+signers.length+' nënshkrime për shqyrtim. Miratimi kërkon 61 vota; rezultati varet nga qëndrimi i deputetëve.';addMediaNews('Kuvendi','Opozita dorëzon mocion mosbesimi', 'NEUTRAL',m.desc);}return id;
+}
+let partyAIMotionTimer=null;
+function schedulePartyAIMotion(){if(partyAIMotionTimer!==null)return;partyAIMotionTimer=setTimeout(()=>{partyAIMotionTimer=null;if(weeklyProcessing||weeklyVisualBusy||state.pendingVote||hasOpenElectionProcess()||urgentInterfaceBusy()||document.querySelector('.modal-overlay.show,dialog[open]')||!document.getElementById('startScreen')?.classList.contains('hidden'))return;const m=state.motions.find(m=>m.partyAI?.dueTurn<=state.turnCount&&m.type==='NO_CONFIDENCE'&&m.status==='PENDING'&&m.partyAI.cycle===deputyCycleId(state));if(m)voteNoConfidenceMotion(m.id);},0);}
+const aiMotionRefresh=refreshAllUI,aiMotionToggle=toggleModal;
+refreshAllUI=function(...args){const r=aiMotionRefresh(...args);schedulePartyAIMotion();return r;};
+toggleModal=function(id,show){const r=aiMotionToggle(id,show);if(!show)schedulePartyAIMotion();return r;};
+document.addEventListener('close',schedulePartyAIMotion,true);

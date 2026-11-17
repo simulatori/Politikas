@@ -3176,7 +3176,7 @@ function voteNoConfidenceMotion(motionId) {
     if (!validAssemblyComposition()) return;
     var motion = state.motions.find(function(m) { return m.id === motionId; });
     if (!motion || motion.type!=='NO_CONFIDENCE' || motion.status!=='PENDING') return false;
-    var managedOpposition=typeof oppositionActive==='function' && oppositionActive();
+    var managedOpposition=!motion.partyAI && typeof oppositionActive==='function' && oppositionActive();
     if(managedOpposition&&!oppositionMotionReady()){showToast('Kërkohen 61 zotime aktive dhe mbështetje e Qeverisë ≤45%.');return false;}
     if(motion.oppositionOwner && (motion.oppositionOwner!==state.playerParty || !oppositionMotionReady())){showToast('Zotimet ose mbështetja e Qeverisë nuk lejojnë mocionin tani.');return false;}
 
@@ -3184,6 +3184,7 @@ function voteNoConfidenceMotion(motionId) {
     var myPartyIsOpposition = !state.coalitionParties.includes(state.playerParty);
 
     state.mps.forEach(function(mp) {
+        if(motion.partyAI){if(specialBlockedSeats(state).has(mp.seatNumber)){mungese++;return;}if(!state.coalitionParties.includes(mp.party)||state.approval<=30&&mp.rebelRisk&&(mp.loyalty||50)<60)pro++;else kunder++;return;}
         if(motion.lifeNetwork){if(lifeNoConfidenceVote(mp,state))pro++;else kunder++;return;}
         if(motion.coalitionBlackmailId){if(coalitionBlackmailMotionVote(motion,mp))pro++;else kunder++;return;}
         if(motion.veteransBudgetMotion){if(!state.coalitionParties.includes(mp.party)||specialBlockedSeats(state).has(mp.seatNumber))pro++;else kunder++;return;}
@@ -3233,7 +3234,7 @@ function voteNoConfidenceMotion(motionId) {
             addMediaNews("KOHA", "Bie Qeveria! Mocioni i mosbesimit miratohet me " + pro + " vota pro!", "CRITICAL");
 
             setInstitutionalPhase(INSTITUTIONAL_PHASES.GOV_OVERTHROWN, "Qeveria u rrëzua me mocion mosbesimi (" + pro + " vota pro).");
-            if(motion.oppositionOwner)state.opposition.snapDue=true;
+            if(motion.oppositionOwner||motion.partyAI&&!agendaExecutive(state))state.opposition.snapDue=true;
 
             showMajorAnnouncement({
                 badge: "QEVEREA U RRËZUA — CIKLI INSTITUCIONAL RIVENDOSET",
