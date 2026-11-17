@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-16",
-  "cacheVersion": "v121",
+  "generated": "2026-11-17",
+  "cacheVersion": "v122",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -64,8 +64,8 @@
     },
     {
       "file": "budget-meetings.css",
-      "bytes": 5856,
-      "sha256": "a04518a13f42c1d7cf3b0aa885bb0f1649228d56e9c3af123915edf7de94cbe5"
+      "bytes": 6976,
+      "sha256": "66e7f048ab25fd232d4dfd618d3938091772f083fa8d6a3db9dcc2d4bfc80da1"
     },
     {
       "file": "cabinet-intelligence.js",
@@ -94,8 +94,8 @@
     },
     {
       "file": "career-debates.js",
-      "bytes": 15343,
-      "sha256": "c3e26ab37326911bb25acd4526109c1e23a56b543352e22e4f1b5649de7ecc2e"
+      "bytes": 17322,
+      "sha256": "4051a81c4fb158ab2315dc39709c07348ac70d7e1e112bbc22dd4572834019ec"
     },
     {
       "file": "catalog-view.js",
@@ -669,8 +669,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 101766,
-      "sha256": "122933cde036e34f783ed366083448ae4b06d957f89ee61d7cbd60499ca98e8e"
+      "bytes": 101769,
+      "sha256": "08ddd1f7bc52f028ef3441ecd7f99b2c1b80709e06ce72457ac8afe736ed0e25"
     },
     {
       "file": "influence-network.js",
@@ -764,8 +764,8 @@
     },
     {
       "file": "live-speech.css",
-      "bytes": 5588,
-      "sha256": "2594e8fce41abd468439b5410b93e9a89757f6dba147a587b87a211a2b9159f7"
+      "bytes": 6528,
+      "sha256": "f2b6c8ef9d2ffe90cf849e92d65e80265d1fbb56180a00edffad9374f1de6fc1"
     },
     {
       "file": "live-speech.js",
@@ -899,13 +899,13 @@
     },
     {
       "file": "party-career.js",
-      "bytes": 21712,
-      "sha256": "18ecf2b0c7a45ca8cd930eb625715b518aeec9acdcfcc7580a17af5c915f7a65"
+      "bytes": 23635,
+      "sha256": "da4f6ffc257a34d728291d448aecb7a949a4f7e495d00d396dd985bded025f7b"
     },
     {
       "file": "party-strategies.js",
-      "bytes": 19164,
-      "sha256": "acf0b4953b56d16b04512c701a901f43a4d48a95dbdf259f75479b93d197c7e1"
+      "bytes": 21492,
+      "sha256": "ad9bb17ae87fc3bbd43ae19b4fd48fbf38154fd35c0224b1410e6befe8fade65"
     },
     {
       "file": "personal-life-data.js",
@@ -1030,7 +1030,7 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "28de92cd18e7881390c0d60d67e6b6d998b0bbde4cb4b0e1ce51dca273a37e5a"
+      "sha256": "737c444048f758572f952f81132dd4b299b7ca1d501e3c405540ed08a1c9cad6"
     },
     {
       "file": "regular-cabinet.js",
@@ -1064,8 +1064,8 @@
     },
     {
       "file": "script.js",
-      "bytes": 558503,
-      "sha256": "68b35f88eecb63c96e627aca53d7fdcb559b2cead2b72dc2847801fc9c55eda7"
+      "bytes": 558788,
+      "sha256": "aede30e2dd32cb7917fd528ec1c68cb51670da8471a5b70f9c67d5c15fa2208b"
     },
     {
       "file": "sector-expansion-data.js",
@@ -1100,7 +1100,7 @@
     {
       "file": "service-worker.js",
       "bytes": 9571,
-      "sha256": "ef8839f98ba7694bd139031eaaa0ac1fa4326a60bd657e9550ecd6b9ea7e8571"
+      "sha256": "f8c08293331a91526b21d08627a3dde9d971205520ecb7d6613374425b9caa42"
     },
     {
       "file": "shadow-cabinet.js",
@@ -1139,8 +1139,8 @@
     },
     {
       "file": "speech-editorial.js",
-      "bytes": 10182,
-      "sha256": "c83e205d361346acf8082c0e89809e9bb11b086874ff2c657ddf4a4a59277444"
+      "bytes": 12893,
+      "sha256": "02c573593ce74ff50a88ed7131088684bdb6db07b5328a0e17a4b0765a92b263"
     },
     {
       "file": "state-calendar.js",
