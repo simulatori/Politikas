@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-17",
-  "cacheVersion": "v124",
+  "cacheVersion": "v125",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -194,8 +194,8 @@
     },
     {
       "file": "cooperation.css",
-      "bytes": 7981,
-      "sha256": "8e7321adea56ffc44298f01da00136cd6bef50e74c77472feec6cc91156dfa8b"
+      "bytes": 8376,
+      "sha256": "c5fa381fb7af0a39821c769bb1d042c821b17d425e23844118cb511f499136a9"
     },
     {
       "file": "cooperation.js",
@@ -514,8 +514,8 @@
     },
     {
       "file": "elections-hub.js",
-      "bytes": 4361,
-      "sha256": "68e44e3c75e6e7f21fd10ee67269765ce6eb4b350bc4633607026006ef233f81"
+      "bytes": 4378,
+      "sha256": "d5bf4b63cf68d0b9ae9711e35dec3e94a467e9ae73f1620ec05d6806d6f2e94c"
     },
     {
       "file": "electoral-memory.js",
@@ -669,8 +669,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 102127,
-      "sha256": "1c15dcc8c144991450ea2e350d27acbe94d33d64d1e3b045c72adc17201bf961"
+      "bytes": 102233,
+      "sha256": "d2de14ab3290a195f01e2d0fef73cb39c616906bf2bc015271cb017c4589e31f"
     },
     {
       "file": "influence-network.js",
@@ -789,8 +789,8 @@
     },
     {
       "file": "local-elections.js",
-      "bytes": 18274,
-      "sha256": "06f91a3c41e75d1378aed17ffdc5e9068a7fc0e4fed2c0a00d5b8ed0ec1b7471"
+      "bytes": 19301,
+      "sha256": "9044c0f47c9a7f85409d3e1e3bebe13d4233afb88b19608b898bbbd2b54bf281"
     },
     {
       "file": "local-obstructions.js",
@@ -904,13 +904,23 @@
     },
     {
       "file": "party-career.js",
-      "bytes": 23805,
-      "sha256": "d94fe105792ccedd3826cd78a23bfc3d352795f389de6b49cab71186dfe17ae8"
+      "bytes": 23873,
+      "sha256": "7b075e6cecf31eba1c4ef679d49c50796137421f0f1b943a1d7b6cd62bb38218"
     },
     {
       "file": "party-community.js",
-      "bytes": 36081,
-      "sha256": "c71f58561d77e780dd0407efc44c690a2f428a90fcd5244e4acda62f131269c5"
+      "bytes": 36906,
+      "sha256": "4458db53bc66436bc39d09707e0265f08702b2d79b848badda82810baf28a2f1"
+    },
+    {
+      "file": "party-ground-game.js",
+      "bytes": 27631,
+      "sha256": "d9a7e7ca9df01f97814ecb49be39ea03cebcf600c2b900e7cdae4496fadf4a9d"
+    },
+    {
+      "file": "party-local-elections.js",
+      "bytes": 13095,
+      "sha256": "0280b102ff4aa997b2178f20c99509f18f31700cd4df0e1bee8adf260d384fa8"
     },
     {
       "file": "party-strategies.js",
@@ -1045,7 +1055,7 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "970af68a1b5fda74a8566d85cfbe5476d3601d134e8ac2bb915ad33283b590a6"
+      "sha256": "5873e57e5ef4e4ce7586adfa79d6a4661f27422bc85ead286955c51f802d7ba4"
     },
     {
       "file": "regular-cabinet.js",
@@ -1114,8 +1124,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 9655,
-      "sha256": "0c4b904631876cb2eb14b5a0820ce9166fa6f279fe740a177f3888c406a6426f"
+      "bytes": 9711,
+      "sha256": "5071fbb5ab873521f071b4b0ed337a745b240925f93c317059f91e23b17f7108"
     },
     {
       "file": "shadow-cabinet.js",
