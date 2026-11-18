@@ -1,8 +1,15 @@
 /* Acknowledgement belongs to the browser, not a campaign/save or cache version. */
 (function(){
  'use strict';
- const release='2026-11-15-features',key='republika:release-notes:'+release;
+ const release='2026-11-18-features',key='republika:release-notes:'+release;
  const groups=[
+  {title:'Zgjedhjet dhe ekipi lokal',intro:'Ruajtje më e qëndrueshme në telefon dhe vendime që vazhdojnë pas fushatës.',items:[
+   ['Hapja e votimit','Kompresim pa humbje kur hapësira lokale është e kufizuar dhe shpjegim i dukshëm nëse ruajtja nuk pranohet.'],
+   ['Konsultimet dhe votimi i brendshëm','Zgjidh strategjinë me ekipin dhe mbaj votim dyjavor mes kandidatëve realë të listës.'],
+   ['Debati dhe balotazhi','Përgatit kandidatin për shërbimet e komunës dhe vendos për mbështetje programore kur del i treti.'],
+   ['Pas fitores komunale','Negocio mbështetjen komunale, kontrollo shërbimet e kryetarit dhe kërko raport për marrëveshjet.'],
+   ['Verifikimi i rezultatit','Diferenca e ngushtë kontrollohet mbi votat e ruajtura, pa rigjeneruar rezultatin.']
+  ]},
   {title:'Një natë zgjedhore me më shumë tension',intro:'Exit poll, partnerë, bastione dhe vendime deri te rezultati përfundimtar.',items:[
    ['Exit poll dhe reagimi yt','Prit rezultatin, fol me kujdes ose merr rrezikun e shpalljes së hershme të fitores.'],
    ['Oferta gjatë numërimit','Partnerët mund të kërkojnë zotime politike, që më pas lidhen me negociatat reale të koalicionit.'],

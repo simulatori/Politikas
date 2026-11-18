@@ -74,3 +74,15 @@ function priorityCandidateOrder(a,b,metadata,seed){
     }
     return b.personalVotes-a.personalVotes||assemblyDraw(seed,a.id)-assemblyDraw(seed,b.id)||a.id.localeCompare(b.id);
 }
+
+// Keep the last good autosave intact until the browser accepts its replacement.
+function writeLocalAutosave(st){
+ const json=JSON.stringify(st);
+ try{localStorage.setItem(STORAGE_KEY_AUTO,json);return;}
+ catch(error){if(error?.name!=='QuotaExceededError')throw error;}
+ const packed=packLocalSlots(st);
+ try{localStorage.setItem(STORAGE_KEY_AUTO,packed);return;}
+ catch(error){if(error?.name!=='QuotaExceededError')throw error;}
+ if(compactExistingLocalSlots()){localStorage.setItem(STORAGE_KEY_AUTO,packed);return;}
+ const error=new Error('Hapësira lokale nuk mjafton për këtë hap. Eksporto lojën dhe liro hapësirë në shfletues.');error.name='QuotaExceededError';throw error;
+}

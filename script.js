@@ -1567,13 +1567,16 @@ function issueQuickPressRelease(newsIdx,expectedNewsId) {
     return true;
 }
 
+var lastGameSaveError=null;
 function reportSaveError(error) {
+    lastGameSaveError=error;
     console.error("Gabim në ruajtje/ngarkim:", error);
     showToast(error?.name==='QuotaExceededError'?'Hapësira lokale është mbushur. Eksporto një kopje të lojës; ruajtjet ekzistuese nuk u fshinë.':'Ruajtja ose ngarkimi dështoi: '+(error?.message||'ruajtja lokale nuk është e arritshme')+'. Të dhënat ekzistuese nuk u fshinë.');
 }
 
 // Local autosave only. Cloud saving is an explicit action in auth-cloud-save.js.
 function saveGameAuto() {
+    lastGameSaveError=null;
     if (!state || _committingVote) return false;
     if (weeklyProcessing) return true;
     var mandateBefore=state.mandateExperience?JSON.stringify(state.mandateExperience):null;
@@ -1581,11 +1584,11 @@ function saveGameAuto() {
     try {
         fiscalSyncBudgetStatuses();
         if(mandateBefore && typeof syncMandateExperience==='function')syncMandateExperience();
-        try { localStorage.setItem(STORAGE_KEY_AUTO, JSON.stringify(state)); }
-        catch(error){if(error?.name!=='QuotaExceededError'||!compactExistingLocalSlots())throw error;localStorage.setItem(STORAGE_KEY_AUTO,JSON.stringify(state));}
+        writeLocalAutosave(state);
         _saveErrorShown = false;
         return true;
     } catch (e) {
+        lastGameSaveError=e;
         if(mandateBefore){state.mandateExperience=JSON.parse(mandateBefore);state.promises=JSON.parse(mandatePromises);}
         if (!_saveErrorShown) reportSaveError(e);
         _saveErrorShown = true;
@@ -1640,7 +1643,7 @@ window.republikaCloudGame = {
         }
         var loaded = prepareLoadedState(JSON.parse(json));
         // Commit locally first. A validation/storage failure leaves the current game intact.
-        localStorage.setItem(STORAGE_KEY_AUTO, JSON.stringify(loaded));
+        writeLocalAutosave(loaded);
         if(typeof resetGovernmentNotifications==='function')resetGovernmentNotifications();
         clearInterval(votingAnimInterval);
         currentVotingData = null;
@@ -1688,8 +1691,8 @@ function loadFromSlot(slotIdx) {
     if (!slots || !slots[slotIdx]) return;
     try {
         var loaded = prepareLoadedState(slots[slotIdx].data);
-        try{localStorage.setItem(STORAGE_KEY_AUTO,JSON.stringify(loaded));}
-        catch(error){if(error?.name!=='QuotaExceededError'||!compactExistingLocalSlots())throw error;localStorage.setItem(STORAGE_KEY_AUTO,JSON.stringify(loaded));}
+        try{writeLocalAutosave(loaded);}
+        catch(error){if(error?.name!=='QuotaExceededError'||!compactExistingLocalSlots())throw error;writeLocalAutosave(loaded);}
     } catch (e) { reportSaveError(e); return; }
     clearInterval(votingAnimInterval);
     if(typeof resetGovernmentNotifications==='function')resetGovernmentNotifications();
@@ -2328,7 +2331,7 @@ function initApp() {
     catch (e) { reportSaveError(e); }
     if (saved) {
         try {
-            var loaded = prepareLoadedState(JSON.parse(saved));
+            var loaded = prepareLoadedState(unpackLocalSlots(saved));
             state = loaded;
 
             document.getElementById("setupModal").classList.remove("show");
