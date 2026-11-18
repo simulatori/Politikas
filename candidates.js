@@ -244,14 +244,14 @@ function validateCandidateRegistry(gameState) {
     });
 }
 
+let candidateArchiveNameIndex=null;
 function getCandidateCatalogue(gameState) {
     if (!gameState.candidateRegistry) return getLegacyCandidateCatalogue(gameState);
+    if(!candidateArchiveNameIndex){candidateArchiveNameIndex=new Map();for(const person of CANDIDATE_ARCHIVE){const key=candidateSearchText(candidateName(person));if(!candidateArchiveNameIndex.has(key))candidateArchiveNameIndex.set(key,person);}}
     var catalogue=[];
     Object.keys(gameState.candidateRegistry).forEach(function(partyId) {
         gameState.candidateRegistry[partyId].forEach(function(record) {
-            var words=String(record.name || '').split(/\s+/), historical=CANDIDATE_ARCHIVE.find(function(person) {
-                return record.source!=="MANUAL_SIMULATED" && candidateSearchText(candidateName(person))===candidateSearchText(record.name);
-            });
+            var words=String(record.name || '').split(/\s+/), historical=record.source!=="MANUAL_SIMULATED"&&candidateArchiveNameIndex.get(candidateSearchText(record.name));
             catalogue.push(Object.assign({},record,{firstName:words.shift(),lastName:words.join(" "),
                 history:record.source==="KQZ_BROCHURE"?brochureCandidateHistory(record):historical?historical.history:[],gamePartyIds:[partyId],
                 dataIncomplete:!record.id || !record.name?.trim() || !record.partyId,
@@ -259,9 +259,11 @@ function getCandidateCatalogue(gameState) {
         });
     });
     // Retain references from earlier saves, but never offer obsolete profiles as imported candidates.
+    var existingIds=new Set(catalogue.map(function(candidate){return candidate.id;}));
     getLegacyCandidateCatalogue(gameState).forEach(function(person) {
-        if (!catalogue.some(function(candidate){return candidate.id===person.id;})) {
+        if (!existingIds.has(person.id)) {
             catalogue.push(Object.assign({},person,{archived:gameState.candidateRegistry[person.gamePartyIds[0]]?true:false}));
+            existingIds.add(person.id);
         }
     });
     return catalogue;

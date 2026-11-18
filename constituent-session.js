@@ -29,7 +29,7 @@ function constituentComposition(st) {
     var cycle=constituentCycle(st);
     return cycle && constituentCompositionById(st,cycle.id) || null;
 }
-function constituentPrerequisite(st) {
+function constituentPrerequisite(st,verifyIntegrity=true) {
     var cycle=constituentCycle(st),composition=constituentComposition(st);
     if(cycle && cycle.source==="INITIAL_SCENARIO") {
         try {validateInitialConstituentContext(st);}catch(error){return error.message;}
@@ -37,7 +37,7 @@ function constituentPrerequisite(st) {
     }
     if (!cycle || cycle.status!=="RESULTS" || !cycle.results) return "Seanca mund të hapet pas përfundimit të zgjedhjeve dhe numërimit të votave.";
     if (!composition || composition.status!=="PUBLISHED") return "Para hapjes së seancës duhet të përfundojë ndarja e mandateve për të 120 deputetët.";
-    try {validateElectionDayState(st);validateAssemblyState(st);} catch(error){return "Të dhënat zgjedhore nuk janë të vlefshme: "+error.message;}
+    if(verifyIntegrity)try {validateElectionDayState(st);validateAssemblyState(st);} catch(error){return "Të dhënat zgjedhore nuk janë të vlefshme: "+error.message;}
     if (composition.deputies.length!==120) return "Kërkohen saktësisht 120 deputetë unikë me mandate të publikuara.";
     return null;
 }
@@ -314,11 +314,18 @@ function openConstituentSessionPanel() {
     switchMainTab("tab-assembly");switchSubTab("ass","constituent",document.getElementById("constituentTabBtn"));return true;
 }
 function stopConstituentAnimation() {if(constituentTimer!==null)clearInterval(constituentTimer);constituentTimer=null;}
+function constituentSpeakerLabel(st=state){
+ const value=String(st.speakerOfAssembly||''),match=value.match(/\s*\(([^()]+)\)\s*$/);
+ return match&&st.parties[match[1]]?value.slice(0,match.index)+' · '+st.parties[match[1]].name:value;
+}
+function constituentNomineeLabel(mp,party,st=state){
+ return candidateDisplayName(mp,mp.partyId,st)+' · '+(st.parties[mp.partyId]?.name||party.name)+' · Partia: '+party.total+' mandate';
+}
 function constituentEntryRequired(st=state){
     const cycle=constituentCycle(st),session=currentConstituentSession(st);
     if(!cycle||session?.status==='COMPLETED')return false;
     if(st.assemblyConstituted&&st.assemblyCycleId===cycle.id)return false;
-    return !constituentPrerequisite(st);
+    return !constituentPrerequisite(st,false);
 }
 function renderConstituentEntry(){
     const entry=document.getElementById('constituentEntryCard');if(!entry||!state)return;
@@ -326,7 +333,7 @@ function renderConstituentEntry(){
 }
 function renderConstituentSession() {
     var host=document.getElementById("constituentPanel");if(!host)return;
-    var s=currentConstituentSession(),c=constituentComposition(state),problem=constituentPrerequisite(state),esc=electoralEscape;
+    var s=currentConstituentSession(),c=constituentComposition(state),problem=constituentPrerequisite(state,false),esc=electoralEscape;
     renderConstituentEntry();
     var html='<div class="card"><h3>Seanca konstituive e Kuvendit</h3><p>Kuvendi ka 120 deputetë. Kryetari dhe secili nënkryetar zgjidhen me të paktën 61 vota pro. Votat kundër, abstenimet dhe mungesat nuk llogariten si mbështetje.</p><p>Çdo subjekt paraqet kandidatin për postin që i takon. Ju propozoni kandidatët e partisë suaj dhe zgjidhni nëse do t’i mbështesni kandidatët e të tjerëve. Pas zgjedhjes së Kryetarit dhe pesë nënkryetarëve, seanca përfundon.</p>';
     if(problem)html+='<p role="alert">'+esc(problem)+'</p>';
@@ -350,16 +357,16 @@ function renderConstituentSession() {
             if(!nominees.length)html+='<p role="alert">Ende nuk është paraqitur kandidat i vlefshëm për këtë post.</p>';
             else if(ownNomination) {
                 html+='<p>Propozimi për këtë post i takon partisë suaj. Zgjidhni një nga deputetët tuaj.</p>';
-                html+='<label>Kandidati<select id="constituentCandidate">'+nominees.map(function(mp){var party=c.mandates.find(function(p){return p.partyId===mp.partyId;});return '<option value="'+esc(mp.candidateId)+'">'+esc(candidateDisplayName(mp))+' · '+esc(mp.partyId)+' · '+party.total+' mandate</option>';}).join('')+'</select></label>';
+                html+='<label>Kandidati<select id="constituentCandidate">'+nominees.map(function(mp){var party=c.mandates.find(function(p){return p.partyId===mp.partyId;});return '<option value="'+esc(mp.candidateId)+'">'+esc(constituentNomineeLabel(mp,party))+'</option>';}).join('')+'</select></label>';
                 html+='<button id="proposeConstituentBtn" class="action-btn" onclick="proposeConstituentFromPanel()">Propozo kandidatin</button>';
             }
             if(s.proposal){var nominatingParty=c.mandates.find(function(p){return p.partyId===s.proposal.candidate.partyId;});
-                html+='<div class="candidate-card" id="constituentProposalCard"><p>'+(s.proposal.automatic?(["VICE_SERB","VICE_OTHER"].includes(office)?'Deputetët e komunitetit përkatës propozojnë:':esc(nominatingParty.name)+' propozon:'):'Kandidati i propozuar nga partia juaj:')+'</p><strong>'+esc(candidateDisplayName(s.proposal.candidate))+' · '+esc(s.proposal.candidate.partyId)+'</strong><p>'+nominatingParty.total+' mandate · '+esc(constituentOfficeLabel(s.proposal.office))+'</p><p>Zgjidhni votën e partisë suaj:</p><div class="candidate-actions"><button id="voteConstituentBtn" class="action-btn btn-gold" onclick="voteConstituentProposal(\'pro\')">Voto pro</button><button id="voteConstituentAgainstBtn" class="action-btn" onclick="voteConstituentProposal(\'kunder\')">Voto kundër</button><button id="voteConstituentAbstainBtn" class="action-btn" onclick="voteConstituentProposal(\'abstenim\')">Absteno</button></div></div>';
+                html+='<div class="candidate-card" id="constituentProposalCard"><p>'+(s.proposal.automatic?(["VICE_SERB","VICE_OTHER"].includes(office)?'Deputetët e komunitetit përkatës propozojnë:':esc(nominatingParty.name)+' propozon:'):'Kandidati i propozuar nga partia juaj:')+'</p><strong>'+esc(candidateDisplayName(s.proposal.candidate))+' · '+esc(state.parties[s.proposal.candidate.partyId]?.name||nominatingParty.name)+'</strong><p>'+'Partia ka '+nominatingParty.total+' mandate · '+esc(constituentOfficeLabel(s.proposal.office))+'</p><p>Zgjidhni votën e partisë suaj:</p><div class="candidate-actions"><button id="voteConstituentBtn" class="action-btn btn-gold" onclick="voteConstituentProposal(\'pro\')">Voto pro</button><button id="voteConstituentAgainstBtn" class="action-btn" onclick="voteConstituentProposal(\'kunder\')">Voto kundër</button><button id="voteConstituentAbstainBtn" class="action-btn" onclick="voteConstituentProposal(\'abstenim\')">Absteno</button></div></div>';
             }
         }
         html+='</div>';
         if(s.rounds.length)html+='<div class="card"><h3>Historiku i votimeve</h3>'+s.rounds.map(function(r,i){var counts={pro:0,kunder:0,abstenim:0,mungese:0};r.result.ballots.slice(0,r.revealed).forEach(function(b){counts[b.choice]++;});return '<article class="candidate-card"><strong>Raundi '+(i+1)+' · '+esc(constituentOfficeLabel(r.office))+' · '+esc(r.candidate.name)+'</strong><p>Pro: '+counts.pro+' · Kundër: '+counts.kunder+' · Abstenime: '+counts.abstenim+' · Mungesa: '+counts.mungese+'</p><progress max="120" value="'+r.revealed+'" aria-label="Numërimi i votave"></progress><p>'+r.revealed+' / 120 · '+(r.finalized?(r.result.passed?'Kandidati u zgjodh':'Kandidati nuk u zgjodh — kërkohen 61 vota pro'):'Numërimi në vazhdim')+'</p>'+(r.revealed<120?'<button id="advanceConstituentBtn" class="action-btn" onclick="advanceConstituentCount()">Avanco numërimin</button>':'')+'</article>';}).join('')+'</div>';
-        if(s.elected.SPEAKER)html+='<div class="card"><h3>Kryetari i zgjedhur: '+esc(s.elected.SPEAKER.name)+' · '+esc(s.elected.SPEAKER.partyId)+'</h3><p>'+(s.status==="COMPLETED"?'Kuvendi është konstituuar. Hapi i ardhshëm është mandatimi për formimin e Qeverisë.':'Për përfundimin e seancës duhet të zgjidhen edhe të gjithë nënkryetarët.')+'</p>'+Object.keys(s.elected).filter(function(k){return k!=="SPEAKER";}).map(function(k){return '<p>'+esc(constituentOfficeLabel(k))+': '+esc(candidateDisplayName(s.elected[k]))+'</p>';}).join('')+'</div>';
+        if(s.elected.SPEAKER)html+='<div class="card"><h3>Kryetari i zgjedhur: '+esc(s.elected.SPEAKER.name)+' · '+esc(state.parties[s.elected.SPEAKER.partyId]?.name||s.elected.SPEAKER.partyId)+'</h3><p>'+(s.status==="COMPLETED"?'Kuvendi është konstituuar. Hapi i ardhshëm është mandatimi për formimin e Qeverisë.':'Për përfundimin e seancës duhet të zgjidhen edhe të gjithë nënkryetarët.')+'</p>'+Object.keys(s.elected).filter(function(k){return k!=="SPEAKER";}).map(function(k){return '<p>'+esc(constituentOfficeLabel(k))+': '+esc(candidateDisplayName(s.elected[k]))+'</p>';}).join('')+'</div>';
     }
     if(s && s.status==="COMPLETED" && !state.mandatar && !state.governmentFormed && !(state.governmentFormationAttempts || []).length)html+='<div class="card"><p>Mandatimi nga Presidenti. Kabineti paraqitet brenda 15 ditësh nga emërimi.</p><button class="action-btn" onclick="appointGovernmentMandatar()">Vazhdo me mandatimin</button></div>';
     if(s && s.status==="COMPLETED" && !state.mandatar && (state.governmentFormationAttempts || []).length===1){
