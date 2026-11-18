@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "public_sector_strike",
+      "priority": 0,
+      "trigger_condition": {
+        "all": [
+          {
+            "path": "event.kind",
+            "op": "eq",
+            "value": "STRIKE"
+          },
+          {
+            "path": "event.active",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "topic": "EDUCATION",
+      "sector": "sec_edu",
+      "question": "Shkollat dhe shërbimet shëndetësore janë prekur nga greva e SBASHK/FSSHK-së. {facts} Si do ta riktheni shërbimin pa premtuar paga që buxheti nuk i mbulon?",
+      "pragmatic": "Duhet të ndajmë kërkesën për paga nga mundësia e financimit. {facts} Propozoj negociata me sindikatat dhe shërbim minimal sipas kompetencave; marrëveshja duhet të ketë kosto, burim dhe afat të kontrollueshëm.",
+      "populist": "Kërkesa e punonjësve meriton përgjigje të shpejtë. Do të ushtroj presion që zgjidhja të mos shtyhet, por kjo deklaratë nuk miraton rritje pagash dhe nuk e mbyll vetë grevën.",
+      "diplomatic": "Duhet t’i dëgjojmë sindikatat dhe institucionet bashkë. Dialogu është i nevojshëm, por pa një ofertë të kostuar nxënësit dhe pacientët do të vazhdojnë ta paguajnë vonesën.",
+      "aggressive": "Sindikatat dhe opozita duhet të shpjegojnë edhe pasojat e qëndrimeve të tyre. Megjithatë, përgjegjësia për një ofertë të financueshme nuk largohet nga institucionet me një akuzë politike.",
+      "proof": "statusin real të grevës, ofertën e pagave, burimin e financimit dhe rikthimin e shërbimeve",
+      "risk": "premtimi për paga të mbetet pa financim ndërsa shërbimet vazhdojnë të mungojnë",
+      "followups": {
+        "PRAGMATIC": "Përmendët ofertën e kostuar. Nëse sindikatat e refuzojnë, si do ta ruani shërbimin minimal pa e përdorur pagën si zëvendësim të negociatës?",
+        "POPULIST": "Kërkuat zgjidhje të shpejtë. A do t’i publikoni investimet që do të shtyheshin për të financuar rritjen e pagave?",
+        "DIPLOMATIC": "Kush i kryeson negociatat me sindikatat dhe cili propozim financiar duhet të jetë në tavolinë që konsultimi të mos mbetet pa përfundim?"
+      }
+    },
+    {
+      "id": "tax_decision",
+      "priority": 10,
+      "trigger_condition": {
+        "all": [
+          {
+            "path": "event.kind",
+            "op": "eq",
+            "value": "TAX"
+          },
+          {
+            "path": "event.player_owned",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "topic": "ECONOMY",
+      "sector": "sec_econ",
+      "question": "Ju vendosët të ndryshoni normat tatimore: {facts} Si i përgjigjeni bizneseve dhe familjeve që kërkojnë shpjegim për barrën dhe shpenzimin e të hyrave?",
+      "pragmatic": "Ndryshimi konkret është ky: {facts} Duhet të publikojmë efektin në të hyrat dhe çmimet, të verifikojmë barrën sipas grupeve dhe ta rishikojmë masën nëse rezultatet nuk e arsyetojnë.",
+      "populist": "Do ta mbrojmë këtë vendim si zgjedhje politike, por qytetarët kanë të drejtë të kërkojnë shërbime për çdo pagesë shtesë. Nuk do ta quajmë rritjen e të hyrave përmirësim të shërbimit pa prova.",
+      "diplomatic": "Do të konsultohemi me bizneset dhe familjet për efektet e normave që ndryshuam. Konsultimi nuk e pezullon automatikisht vendimin; çdo rishikim kërkon procedurën fiskale.",
+      "aggressive": "Rivalët duhet të tregojnë cilat shpenzime do të mbulonin me alternativa. Kjo nuk na përjashton ne nga detyrimi për të shpjeguar barrën konkrete të normave të reja.",
+      "proof": "normat para dhe pas vendimit, arkëtimet dhe çmimet e shportës",
+      "risk": "barra tatimore të rritet pa u përmirësuar shërbimi që merr qytetari",
+      "followups": {
+        "PRAGMATIC": "Përmendët monitorimin e çmimeve. Nëse barra e normave të reja kalon te konsumatori, a do ta rishikoni normën apo shpenzimet që ajo financon?",
+        "POPULIST": "Kërkuat mbështetje për vendimin tatimor. Cili shërbim do ta arsyetojë barrën dhe si shmangni premtimin e dyfishtë me të njëjtat të hyra?",
+        "DIPLOMATIC": "Përmendët konsultimin me bizneset. Cilat të dhëna do t’i publikoni dhe çfarë afati pengon që konsultimi të zgjasë pa përgjigje?"
+      }
+    }
+  ],
+  "options": [
+    {
+      "id": "PRAGMATIC",
+      "tone": "TECHNOCRATIC",
+      "speech": "FACTS",
+      "label": "Fakte dhe plan i verifikueshëm",
+      "field": "pragmatic",
+      "stat_changes": {
+        "popularity": 0.12,
+        "budget": 0,
+        "international_relations": 0.08,
+        "opposition_anger": -0.12,
+        "government_stability": 0.1,
+        "credibility": 0.12,
+        "media_trust": 0.1
+      }
+    },
+    {
+      "id": "POPULIST",
+      "tone": "POPULIST",
+      "speech": "ASSERT",
+      "label": "Mobilizim dhe presion publik",
+      "field": "populist",
+      "stat_changes": {
+        "popularity": 0.2,
+        "budget": 0,
+        "international_relations": -0.08,
+        "opposition_anger": 0.3,
+        "government_stability": 0.05,
+        "credibility": -0.08,
+        "media_trust": -0.05
+      }
+    },
+    {
+      "id": "DIPLOMATIC",
+      "tone": "DIPLOMATIC",
+      "speech": "BRIDGE",
+      "label": "Konsultim dhe përgjegjësi e përbashkët",
+      "field": "diplomatic",
+      "stat_changes": {
+        "popularity": 0.05,
+        "budget": 0,
+        "international_relations": 0.12,
+        "opposition_anger": -0.2,
+        "government_stability": 0.12,
+        "credibility": 0.03,
+        "media_trust": 0.03
+      }
+    },
+    {
+      "id": "AGGRESSIVE",
+      "tone": "AGGRESSIVE",
+      "speech": null,
+      "label": "Kundërshto rivalët politikë",
+      "field": "aggressive",
+      "stat_changes": {
+        "popularity": 0.08,
+        "budget": 0,
+        "international_relations": -0.15,
+        "opposition_anger": 0.45,
+        "government_stability": -0.1,
+        "credibility": -0.12,
+        "media_trust": -0.08
+      }
+    }
+  ]
+}

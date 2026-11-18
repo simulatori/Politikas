@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "REPUBLIKA Context Event Bundle",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "events",
+    "options"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "options": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/option"
+      }
+    }
+  },
+  "$defs": {
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/condition"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/condition"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "path",
+            "op",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "op": {
+              "enum": [
+                "eq",
+                "gte",
+                "lte",
+                "in"
+              ]
+            },
+            "value": {}
+          }
+        }
+      ]
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "id",
+        "priority",
+        "trigger_condition",
+        "topic",
+        "sector",
+        "question",
+        "pragmatic",
+        "populist",
+        "diplomatic",
+        "aggressive",
+        "proof",
+        "risk"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trigger_condition": {
+          "$ref": "#/$defs/condition"
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pragmatic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "populist": {
+          "type": "string",
+          "minLength": 1
+        },
+        "diplomatic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggressive": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk": {
+          "type": "string",
+          "minLength": 1
+        },
+        "followups": {
+          "type": "object",
+          "required": [
+            "PRAGMATIC",
+            "POPULIST",
+            "DIPLOMATIC"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "PRAGMATIC": {
+              "type": "string",
+              "minLength": 1
+            },
+            "POPULIST": {
+              "type": "string",
+              "minLength": 1
+            },
+            "DIPLOMATIC": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "stat_changes": {
+      "type": "object",
+      "required": [
+        "popularity",
+        "budget",
+        "international_relations",
+        "opposition_anger",
+        "government_stability",
+        "credibility",
+        "media_trust"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "popularity": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "budget": {
+          "const": 0,
+          "description": "Dialogue cannot authorize treasury payments; financial commands use the native fiscal transaction."
+        },
+        "international_relations": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "opposition_anger": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "government_stability": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "credibility": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "media_trust": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "required": [
+        "id",
+        "tone",
+        "speech",
+        "label",
+        "field",
+        "stat_changes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "PRAGMATIC",
+            "POPULIST",
+            "DIPLOMATIC",
+            "AGGRESSIVE"
+          ]
+        },
+        "tone": {
+          "enum": [
+            "TECHNOCRATIC",
+            "POPULIST",
+            "DIPLOMATIC",
+            "AGGRESSIVE"
+          ]
+        },
+        "speech": {
+          "enum": [
+            "FACTS",
+            "ASSERT",
+            "BRIDGE",
+            null
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "enum": [
+            "pragmatic",
+            "populist",
+            "diplomatic",
+            "aggressive"
+          ]
+        },
+        "stat_changes": {
+          "$ref": "#/$defs/stat_changes"
+        }
+      }
+    }
+  }
+}

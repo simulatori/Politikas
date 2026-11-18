@@ -187,7 +187,9 @@ function startConstituentSession() {
     var problem=constituentPrerequisite(state);
     if(problem){showToast(problem);return false;}
     if(currentConstituentSession() || state.pendingVote){showToast("Seanca është hapur tashmë ose një votim tjetër është në zhvillim.");return false;}
-    return constituentCommit(function(){
+    return constituentCommit(function(){openConstituentRecord();});
+}
+function openConstituentRecord(){
         migrateConstituentState(state);
         var c=constituentComposition(state);
         state.constituentSessions.push({version:1,cycleId:c.cycleId,assemblyIntegrity:c.integrity,rules:JSON.parse(JSON.stringify(CONSTITUENT_RULES)),
@@ -200,7 +202,6 @@ function startConstituentSession() {
         state.institutionalPhase="ASSEMBLY_CONSTITUTING";state.governmentFormed=false;state.governmentStatus="CARETAKER";
         if(c.source!=="INITIAL_SCENARIO")state.mandatar=null;
         state.cabinetApproved=false;state.cabinetProposal=null;
-    });
 }
 function verifyConstituentMandates() {
     var s=currentConstituentSession();if(!s || s.stage!=="VERIFY")return false;
@@ -251,7 +252,9 @@ function generateConstituentBallots(st,session,composition,proposal) {
 function voteConstituentProposal(stance) {
     var s=currentConstituentSession();
     if(!s || !s.proposal || s.status!=="IN_PROGRESS" || s.stage!=="ELECTIONS" || state.pendingVote || s.rounds.some(function(r){return r.revealed<120;})){showToast("Regjistroni fillimisht një propozim të vlefshëm dhe përfundoni votimin në vazhdim.");return false;}
-    return constituentCommit(function(){
+    return constituentCommit(function(){applyConstituentProposal(s,stance);});
+}
+function applyConstituentProposal(s,stance){
         var proposal=s.proposal;
         if(typeof stance!=="undefined") {
             if(!["pro","kunder","abstenim"].includes(stance))throw Error("Zgjidhni pro, kundër ose abstenim.");
@@ -263,7 +266,6 @@ function voteConstituentProposal(stance) {
             result:result,revealed:120,finalized:true,at:constituentStamp()});s.proposal=null;
         if(result.passed){s.elected[proposal.office]=JSON.parse(JSON.stringify(proposal.candidate));if(proposal.office==='SPEAKER'){state.speakerElected=true;state.speakerOfAssembly=proposal.candidate.name+' ('+proposal.candidate.partyId+')';state.speakerElectionWeek=state.turnCount;}}
         if(!constituentOffice(s))activateConstitutedAssembly(s);
-    });
 }
 function activateConstitutedAssembly(session) {
     var composition=constituentComposition(state),cycle=constituentCycle(state);
