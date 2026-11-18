@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-17",
-  "cacheVersion": "v125",
+  "generated": "2026-11-18",
+  "cacheVersion": "v126",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -494,8 +494,8 @@
     },
     {
       "file": "election-day.js",
-      "bytes": 31906,
-      "sha256": "e186defded2ed9efb3244b6b886b03a3daab71d7991a410acd0be6a29192ad4f"
+      "bytes": 32324,
+      "sha256": "f982e7f84057e9376a6f8522a5c545c2ca8813be5376ea1aa72c32b2ae18a2d7"
     },
     {
       "file": "election-night.css",
@@ -504,8 +504,8 @@
     },
     {
       "file": "election-night.js",
-      "bytes": 35891,
-      "sha256": "00677ac0c1b51aec04275d83857060bc4906a4b3f76d351b9d56ec2699d3525f"
+      "bytes": 36131,
+      "sha256": "79b6d81e302f7a6dc74d078ff608c7d70bbd8ce4dde39013f24608eade1d9032"
     },
     {
       "file": "election-preparation.js",
@@ -519,8 +519,8 @@
     },
     {
       "file": "electoral-memory.js",
-      "bytes": 13684,
-      "sha256": "f4802e1994e6de27b41c375260ec9c86b0d93a166a4accbe64a4baf5ca97f827"
+      "bytes": 13708,
+      "sha256": "f07a4a665ba27950521d6a9204f8b1710274b8f7646356ecbacdbd7aa7aa63b7"
     },
     {
       "file": "electoral-promises.js",
@@ -669,8 +669,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 102233,
-      "sha256": "d2de14ab3290a195f01e2d0fef73cb39c616906bf2bc015271cb017c4589e31f"
+      "bytes": 102291,
+      "sha256": "de411d464895c749d80c9f118197bc216815de01ffaf757c410a488d4cc4b8d2"
     },
     {
       "file": "influence-network.js",
@@ -859,8 +859,8 @@
     },
     {
       "file": "minister-performance.js",
-      "bytes": 21278,
-      "sha256": "0c39e3da6adf89e4ef110ecec80d37a654db885d7945b54ff5cba69ceabba5de"
+      "bytes": 21302,
+      "sha256": "750ac37806e913445ba49388b87bc12048baedd02d0ccf2b11f0bfc100190d85"
     },
     {
       "file": "ministry-envelopes.js",
@@ -921,6 +921,11 @@
       "file": "party-local-elections.js",
       "bytes": 13095,
       "sha256": "0280b102ff4aa997b2178f20c99509f18f31700cd4df0e1bee8adf260d384fa8"
+    },
+    {
+      "file": "party-political-episodes.js",
+      "bytes": 29237,
+      "sha256": "970e3669c308b9f115cd71ba13a3df7ceda8a3fa2b18edf075b6f6eb53928054"
     },
     {
       "file": "party-strategies.js",
@@ -984,8 +989,8 @@
     },
     {
       "file": "political-systems-update.js",
-      "bytes": 5580,
-      "sha256": "15bff82bf03beb71eba4eb4ac73a5c2d5485893c79e1d8c690d85f1006f77eb5"
+      "bytes": 6269,
+      "sha256": "195123a03f20ed82eb8093eba604d1fcd15f4146dbebe28b4ca724db649922a3"
     },
     {
       "file": "population.js",
@@ -1055,7 +1060,7 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "5873e57e5ef4e4ce7586adfa79d6a4661f27422bc85ead286955c51f802d7ba4"
+      "sha256": "2c764cbb06a071fd1862cd0ed3654e545a4630ddba40a0e391f5ff6ac3ff66b1"
     },
     {
       "file": "regular-cabinet.js",
@@ -1069,8 +1074,8 @@
     },
     {
       "file": "release-notes.js",
-      "bytes": 7240,
-      "sha256": "da6a35a192b15188ff0419932cd5bde75a03071b1d36776fff04209a20a7abb7"
+      "bytes": 8038,
+      "sha256": "69edea1d29d6df9616e70b186c7355cabfb8ad030cbb1866245c5c1b218b4861"
     },
     {
       "file": "responsive-ui.js",
@@ -1089,8 +1094,8 @@
     },
     {
       "file": "script.js",
-      "bytes": 559001,
-      "sha256": "1abc00a8261a30227494a80dfd3ea581fb6c7452eceb788fb8c7823bce0da9f8"
+      "bytes": 558807,
+      "sha256": "bfc587ce6b711f239018598acbe5dde4ee7d37848c18c2f0409037865d0951c7"
     },
     {
       "file": "sector-expansion-data.js",
@@ -1124,13 +1129,13 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 9711,
-      "sha256": "5071fbb5ab873521f071b4b0ed337a745b240925f93c317059f91e23b17f7108"
+      "bytes": 9744,
+      "sha256": "1fe20c73e35fcd43f6e1f694981577349f30f0bba823e3f7cb98d3071722a7f3"
     },
     {
       "file": "shadow-cabinet.js",
-      "bytes": 16399,
-      "sha256": "fee7115e698bbf6df64382b096f33cade80b884dc9ab9cd46b6473964ad29341"
+      "bytes": 16423,
+      "sha256": "e31b0e855a142cc324d90900f239edf3b0e034414825b8f6c5f2dcd5251b2d98"
     },
     {
       "file": "social-policy-ui.js",
@@ -1199,8 +1204,8 @@
     },
     {
       "file": "strategic-simulation.js",
-      "bytes": 6068,
-      "sha256": "4e8342e0981ba1659bb9a283ff12ee4e0073275884f0001dcfee029bee664904"
+      "bytes": 6088,
+      "sha256": "acd4a6b4e3d1afb9c64d7094921728e2797de84576f74a583b14706324c07f25"
     },
     {
       "file": "street-protests.js",
