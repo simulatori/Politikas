@@ -169,9 +169,12 @@ function syncElectionDayAnimation() {
 }
 
 function openElectionDayPanel() {
-    if(!electionDayEligible(state)){showToast('Dita e zgjedhjeve kërkon fushatë të mbyllur dhe '+campaignDuration(state.electionCampaign)+' javë të përfunduara.');return false;}
+    if(!electionDayEligible(state)&&!getElectionDayCycle(state)){showToast('Dita e zgjedhjeve kërkon fushatë të mbyllur dhe '+campaignDuration(state.electionCampaign)+' javë të përfunduara.');return false;}
+    var button=document.getElementById('electionDayTabBtn');
+    if(button)button.disabled=false;
     switchMainTab("tab-elections");
-    switchSubTab("elec","voting",document.getElementById("electionDayTabBtn"));
+    switchSubTab("elec","voting",button);
+    renderElectionDayPanel();
     return true;
 }
 
@@ -243,7 +246,7 @@ function renderElectionDayPanel() {
     var host=document.getElementById("electionDayPanel"),cycle=getElectionDayCycle(state),eligible=electionDayEligible(state);
     var pill=document.getElementById("electionDayTabBtn");if(pill)pill.disabled=!eligible&&!cycle;
     if(!host)return;
-    if(!eligible){host.innerHTML='<p>Dita e zgjedhjeve aktivizohet pas përfundimit dhe mbylljes së fushatës trejavore.</p>';stopElectionDayAnimation();return;}
+    if(!eligible&&!cycle){host.innerHTML='<p>Dita e zgjedhjeve aktivizohet pas përfundimit dhe mbylljes së fushatës trejavore.</p>';stopElectionDayAnimation();return;}
     if(!cycle){host.innerHTML='<div class="card"><h3>Kontrolloni listat zgjedhore</h3><p>'+electoralEscape(state.electionDayPreparationError||"Korrigjoni listën dhe provoni sërish.")+'</p><button class="action-btn" onclick="openElectionVoting()">Hape procesin e votimit</button></div>';return;}
     var opened=host.querySelectorAll?Array.from(host.querySelectorAll("details[open]")).map(function(detail){return detail.getAttribute("data-election-details");}):[];
     var labels={READY:"Gati për hapje",VOTING:"Vendvotimet janë të hapura",COUNTING:"Vendvotimet u mbyllën — numërimi në vazhdim",RESULTS:"Numërimi përfundoi"};

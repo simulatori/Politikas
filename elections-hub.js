@@ -1,7 +1,9 @@
 /* A single entrance to the existing electoral engines; ballots and clocks stay native. */
 function openElectionsHub(button){switchMainTab('tab-elections',button);const pill=Array.from(document.querySelectorAll('#tab-elections .sub-pill')).find(b=>(b.getAttribute('onclick')||'').includes("'overview'"));if(pill)switchSubTab('elec','overview',pill);renderElectionsHub();}
 function openElectionWorkspace(key){
+    if(key==='voting')return openElectionDayPanel();
     switchMainTab('tab-elections');
+    if(key==='campaignplay')renderCampaignPanel();
     const button=Array.from(document.querySelectorAll('#tab-elections .sub-pill')).find(b=>(b.getAttribute('onclick')||'').includes("'"+key+"'"));
     if(button&&!button.disabled)switchSubTab('elec',key,button);
 }
@@ -16,6 +18,10 @@ function electionHubStatus(st=state){
 function renderElectionsHub(){
     const host=document.getElementById('electionsHubPanel');if(!host||!state)return;
     const e=catalogEscape,s=electionHubStatus(),local=activeLocalElection(state),schedule=local?.schedule||localElectionSchedule(state.localElections?.nextYear||2029);
+    const votingButton=document.getElementById('electionDayTabBtn');
+    if(votingButton)votingButton.disabled=!electionDayEligible(state)&&!getElectionDayCycle(state);
+    const campaignButton=document.getElementById('campaignTabBtn');
+    if(campaignButton)campaignButton.disabled=!(state.electionCampaign?.moduleVersion===3&&['CAMPAIGN','CAMPAIGN_CLOSED'].includes(state.electionPhase));
     host.innerHTML='<article class="card"><h2>🗳️ Zgjedhjet</h2><h3>'+e(s.label)+'</h3><p>'+e(s.detail)+'</p><button class="action-btn btn-gold" onclick="openElectionWorkspace(\''+s.key+'\')">'+(s.key==='voting'?'Hap ditën e zgjedhjeve / rezultatet':s.key==='campaignplay'?'Hap fushatën parlamentare':'Procedura e shpalljes')+'</button>'+(getElectionDayCycle(state)?'<button class="action-btn" onclick="openElectionNight()">Nata zgjedhore dhe raporti</button>':'')+'<button class="action-btn" onclick="openElectionPreparation()">Lista parlamentare e kandidatëve</button><button class="action-btn" onclick="openElectionAssemblyResults()">Mandatet dhe Kuvendi</button></article><article class="card"><h3>Zgjedhjet komunale</h3><p>Raundi i parë: '+e(schedule.date)+' · Balotazhi: '+e(schedule.runoffDate)+'. '+(local?'Statusi: '+e(({ANNOUNCED:'Të shpallura',CAMPAIGN:'Fushata',RUNOFF:'Balotazhi',COMPLETED:'Të përfunduara'})[local.status]):'Cikli i radhës sipas kalendarit të lojës.')+'</p><button class="action-btn" onclick="openLocalElections()">Përgatit kandidatët dhe hap zgjedhjet komunale</button></article><article class="card"><h3>Presidenti dhe institucionet</h3><p>Zgjedhja e Presidentit bëhet në Kuvend, sipas procedurës ekzistuese.</p><button class="action-btn" onclick="openElectionPresidency()">Procedura presidenciale</button><button class="btn-top" onclick="switchMainTab(\'tab-municipalities\')">Menaxhimi i komunave</button></article>';
     const nav=document.getElementById('electionsNav');if(nav){nav.title=s.label;nav.setAttribute('aria-label','Zgjedhjet · '+s.label);}
 }
