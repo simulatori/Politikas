@@ -2756,28 +2756,27 @@ function openCabinetSelectionModal() {
         return;
     }
 
-    if (!state.cabinetProposal) {
-        state.cabinetProposal = buildDefaultCabinetProposal();
-    }
+    try{recoverCoalitionPortfolios(state);if(!state.cabinetProposal)state.cabinetProposal=buildDefaultCabinetProposal();}
+    catch(error){showToast(error.message);return false;}
 
     renderCabinetSelectionModal();
 }
 
-function buildDefaultCabinetProposal() {
+function buildDefaultCabinetProposal(st=state,preferred=[]) {
     var proposal = [];
-    var mandatarParty = state.mandatar;
-    var catalogue=getCandidateCatalogue(state);
+    var mandatarParty = st.mandatar;
+    var catalogue=getCandidateCatalogue(st),allocation=coalitionCabinetAllocation(st);
+    var keep=preferred.filter(r=>allocation.owners.get(r.ministryId)===r.party&&!cabinetReservedName(st,r.ministerName)),reserved=new Set(keep.map(r=>cabinetIdentity(r.ministerName)));
 
-    state.ministries.forEach(function(min, i) {
-        var partnerSeats=(state.coalitionAgreements||[]).filter(a=>a.partner!==mandatarParty&&state.coalitionParties.includes(a.partner)&&a.ministriesCount>0),assigned=partnerSeats.flatMap(a=>Array(Math.min(state.ministries.length,a.ministriesCount)).fill(a.partner));
-        var owner=assigned[i]||mandatarParty,pool=cabinetCandidateRegistry(state,owner,catalogue).filter(c=>!cabinetReservedName(state,c.name)&&!proposal.some(m=>cabinetIdentity(m.ministerName)===cabinetIdentity(c.name)));
-        var cand=pool[0];
+    st.ministries.forEach(function(min, i) {
+        var owner=allocation.owners.get(min.id)||mandatarParty,old=keep.find(r=>r.ministryId===min.id),pool=cabinetCandidateRegistry(st,owner,catalogue).filter(c=>!cabinetReservedName(st,c.name)&&!proposal.some(m=>cabinetIdentity(m.ministerName)===cabinetIdentity(c.name)));
+        var cand=(old&&pool.find(c=>cabinetIdentity(c.name)===cabinetIdentity(old.ministerName)))||pool.find(c=>!reserved.has(cabinetIdentity(c.name)));
         proposal.push({
             ministryId: min.id,
             ministryName: min.name,
             party: owner,
             ministerName: cand ? cand.name : '',
-            competence: cand ? Math.min(95, (cand.loyalty||75) + 5 + (typeof shadowCandidateBonus==='function'?shadowCandidateBonus(state,cand.id,cand.name,owner):0)) : 85,
+            competence: cand ? Math.min(95, (cand.loyalty||75) + 5 + (typeof shadowCandidateBonus==='function'?shadowCandidateBonus(st,cand.id,cand.name,owner):0)) : 85,
             ministerCandidateId: cand ? cand.id : null,
             loyalty: cand ? (cand.loyalty||75) : 90,
             isCustom: false
@@ -2818,9 +2817,9 @@ function renderCabinetSelectionModal() {
             '<button class="btn-top" onclick="toggleModal(\'interactiveActionModal\', false)">Mbyll ✕</button>' +
         '</div>' +
         '<p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">' +
-            'Zgjidhni ministrat për secilën ministri. Mund të ndryshoni emrin ose partinë politike. Kabineti do të paraqitet për votim në Kuvend.' +
+            'Ministritë respektojnë marrëveshjen e koalicionit. Zgjidhni ministrat e partisë suaj; emërimet e partnerit i propozon partneri. Kabineti do të paraqitet për votim në Kuvend.' +
         '</p>' +
-        '<div style="max-height:480px; overflow-y:auto; margin-bottom:10px;">' + rowsHtml + '</div>' +
+        cabinetPortfolioSummary()+'<div style="max-height:480px; overflow-y:auto; margin-bottom:10px;">' + rowsHtml + '</div>' +
         '<div style="display:flex; gap:6px; flex-wrap:wrap;">' +
             '<button class="action-btn btn-gold" onclick="confirmCabinetProposal()">✅ Konfirmo Kabinetin</button>' +
             '<button class="action-btn btn-outline" onclick="resetCabinetProposal()">🔄 Rikthe Propozimin Automatik</button>' +
@@ -2888,7 +2887,7 @@ function confirmCabinetProposal() {
 function resetCabinetProposal() {
     if(state.mandatar!==state.playerParty){showToast('Formimi i kabinetit i takon mandatarit aktual.');return false;}
     if (!constituentGovernmentGate()) return false;
-    state.cabinetProposal = buildDefaultCabinetProposal();
+    try{state.cabinetProposal=buildDefaultCabinetProposal();}catch(error){showToast(error.message);return false;}
     state.cabinetApproved = false;
     renderCabinetSelectionModal();
 }
@@ -4576,6 +4575,9 @@ function evaluateCoalitionRound3(targetPartyId) {
     var rel = myP.relations[targetPartyId] || 40;
 
     var checkedMins = Array.from(document.querySelectorAll(".neg-min-check:checked")).map(function(el) { return parseInt(el.value, 10); });
+    if(checkedMins.some(i=>!Number.isInteger(i)||!state.ministries[i])||new Set(checkedMins).size!==checkedMins.length){showToast('Zgjidhni ministri të vlefshme pa përsëritje.');return false;}
+    var conflict=state.coalitionAgreements.find(a=>a.honored!==false&&a.partner!==targetPartyId&&state.coalitionParties.includes(a.partner)&&(a.ministryIds||state.ministries.filter(m=>m.party===(a.recipientParty||a.partner)).map(m=>m.id)).some(id=>checkedMins.some(i=>state.ministries[i].id===id)));
+    if(conflict){showToast('Një nga këto ministri është rezervuar për një partner tjetër. Rishiko ofertën.');return false;}
     var offerDepPMEl = document.getElementById("negOfferDeputyPM");
     var offerSpeakerEl = document.getElementById("negOfferSpeaker");
     var offerPresEl = document.getElementById("negOfferPresConsensus");
@@ -4626,11 +4628,15 @@ function evaluateCoalitionRound3(targetPartyId) {
         state.coalitionAgreements.push({
             partner: targetPartyId,
             ministriesCount: checkedMins.length,
+            ministryIds: checkedMins.map(i=>state.ministries[i].id),
+            recipientParty: receivingParty,
+            allocationSource: 'NEGOTIATED',
             deputyPM: offerDepPM,
             speaker: offerSpeaker,
             conditions: checkedMins.length + " Ministri" + (offerSpeaker ? " + Kryeparlamentari" : ""),
             honored: true
         });
+        if(!state.governmentFormed){state.cabinetProposal=null;state.cabinetApproved=false;}
 
         politicalSceneJournal("coalition:"+targetPartyId,"COALITION","Marr\u00ebveshja e koalicionit u pranua pas shqyrtimit t\u00eb ofert\u00ebs.","COMPLETED");
         toggleModal("interactiveActionModal", false);
@@ -4714,7 +4720,7 @@ function getMajorityBadgeClass(law) {
 
 function renderAssemblySection() {
     var speakerEl = document.getElementById("speakerNameBadge");
-    if (speakerEl) speakerEl.textContent = "Kryetar/e: " + state.speakerOfAssembly;
+    if (speakerEl) speakerEl.textContent = "Kryetar/e: " + constituentSpeakerLabel(state);
 
     var grid = document.getElementById("parliamentSeats");
     if (grid) {

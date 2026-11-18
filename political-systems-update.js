@@ -60,7 +60,8 @@ function cabinetProposalProblem(st){
     const rows=st.cabinetProposal||[];
     if(rows.length!==st.ministries.length||new Set(rows.map(m=>m.ministryId)).size!==rows.length)return 'Kabineti duhet të përmbajë çdo ministri vetëm një herë.';
     if(rows.some(r=>!st.ministries.some(m=>m.id===r.ministryId)||!st.coalitionParties.includes(r.party)))return 'Ministri ose subjekt jashtë marrëveshjes së koalicionit.';
-    for(const a of st.coalitionAgreements||[])if(st.coalitionParties.includes(a.partner)&&rows.filter(r=>r.party===a.partner).length!==a.ministriesCount)return 'Respektoni ministritë e rezervuara për partnerët e koalicionit.';
+    let allocation;try{allocation=coalitionCabinetAllocation(st);}catch(error){return error.message;}
+    if(rows.some(r=>allocation.owners.get(r.ministryId)!==r.party))return 'Kabineti duhet të respektojë ministritë konkrete të marrëveshjes së koalicionit.';
     for(let i=0;i<rows.length;i++)if(!cabinetNomineeAvailable(st,rows[i].ministerName,rows,i))return 'Kryeministri/Kryetari i Kuvendit nuk emërohet ministër dhe një person nuk mban dy ministri.';
     return '';
 }
