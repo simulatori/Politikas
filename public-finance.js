@@ -286,6 +286,7 @@ function confirmFiscalDecision(id){
     if(!['RESERVE','REPAY','BORROW'].includes(p.kind)){var authorization=fiscalSpendingCheck(p.costB,false);if(!authorization.allowed){showToast(authorization.message);return false;}}
     var ok=fiscalCommit(function(){
         var d=Object.assign({},p,{status:p.weeks?'ACTIVE':'COMPLETED',startTurn:state.turnCount,elapsed:0,lastTurn:state.turnCount});
+        if(typeof stampContextAction==='function')stampContextAction(d,p.kind==='TAX'?'TAX':'FISCAL');if(p.kind==='TAX')d.previousRates={...state.taxPolicy};
         if(p.kind==='BORROW'){
             fiscalAttachInstrument(d,state);
             var reserve=p.data.purpose==='EMERGENCY'?p.data.amountB*.5:0;

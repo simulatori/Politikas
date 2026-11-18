@@ -2894,7 +2894,7 @@ function resetCabinetProposal() {
 
 function applyCabinetProposalToState(authorization) {
     const approvedInstitutionalVote=authorization===GOVERNMENT_VOTE_COMMIT&&_committingVote&&state.pendingVote?.data.pro>=61&&!state.pendingVote.finalized;
-    if(state.mandatar!==state.playerParty&&!approvedInstitutionalVote){showToast('Formimi i kabinetit i takon mandatarit aktual.');return false;}
+    if(state.mandatar!==state.playerParty&&!approvedInstitutionalVote&&!(typeof autonomousGovernmentVoteAuthorized==='function'&&autonomousGovernmentVoteAuthorized(authorization))){showToast('Formimi i kabinetit i takon mandatarit aktual.');return false;}
     if (!constituentGovernmentGate()) return false;
     if (!state.cabinetProposal) return;
     var problem=cabinetProposalProblem(state);if(problem)throw Error(problem);
@@ -4636,6 +4636,7 @@ function evaluateCoalitionRound3(targetPartyId) {
             conditions: checkedMins.length + " Ministri" + (offerSpeaker ? " + Kryeparlamentari" : ""),
             honored: true
         });
+        if(typeof stampContextAction==='function')stampContextAction(state.coalitionAgreements.at(-1),'COALITION');
         if(!state.governmentFormed){state.cabinetProposal=null;state.cabinetApproved=false;}
 
         politicalSceneJournal("coalition:"+targetPartyId,"COALITION","Marr\u00ebveshja e koalicionit u pranua pas shqyrtimit t\u00eb ofert\u00ebs.","COMPLETED");
@@ -5229,6 +5230,7 @@ function recordBillSubmission(law) {
     law.status = "SUBMITTED";
     law.stage = "Dorëzuar në Kuvend";
     law.submittedWeek = state.turnCount;
+    if(typeof stampContextAction==='function'){stampContextAction(law,'LAW');law.contextAction.stage='SUBMITTED';}
     law.stageHistory=law.stageHistory||[];law.stageHistory.push({ stage: "SUBMITTED", week: state.turnCount });
     try{if(!isSpecialRepealLaw(law))registerAssemblyObstruction(law);validateLoadedState(state);if(!saveGameAuto())throw Error('Ruajtja deshtoi.');}catch(error){state=JSON.parse(beforeSubmission);showToast(error.message);return false;}
     addMediaNews("Kuvendi i Kosovës", "Projektligji \"" + law.title + "\" u dorëzua në Kuvend.", "NEUTRAL");
@@ -7872,7 +7874,7 @@ window.promptAdvanceTime = function(weeks) {
 
 function processExistingTimeAdvance(weeksCount, silentToast) {
     if(associationUltimatumPending(state)){showToast('Vendosni per ultimatumin e QUINT-it perpara kalimit te kohes.');return false;}
-    if (!constituentGovernmentGate(true)) {showToast("Përfundoni seancën konstituive përpara se të kaloni në javën tjetër.");return;}
+    if (!constituentGovernmentGate(true) && !(typeof outsideAssemblyTransition==='function'&&outsideAssemblyTransition(state))) {showToast("Përfundoni seancën konstituive përpara se të kaloni në javën tjetër.");return;}
     if (hasOpenElectionProcess()) { showToast("Përfundoni votimin dhe numërimin para kalimit të javës."); return; }
     if (state && state.pendingVote) { showToast("Përfundoni votimin para kalimit të kohës."); return; }
     if (typeof weeksCount === "undefined") weeksCount = 1;
@@ -8332,6 +8334,7 @@ function catalogBillDetails(i) {
 function catalogGovernmentDecision(i,decision) {
     if(!assertGovernmentAuthority('Vendimi i Qeverisë'))return false;
     var l=state.laws[i];if(!l || l.status!=='DRAFT' || !l.govRequired)return false;
+    var contextBefore=JSON.stringify(state);
     if(decision==='REVIEW'){
         if(!['DRAFT','RETURNED'].includes(l.govStage))return false;
         l.govStage='REVIEW';l.govReviewTurn=state.turnCount;
@@ -8340,9 +8343,11 @@ function catalogGovernmentDecision(i,decision) {
         if(l.govStage!=='REVIEW' || state.turnCount<=l.govReviewTurn){showToast('Shqyrtimi qeveritar kërkon të paktën një javë.');return false;}
         if(!['APPROVED','RETURNED','REJECTED'].includes(decision))return false;
         if(decision==='APPROVED' && l.costB>state.budgetTotalB){showToast('Mungojnë fondet për koston e propozuar.');return false;}
-        l.govStage=decision;if(decision==='REJECTED'){l.status='FAILED';l.failureReason='Refuzuar me vendim të Qeverisë në simulim.';}
+        l.govStage=decision;if(typeof stampContextAction==='function'){stampContextAction(l,'LAW');l.contextAction.stage=decision;}if(decision==='REJECTED'){l.status='FAILED';l.failureReason='Refuzuar me vendim të Qeverisë në simulim.';}
     }
-    l.stageHistory.push({stage:l.govStage,week:state.turnCount});catalogCommit();return true;
+    l.stageHistory.push({stage:l.govStage,week:state.turnCount});
+    try{if(!saveGameAuto())throw Error('Vendimi nuk u ruajt. Provo përsëri.');}catch(e){state=JSON.parse(contextBefore);showToast(e.message);return false;}
+    catalogCommit();return true;
 }
 function catalogRevise(i) {
     if(!assertBillInitiator(state.laws[i]))return false;
