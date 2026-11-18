@@ -6,7 +6,7 @@ function electoralListEditable(st,list){
     if(!list || list.status!=='DRAFT')return false;
     if(list.cycleKey.startsWith('preparation:'))return st.electionPhase==='NONE';
     var c=st.electionCampaign;
-    return list.cycleKey===electoralListCycleKey(st) && st.electionPhase==='CAMPAIGN' && c && (c.status===undefined || c.status==='ACTIVE') && st.turnCount<(c.electionTurn??c.startWeek+3);
+    return list.cycleKey===electoralListCycleKey(st) && st.electionPhase==='CAMPAIGN' && c && (c.status===undefined || ['ACTIVE','READY'].includes(c.status)) && !getElectionDayCycle(st);
 }
 function electoralParticipantIds(st){if(st.electionCountConfiguration?.participants)return st.electionCountConfiguration.participants.slice();return Array.from(new Set(Object.keys(st.parties).concat(Object.keys(st.candidateRegistry||{}).filter(function(id){return Object.hasOwn(PROVIDED_CANDIDATE_LISTS,id);})))) ;}
 function currentElectionDraw(st){st=st||state;var id=electionDayCycleId(st);return (st.electoralDraws||[]).find(function(d){return d.cycleId===id;})||null;}

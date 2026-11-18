@@ -76,7 +76,7 @@
         
         <div class="start-footer">
             <span class="start-tag" data-legislature-label>Legjislatura XI</span>
-            <span class="start-tag">Loja v128</span>
+            <span class="start-tag">Loja v130</span>
         </div>
     </div>
     <div class="start-content start-auth-step" id="startAuthStep" hidden aria-labelledby="startAuthTitle">
@@ -142,7 +142,7 @@
         <button type="button" class="action-btn" onclick="document.getElementById('localBackupFile').click()">Ngarko kopjen JSON</button>
         <input type="file" id="localBackupFile" accept=".json,application/json" hidden onchange="importLocalGameBackup(this)">
         <section class="card" aria-labelledby="pwaUpdateTitle">
-            <p id="pwaVersion">Loja v128</p>
+            <p id="pwaVersion">Loja v130</p>
             <h3 id="pwaUpdateTitle">Versioni i lojës dhe përditësimet</h3>
             <p id="pwaUpdateStatus" role="status" aria-live="polite">Përditësimet kontrollohen kur hapet loja online. Ruajtjet lokale ruhen veçmas nga cache-i.</p>
             <button type="button" class="action-btn" onclick="window.republikaPWA?.check()">Kontrollo përditësimet</button>
@@ -1248,6 +1248,10 @@
 <script src="party-ground-game.js" defer></script>
 <script src="party-local-elections.js" defer></script>
 <script src="party-political-episodes.js" defer></script>
+<script src="context-events-data.js" defer></script>
+<script src="context-events.js" defer></script>
+<script src="context-events-integration.js" defer></script>
+<script src="autonomous-institutions.js" defer></script>
 <script type="module">
     // Dynamic CDN imports keep guest play working even when Firebase cannot load.
     try {

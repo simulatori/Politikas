@@ -145,8 +145,8 @@ function resolveMandatarOffer(choice){
         t.status='READY_VOTE';t.reply=choice==='REFUSE'?'Oferta u refuzua. Mandatari siguroi partnerë të tjerë dhe thërret votimin e Qeverisë.':'Oferta u pranua. Koalicioni e paraqet kabinetin në Kuvend.';
     });if(!ok)return false;toggleModal('interactiveActionModal',false);return voteMandatarGovernment();
 }
-function installApprovedGovernment(pro){
-    if(applyCabinetProposalToState(GOVERNMENT_VOTE_COMMIT)===false)throw Error('Kabineti i votuar nuk u instalua.');state.governmentFormed=true;state.primeMinister=state.parties[state.mandatar].leader+' ('+state.parties[state.mandatar].short+')';state.governmentApprovalWeek=state.turnCount;state.governmentStartedAt=constituentStamp();
+function installApprovedGovernment(pro,authorization=GOVERNMENT_VOTE_COMMIT){
+    if(applyCabinetProposalToState(authorization)===false)throw Error('Kabineti i votuar nuk u instalua.');state.governmentFormed=true;state.primeMinister=state.parties[state.mandatar].leader+' ('+state.parties[state.mandatar].short+')';state.governmentApprovalWeek=state.turnCount;state.governmentStartedAt=constituentStamp();
     const attempt=state.governmentFormationAttempts?.at(-1);if(attempt){attempt.status='APPROVED';attempt.decidedAt=constituentStamp();}if(state.previousGovernment)state.previousGovernment.status='REPLACED';
     setInstitutionalPhase(INSTITUTIONAL_PHASES.GOV_IN_OFFICE,'Qeveria u miratua me '+pro+' vota.');syncDeputyGovernment();if(agendaExecutive(state))activateElectoralPromises(state);
 }
