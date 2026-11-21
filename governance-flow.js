@@ -53,7 +53,7 @@ function refreshVisibleGameUI(){
     renderPoliticalRoleUI({light:true});renderPostElectionInvitation();reconcileGovernmentNotificationAudience();renderUrgentSituations();renderGovernmentDecisionStatus();
     if(!weeklyProcessing)reconcileWeeklyTransition();renderPendingGovernmentDialogs();
     const view=document.querySelector('.tab-view.active');if(view)uiEnhanceDetails(view);
-    saveGameAuto();
+    if(typeof scheduleUIAutosave==='function')scheduleUIAutosave();else saveGameAuto();
 }
 function playerPoliticalSupport(st){return agendaExecutive(st)?st.approval:(st.parties[st.playerParty]?.poll||0);}
 function reservedPrimeMinisterCandidate(mp,composition){
