@@ -15,10 +15,12 @@ function contextConferenceSource(plan){
 }
 conferenceSourceRecord=function(st,s){return s.kind==='CONTEXT'?contextRecord(s.contextEvent?.event||{},st):ctxConferenceRecord(st,s);};
 conferenceSources=function(st){
- const original=ctxConferenceSources(st),eligible=contextEventManager.eligible(st),critical=eligible.find(x=>x.event.active);
+ const eligible=contextEventManager.eligible(st),critical=eligible.find(x=>x.event.active);
  // A current severe crisis takes precedence; unrelated generic topics wait.
  if(critical){const plan=contextEventManager.build(critical.event,st);return [contextConferenceSource(plan)];}
  const additions=eligible.filter(x=>x.event.player_owned).map(x=>contextConferenceSource(contextEventManager.build(x.event,st)));
+ if(!agendaExecutive(st))return additions;
+ const original=ctxConferenceSources(st);
  return additions.concat(original.filter(s=>!additions.some(a=>a.ref===s.ref&&['LAW','CASE','PAYMENT'].includes(s.kind))));
 };
 conferenceBuildQuestion=function(source,index,id,st=state){
@@ -101,10 +103,10 @@ chooseLiveSpeech=function(id,step,code){const r=liveSpeechRecord(id);if(!r||r.ch
 openLiveSpeech=function(id){refreshChangedSpeech(id);return ctxOpenSpeech(id);};
 finishLiveSpeech=function(id){const r=liveSpeechRecord(id);if(r?.choices.length===5&&['INVITED','DRAFT'].includes(r.status)&&refreshChangedSpeech(id))return false;return ctxSpeechFinish(id);};
 function contextDebateScript(r,st=state){
- const plans=Array.from({length:5},(_,step)=>GenerateDebateQuestion(st,{step,actionIndex:step===3?1:step===4?2:0}));if(!plans[0])return null;
+ const contextSnapshot=deriveEventContext(st),plans=Array.from({length:5},(_,step)=>GenerateDebateQuestion(st,{step,actionIndex:step===3?1:step===4?2:0,contextSnapshot}));if(!plans[0])return null;
  const old=r.script||[],frames=plans.map((p,step)=>step<r.answers.length?r.contextFrames?.[step]||null:p);
  const script=plans.map((plan,step)=>{if(step<r.answers.length)return old[step];const codes=new Set(step?['PRAGMATIC','POPULIST','DIPLOMATIC']:['DEFAULT']);if(step===r.answers.length&&step)codes.add(r.answers.at(-1).code);
-  return Object.fromEntries([...codes].map(previous=>{const q=GenerateDebateQuestion(st,{step,actionIndex:step===3?1:step===4?2:0,previousAnswer:previous});return [previous,{question:q.question,contextFrame:step}];}));});
+  return Object.fromEntries([...codes].map(previous=>{const q=GenerateDebateQuestion(st,{step,actionIndex:step===3?1:step===4?2:0,previousAnswer:previous,contextSnapshot});return [previous,{question:q.question,contextFrame:step}];}));});
  return {script,frames};
 }
 function attachContextDebate(r,st=state){const plan=GenerateDebateQuestion(st);if(!plan)return false;const built=contextDebateScript(r,st);r.contextEvent=plan;r.script=built.script;r.contextFrames=built.frames;r.scriptVersion=2;r.snapshot.quality=crisisSectorMetric(st,plan.sector);r.snapshot.contextSnapshotTurn=st.turnCount;r.snapshot.inflation=st.inflation;r.snapshot.unemployment=st.unemployment;if(CAREER_DEBATE_TOPICS[plan.topic])r.topic=plan.topic;return true;}

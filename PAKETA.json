@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-18",
-  "cacheVersion": "v130",
+  "generated": "2026-11-21",
+  "cacheVersion": "v131",
   "files": [
     {
       "file": "agreement-documents.js",
@@ -99,8 +99,8 @@
     },
     {
       "file": "career-debates.js",
-      "bytes": 17573,
-      "sha256": "3ff355bb14d613804cc2e9ea228286e64017c16d4fc8d253c2d90865aeb4725e"
+      "bytes": 17488,
+      "sha256": "a14821052370cba6f21208219368176bfab9555af78c297a9d9bf1dcd17bb69b"
     },
     {
       "file": "catalog-view.js",
@@ -189,13 +189,13 @@
     },
     {
       "file": "context-events-integration.js",
-      "bytes": 22605,
-      "sha256": "b6cb02aa9d529d9983e21cd2d86e4d5d1e6ddbfbe0b323acb99bbdbaee62b889"
+      "bytes": 22727,
+      "sha256": "5ed307828cdc61e4e294618527dd91f77a3250df8c14bab954c05f2ca7e76ad8"
     },
     {
       "file": "context-events.js",
-      "bytes": 16052,
-      "sha256": "777018fd9729cbe4b5332245c6e0134ac5d27bbe0dc6128df49efb482734433d"
+      "bytes": 16452,
+      "sha256": "9ca651946654982daa4efc0da9acf0d16b25ac9f7535af62ea14217d27397f03"
     },
     {
       "file": "contextual-meetings.js",
@@ -634,8 +634,8 @@
     },
     {
       "file": "governance-flow.js",
-      "bytes": 21814,
-      "sha256": "9766f58fb2d7a260292073b13b4390d1f00f064789e75a8c1789c294c8e1ac5a"
+      "bytes": 21882,
+      "sha256": "c348a4cf78307488ee3cb79b76d49728fdb3c8db23f8005f6fa9cb4dbda4a5ed"
     },
     {
       "file": "governing-challenges-ui.js",
@@ -699,8 +699,8 @@
     },
     {
       "file": "index.html",
-      "bytes": 102516,
-      "sha256": "443195e716a8da979b1b6feafa120a6b61394472a6ca4c4cb17fcbb633b67b39"
+      "bytes": 102624,
+      "sha256": "63eeb01b0d79a90122cc24dfe090dcf5d82c2fe5dea34f959fbdeb2245cab44e"
     },
     {
       "file": "influence-network.js",
@@ -828,6 +828,16 @@
       "sha256": "219d2e441ab302a8f4a1ab961b1a9d35c4f5744002047877c7a8b18d43e98589"
     },
     {
+      "file": "local-save-storage.js",
+      "bytes": 5386,
+      "sha256": "ad0e30ef6cfa75b7b64762057844a979a2e61709e3c3af43523e56060aa5a90c"
+    },
+    {
+      "file": "local-save-worker.js",
+      "bytes": 223,
+      "sha256": "5640a76f5c9e97e5673aeea1c62df92bbe272336b63b823e514ec0c1e82478f5"
+    },
+    {
       "file": "logo.png",
       "bytes": 10852,
       "sha256": "8b452b84c3f4f1ad376ea1fd5cab4a9b2b2100dc4c2c6266718e095970c897e0"
@@ -943,6 +953,11 @@
       "sha256": "063b4b4372d8dbf119e450169953c47265b18e6e199a90dca5a4b061d37295ad"
     },
     {
+      "file": "party-context-dialogue.js",
+      "bytes": 17032,
+      "sha256": "2431e77afa37dba8c6122742a8041bdd6ac37f1613bbc2f26f34d162c1ea6b4f"
+    },
+    {
       "file": "party-ground-game.js",
       "bytes": 27724,
       "sha256": "83b6566bb5db644b9f95c5378f02531ec9b2b966f9f411a0655f65f1858b56f3"
@@ -999,8 +1014,8 @@
     },
     {
       "file": "political-life-ui.js",
-      "bytes": 20957,
-      "sha256": "c8429826fe0a9a76558038cca9193bb552a2f244ff54d448daf8224ea90035db"
+      "bytes": 21160,
+      "sha256": "abd8344e428ab5439e764e430e61e281e960f6962498fe92b8ef8d739e646114"
     },
     {
       "file": "political-life.css",
@@ -1019,8 +1034,8 @@
     },
     {
       "file": "political-systems-update.js",
-      "bytes": 6305,
-      "sha256": "b525b5e587ff3f77811ca8145bb0b2dd6b97e9f102372507c69e4e681fe267ba"
+      "bytes": 6561,
+      "sha256": "bce8601d543184b0966e474f3098bd36d482bcff8f974020f2c1d43e73b4d3f8"
     },
     {
       "file": "population.js",
@@ -1090,7 +1105,7 @@
     {
       "file": "pwa-registration.js",
       "bytes": 5261,
-      "sha256": "904c52e4334357b310b5a376c95bc0afabe5624083cdf5460067fe007fd63f43"
+      "sha256": "4ed611790ee63e875a8eae64e3f0814e33fb15e6e09dd86f5fcc3af82c5d29f5"
     },
     {
       "file": "regular-cabinet.js",
@@ -1159,8 +1174,8 @@
     },
     {
       "file": "service-worker.js",
-      "bytes": 9949,
-      "sha256": "5c2105ca57f4bb9557c81d53c39b25ffa39fa4e75215aae08264dd066a47d07c"
+      "bytes": 10045,
+      "sha256": "2344d6ce691ff851459d687c74e3522d2ab81cdc2cd3068456f9c5a62f27a80e"
     },
     {
       "file": "shadow-cabinet.js",
