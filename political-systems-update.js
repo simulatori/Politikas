@@ -1,14 +1,12 @@
 /* Shared appointment constraints and lossless local-save codec. */
-function packLocalSlots(slots,maxChars=64000000){
-    const text=JSON.stringify(slots).replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
-    if(text.length>maxChars)throw Error('Ruajtja tejkalon kufirin e dekompresimit.');
-    const dict=new Map();let next=256,word='',out=[];
-    for(const ch of text){const joined=word+ch;if(word===''||dict.has(joined)){word=joined;continue;}
-        out.push(String.fromCharCode((word.length===1?word.charCodeAt(0):dict.get(word))+1));
-        if(next<65534)dict.set(joined,next++);word=ch;
-    }
-    if(word)out.push(String.fromCharCode((word.length===1?word.charCodeAt(0):dict.get(word))+1));
-    return 'RKS-LZW1:'+out.join('');
+function packLocalSlots(slots,maxChars=64000000){return packLocalJSON(JSON.stringify(slots),maxChars);}
+function packLocalJSON(json,maxChars=64000000){
+ const text=json.replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
+ if(text.length>maxChars)throw Error('Ruajtja tejkalon kufirin e dekompresimit.');
+ if(!text.length)return 'RKS-LZW1:';
+ const dict=new Map(),out=[];let next=256,word=text.charCodeAt(0);
+ for(let i=1;i<text.length;i++){const ch=text.charCodeAt(i),key=word*256+ch,code=dict.get(key);if(code!==undefined){word=code;continue;}out.push(String.fromCharCode(word+1));if(next<65534)dict.set(key,next++);word=ch;}
+ out.push(String.fromCharCode(word+1));return 'RKS-LZW1:'+out.join('');
 }
 function unpackLocalSlots(raw,maxChars=64000000){
     if(!raw?.startsWith('RKS-LZW1:'))return JSON.parse(raw);
@@ -76,14 +74,15 @@ function priorityCandidateOrder(a,b,metadata,seed){
     return b.personalVotes-a.personalVotes||assemblyDraw(seed,a.id)-assemblyDraw(seed,b.id)||a.id.localeCompare(b.id);
 }
 
-// Keep the last good autosave intact until the browser accepts its replacement.
+// Keep the last good autosave intact; unchanged UI refreshes never rewrite it.
+let lastAutosaveJSON=null,lastAutosaveRaw=null,preferCompressedAutosave=false;
 function writeLocalAutosave(st){
  const json=JSON.stringify(st);
- try{localStorage.setItem(STORAGE_KEY_AUTO,json);return;}
- catch(error){if(error?.name!=='QuotaExceededError')throw error;}
- const packed=packLocalSlots(st);
- try{localStorage.setItem(STORAGE_KEY_AUTO,packed);return;}
- catch(error){if(error?.name!=='QuotaExceededError')throw error;}
- if(compactExistingLocalSlots()){localStorage.setItem(STORAGE_KEY_AUTO,packed);return;}
- const error=new Error('Hapësira lokale nuk mjafton për këtë hap. Eksporto lojën dhe liro hapësirë në shfletues.');error.name='QuotaExceededError';throw error;
+ if(json===lastAutosaveJSON&&localStorage.getItem(STORAGE_KEY_AUTO)===lastAutosaveRaw)return;
+ function write(raw){localStorage.setItem(STORAGE_KEY_AUTO,raw);lastAutosaveJSON=json;lastAutosaveRaw=raw;}
+ if(!preferCompressedAutosave)try{write(json);return;}catch(error){if(error?.name!=='QuotaExceededError')throw error;preferCompressedAutosave=true;}
+ const packed=packLocalJSON(json);
+ try{write(packed);return;}catch(error){if(error?.name!=='QuotaExceededError')throw error;}
+ if(compactExistingLocalSlots()){write(packed);return;}
+ const error=new Error('Hapësira e autoruajtjes nuk mjafton. Ruaje në një slot lokal ose eksporto kopjen.');error.name='QuotaExceededError';throw error;
 }
